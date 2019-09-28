@@ -391,3 +391,5 @@ MigrationBackup/
 # tesseViewer
 tesseViewer/data/font/
 tesseViewer/data/shader/gen.*
+compile_flags.txt
+.vscode/tasks.json
