@@ -17,29 +17,29 @@ void main(int argc, char* argv[]) {
 	options_description ui_option("ui_option");
 
 	options.add_options()
-		("help,h", "ƒwƒ‹ƒv‚ğ•\¦")
-		("version,v", "ƒo[ƒWƒ‡ƒ“î•ñ")
-		("object,o", value<std::string>()->default_value(MODEL "cube_uv.sdmj"), "•\¦ƒ‚ƒfƒ‹");
+		("help,h", "ãƒ˜ãƒ«ãƒ—ã‚’è¡¨ç¤º")
+		("version,v", "ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±")
+		("object,o", value<std::string>()->default_value(MODEL "cube_uv.sdmj"), "è¡¨ç¤ºãƒ¢ãƒ‡ãƒ«");
 
 	window_option.add_options()
-		(GLAPP_CONFIG_FULLSCREEN ",f", "‘S‰æ–Ê•\¦")
-		(GLAPP_CONFIG_RESOLUTION_X, value<int>()->default_value(1280), "‰¡‰ğ‘œ“x")
-		(GLAPP_CONFIG_RESOLUTION_Y, value<int>()->default_value(720), "c‰ğ‘œ“x")
+		(GLAPP_CONFIG_FULLSCREEN ",f", "å…¨ç”»é¢è¡¨ç¤º")
+		(GLAPP_CONFIG_RESOLUTION_X, value<int>()->default_value(1280), "æ¨ªè§£åƒåº¦")
+		(GLAPP_CONFIG_RESOLUTION_Y, value<int>()->default_value(720), "ç¸¦è§£åƒåº¦")
 		(GLAPP_CONFIG_FOV, value<float>()->default_value(60.f), "Fov")
 		(GLAPP_CONFIG_VSYNC, value<bool>()->default_value(true), "VSync");
 
 	graphics_option.add_options()
-		(GLAPP_CONFIG_PATCH_TYPE_GREGORY ",g", "Patch Type ‚É GREGORY_BASIS ‚ğg—p")
-		(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT ",p", value<int>()->default_value(2), "ƒfƒtƒHƒ‹ƒgƒpƒbƒ`ƒŒƒxƒ‹")
-		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>()->default_value(6), "Å‘åƒpƒbƒ`ƒŒƒxƒ‹")
-		(GLAPP_CONFIG_TESS_LEVEL_DEFAULT ",t", value<int>()->default_value(1), "ƒfƒtƒHƒ‹ƒgƒeƒbƒZƒŒ[ƒVƒ‡ƒ“ŒW”")
-		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>()->default_value(6), "Å‘åƒeƒbƒZƒŒ[ƒVƒ‡ƒ“ŒW”");
+		(GLAPP_CONFIG_PATCH_TYPE_GREGORY ",g", "Patch Type ã« GREGORY_BASIS ã‚’ä½¿ç”¨")
+		(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT ",p", value<int>()->default_value(2), "ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ‘ãƒƒãƒãƒ¬ãƒ™ãƒ«")
+		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>()->default_value(6), "æœ€å¤§ãƒ‘ãƒƒãƒãƒ¬ãƒ™ãƒ«")
+		(GLAPP_CONFIG_TESS_LEVEL_DEFAULT ",t", value<int>()->default_value(1), "ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ†ãƒƒã‚»ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ä¿‚æ•°")
+		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>()->default_value(6), "æœ€å¤§ãƒ†ãƒƒã‚»ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ä¿‚æ•°");
 
 	ui_option.add_options()
-		(GLAPP_CONFIG_USER_INTERFACE, value<bool>()->default_value(true), "ƒ†[ƒU[ƒCƒ“ƒ^[ƒtƒFƒCƒX")
-		(GLAPP_CONFIG_FONT_FILE, value<std::string>()->default_value(FONT "ipaexg.ttf"), "g—p‚·‚éƒtƒHƒ“ƒg")
-		(GLAPP_CONFIG_FONT_SIZE, value<int>()->default_value(16), "ƒtƒHƒ“ƒgƒTƒCƒY")
-		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>()->default_value(0), "ƒtƒHƒ“ƒgF");
+		(GLAPP_CONFIG_USER_INTERFACE, value<bool>()->default_value(true), "ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹")
+		(GLAPP_CONFIG_FONT_FILE, value<std::string>()->default_value(FONT "ipaexg.ttf"), "ä½¿ç”¨ã™ã‚‹ãƒ•ã‚©ãƒ³ãƒˆ")
+		(GLAPP_CONFIG_FONT_SIZE, value<int>()->default_value(16), "ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º")
+		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>()->default_value(0), "ãƒ•ã‚©ãƒ³ãƒˆè‰²");
 
 	options.add(window_option).add(graphics_option).add(ui_option);
 

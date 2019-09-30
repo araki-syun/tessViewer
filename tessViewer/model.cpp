@@ -242,9 +242,9 @@ namespace tv {
 			glDeleteVertexArrays(1, &vao);
 		glCreateVertexArrays(1, &vao);
 
-		// インデックスバッファ
+		// 繧､繝ｳ繝�繝�繧ｯ繧ｹ繝舌ャ繝輔ぃ
 		glVertexArrayElementBuffer(vao, mesh->GetPatchTable()->GetPatchIndexBuffer());
-		// 頂点バッファ
+		// 鬆らせ繝舌ャ繝輔ぃ
 		const glslProgram& program = shader_manage->Get(default_glsl_info, shader_osd_info);
 		GLuint posIndex = program.GetAttrib("position")->GetIndex(),
 			vertbuf = mesh->BindVertexBuffer();
@@ -256,7 +256,7 @@ namespace tv {
 		glVertexArrayAttribBinding(vao, posIndex, 0);
 		glEnableVertexArrayAttrib(vao, posIndex);
 		
-		// パッチパラメータバッファ
+		// 繝代ャ繝√ヱ繝ｩ繝｡繝ｼ繧ｿ繝舌ャ繝輔ぃ
 		//glActiveTexture(GL_TEXTURE0);
 		//glBindTexture(GL_TEXTURE_BUFFER, mesh->GetPatchTable()->GetPatchParamTextureBuffer());
 		glBindTextureUnit(0, mesh->GetPatchTable()->GetPatchParamTextureBuffer());

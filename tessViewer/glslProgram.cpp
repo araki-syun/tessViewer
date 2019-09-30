@@ -18,7 +18,7 @@ GLuint CompileShader(GLenum type, std::string& src) {
 		GLint logSize;
 		GLint length;
 
-		/* ƒƒO‚Ì’·‚³‚ÍAÅŒã‚ÌNULL•¶š‚àŠÜ‚Ş */
+		/* ãƒ­ã‚°ã®é•·ã•ã¯ã€æœ€å¾Œã®NULLæ–‡å­—ã‚‚å«ã‚€ */
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
 		std::vector<GLchar> log(logSize);
 
@@ -539,7 +539,7 @@ const tv::glShaderUniformBuffer * glslProgram::glsl_info::GetUniformBuffer(const
 		return buffers.at(name).get();
 	}
 	catch (std::out_of_range& e) {
-		std::cout << name << " ‚Í‘¶İ‚µ‚Ü‚¹‚ñ" << std::endl;
+		std::cout << name << " ã¯å­˜åœ¨ã—ã¾ã›ã‚“" << std::endl;
 		throw;
 	}
 }
