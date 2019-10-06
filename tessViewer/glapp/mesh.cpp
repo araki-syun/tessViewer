@@ -62,7 +62,7 @@ namespace glapp{
 	{
 		if(_faceIndices.empty())
 			return NULL;
-		return _faceIndices.data();
+		return reinterpret_cast<const unsigned int*>(_faceIndices.data());
 	}
 
 
@@ -122,14 +122,14 @@ namespace glapp{
 	}
 
 	void mesh::Draw(){
-		
-		const Osd::PatchArrayVector &pav = _osdMesh->GetPatchTable()->GetPatchArrays();
+		// 使用していない
+		/*const Osd::PatchArrayVector &pav = _osdMesh->GetPatchTable()->GetPatchArrays();
 		for(Osd::PatchArray pa : pav){
 			Far::PatchDescriptor desc = pa.GetDescriptor();
 			int numVertPerPatch = desc.GetNumControlVertices();
 			glUseProgram();
 			glPatchParameteri(GL_PATCH_VERTICES, numVertPerPatch);
 			glDrawElements(GL_PATCHES, pa.GetNumPatches() * numVertPerPatch, GL_UNSIGNED_INT, nullptr);
-		}
+		}*/
 	}
 }

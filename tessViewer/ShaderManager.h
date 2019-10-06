@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <stdexcept>
 
 #include "osd_info.h"
 #include "glslProgram.h"
