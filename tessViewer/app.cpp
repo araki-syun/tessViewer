@@ -28,7 +28,7 @@ app::app(boost::program_options::variables_map& vm)
 	setting.graphics_osd_tess_level_default = vm[GLAPP_CONFIG_TESS_LEVEL_DEFAULT].as<int>();
 	setting.graphics_osd_tess_level_max = vm[GLAPP_CONFIG_TESS_LEVEL_MAX].as<int>();
 	setting.ui_user_interface = vm[GLAPP_CONFIG_USER_INTERFACE].as<bool>();
-	setting.ui_font_file = vm[GLAPP_CONFIG_FONT_FILE].as<std::string>();
+	setting.ui_font_file = std::string(FONT R"(ipaexg.ttf)");
 	setting.ui_font_size = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
 	setting.ui_font_color = vm[GLAPP_CONFIG_FONT_COLOR].as<std::uint8_t>();
 	tv::model::default_patch_type = vm.count(GLAPP_CONFIG_PATCH_TYPE_GREGORY) > 0 ?

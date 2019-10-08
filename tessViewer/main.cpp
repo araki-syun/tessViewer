@@ -1,6 +1,7 @@
 #include "app.h"
 
 #include <iostream>
+#include <string>
 #include <boost\program_options.hpp>
 
 #include "location_define.h"
@@ -10,6 +11,7 @@
 #include "glapp\glapp_define.h"
 
 void main(int argc, char* argv[]) {
+	using namespace std::literals::string_literals;
 	using namespace boost::program_options;
 	options_description options("option");
 	options_description window_option("display_option");
@@ -37,7 +39,7 @@ void main(int argc, char* argv[]) {
 
 	ui_option.add_options()
 		(GLAPP_CONFIG_USER_INTERFACE, value<bool>()->default_value(true), "ユーザーインターフェイス")
-		(GLAPP_CONFIG_FONT_FILE, value<std::string>()->default_value(FONT R"(ipaexg.ttf)"), "使用するフォント")
+		//(GLAPP_CONFIG_FONT_FILE, value<std::string>()->default_value(FONT R"(ipaexg.ttf)"), R"(使用するフォント)")
 		(GLAPP_CONFIG_FONT_SIZE, value<int>()->default_value(16), "フォントサイズ")
 		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>()->default_value(0), "フォント色");
 
