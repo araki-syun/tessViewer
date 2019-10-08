@@ -45,15 +45,15 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(LIB_PATH)\boost;$(LIB_PATH)\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(LIB_PATH)\boost\lib;$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options-vc140-mt-gd-1_59.lib;opencv\opencv_core300d.lib;opencv\opencv_highgui300d.lib;opencv\opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_LIB);$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;boost_program_options.lib;opencv\opencv_core300d.lib;opencv\opencv_highgui300d.lib;opencv\opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -64,7 +64,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(LIB_PATH)\boost;$(LIB_PATH)\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -74,8 +74,8 @@
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(LIB_PATH)\boost\lib;$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options-vc140-mt-1_59.lib;opencv\opencv_core300.lib;opencv\opencv_highgui300.lib;opencv\opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(BOOST_LIB);$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300.lib;opencv\opencv_highgui300.lib;opencv\opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
   </ItemDefinitionGroup>
