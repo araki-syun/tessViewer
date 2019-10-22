@@ -3,19 +3,17 @@
 #include <memory>
 #include "glslprogram.h"
 
-namespace glapp{
-	class material
-	{
-	public:
-		material(void);
-		virtual ~material(void);
+namespace glapp {
+class material {
+public:
+	material(void);
+	virtual ~material(void);
 
-		const glslprogram* GetGLSLProgram() const;
+	const glslprogram* GetGLSLProgram() const;
 
-		virtual void Uniform() const = 0;
+	virtual void Uniform() const = 0;
 
-	private:
-		std::shared_ptr<glslprogram> program;
-	};
-}
-
+private:
+	std::shared_ptr<glslprogram> program;
+};
+} // namespace glapp

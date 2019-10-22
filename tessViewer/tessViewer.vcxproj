@@ -58,6 +58,10 @@
       <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300d.lib;opencv\opencv_highgui300d.lib;opencv\opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -80,6 +84,10 @@
       <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300.lib;opencv\opencv_highgui300.lib;opencv\opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />

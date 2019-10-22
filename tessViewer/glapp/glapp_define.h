@@ -23,4 +23,3 @@
 #define GLAPP_CONFIG_FONT_FILE "font_file"
 #define GLAPP_CONFIG_FONT_SIZE "font_size"
 #define GLAPP_CONFIG_FONT_COLOR "font_color"
-

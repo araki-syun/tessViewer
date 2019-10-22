@@ -7,20 +7,14 @@
 
 #include "glapp_define.h"
 
-namespace glapp{
-	glslOSDprogram::glslOSDprogram(void)
-	{
-		
-	}
+namespace glapp {
+glslOSDprogram::glslOSDprogram(void) {}
 
-	glslOSDprogram::~glslOSDprogram(void)
-	{
-		glDeleteProgram(_program);
-	}
+glslOSDprogram::~glslOSDprogram(void) { glDeleteProgram(_program); }
 
-	//const GLuint glslOSDprogram::GetProgram() const{
-	//	return _program;
-	//}
+//const GLuint glslOSDprogram::GetProgram() const{
+//	return _program;
+//}
 
 //	void glslOSDprogram::create(){
 //		_program = glCreateProgram();
@@ -42,8 +36,8 @@ namespace glapp{
 //			GLsizei length;
 //			std::vector<GLchar> log(max_length);
 //			glGetProgramInfoLog(_program, max_length, &length, log.data());
-//			
-//#ifdef GLAPP_GL_COMPILE_ERROR_EXCEPTION 
+//
+//#ifdef GLAPP_GL_COMPILE_ERROR_EXCEPTION
 //			std::string err;
 //			err.append(log.data(), log.size());
 //
@@ -54,62 +48,70 @@ namespace glapp{
 //		}
 //	}
 
-	const GLuint glslOSDprogram::shaderCompile(const glslshader* shader){
-		GLuint id(0);
-		const char* str = includeReplace(shader).c_str();
-		id = glCreateShader(shader->GetType());
-		glShaderSource(id, 1, &str, nullptr);
-		glCompileShader(id);
+const GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
+	GLuint      id(0);
+	const char* str = includeReplace(shader).c_str();
+	id              = glCreateShader(shader->GetType());
+	glShaderSource(id, 1, &str, nullptr);
+	glCompileShader(id);
 
-		// 成否を確認
-		GLint result;
-		glGetShaderiv(id, GL_COMPILE_STATUS, &result);
+	// 成否を確認
+	GLint result;
+	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
-		// ログを取得
-		if (result == GL_FALSE) {
-			// サイズを取得
-			GLint log_length;
-			glGetShaderiv(id, GL_INFO_LOG_LENGTH, &log_length);
+	// ログを取得
+	if (result == GL_FALSE) {
+		// サイズを取得
+		GLint log_length;
+		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &log_length);
 
-			// 文字列を取得
-			GLsizei max_length(log_length);
-			GLsizei length;
-			std::vector<GLchar> log(max_length);
-			glGetShaderInfoLog(id, max_length, &length, log.data());
-			
-#ifdef GLAPP_GL_COMPILE_ERROR_EXCEPTION 
-			std::string err;
-			err.append(log.data(), log.size());
+		// 文字列を取得
+		GLsizei             max_length(log_length);
+		GLsizei             length;
+		std::vector<GLchar> log(max_length);
+		glGetShaderInfoLog(id, max_length, &length, log.data());
 
-			throw std::runtime_error((boost::format("Shader Compile ERROR\n%1%") % err).str());
+#ifdef GLAPP_GL_COMPILE_ERROR_EXCEPTION
+		std::string err;
+		err.append(log.data(), log.size());
+
+		throw std::runtime_error(
+			(boost::format("Shader Compile ERROR\n%1%") % err).str());
 #else
-			err.append(log.data(), log.size());
+		err.append(log.data(), log.size());
 #endif
-			return id;
-		}
+		return id;
 	}
+}
 
-	const std::string& glslOSDprogram::includeReplace(const glslshader* shader){
-		using namespace OpenSubdiv::Osd;
+const std::string& glslOSDprogram::includeReplace(const glslshader* shader) {
+	using namespace OpenSubdiv::Osd;
 
-		std::string src;
-		std::regex common_include("#include <" GLAPP_OSD_COMMON_SOURCE_STRING ">");
-		std::regex vertex_include("#include <" GLAPP_OSD_VERTEX_SOURCE_STRING ">");
-		std::regex tesscont_include("#include <" GLAPP_OSD_TESS_CONTROL_SOURCE_STRING ">");
-		std::regex tesseval_include("#include <" GLAPP_OSD_TESS_EVAL_SOURCE_STRING ">");
+	std::string src;
+	std::regex  common_include("#include <" GLAPP_OSD_COMMON_SOURCE_STRING ">");
+	std::regex  vertex_include("#include <" GLAPP_OSD_VERTEX_SOURCE_STRING ">");
+	std::regex  tesscont_include(
+        "#include <" GLAPP_OSD_TESS_CONTROL_SOURCE_STRING ">");
+	std::regex tesseval_include("#include <" GLAPP_OSD_TESS_EVAL_SOURCE_STRING
+								">");
 
-		src = std::regex_replace(shader->GetSource(), common_include, GLSLPatchShaderSource::GetCommonShaderSource());
-		src = std::regex_replace(src, vertex_include, GLSLPatchShaderSource::GetVertexShaderSource(_type));
-		src = std::regex_replace(src, tesscont_include, GLSLPatchShaderSource::GetTessControlShaderSource(_type));
-		src = std::regex_replace(src, tesseval_include, GLSLPatchShaderSource::GetTessEvalShaderSource(_type));
+	src = std::regex_replace(shader->GetSource(), common_include,
+							 GLSLPatchShaderSource::GetCommonShaderSource());
+	src =
+		std::regex_replace(src, vertex_include,
+						   GLSLPatchShaderSource::GetVertexShaderSource(_type));
+	src = std::regex_replace(
+		src, tesscont_include,
+		GLSLPatchShaderSource::GetTessControlShaderSource(_type));
+	src = std::regex_replace(
+		src, tesseval_include,
+		GLSLPatchShaderSource::GetTessEvalShaderSource(_type));
 
-		return src;
-	}
+	return src;
+}
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-	const std::string& glslOSDprogram::GetError() const{
-		return err;
-	}
+const std::string& glslOSDprogram::GetError() const { return err; }
 #endif
-	
-}
+
+} // namespace glapp

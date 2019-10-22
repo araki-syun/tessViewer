@@ -12,35 +12,33 @@
 
 #define GLAPP_GL_COMPILE_ERROR_EXCEPTION
 
-namespace glapp{
-	class glslshader : boost::noncopyable
-	{
-		friend class glslprogram;
-	public:
-		glslshader(void);
-		glslshader(const std::string& filename);
-		virtual ~glslshader(void);
+namespace glapp {
+class glslshader : boost::noncopyable {
+	friend class glslprogram;
 
-		const GLuint GetShader() const;
-		const std::string& GetSource() const;
-		const GLuint GetType() const;
-		const bool Empty() const;
+public:
+	glslshader(void);
+	glslshader(const std::string& filename);
+	virtual ~glslshader(void);
 
-		//static std::unordered_map<std::string, glslshader> shader_list;
+	const GLuint       GetShader() const;
+	const std::string& GetSource() const;
+	const GLuint       GetType() const;
+	const bool         Empty() const;
 
-	protected:
-		//void Compile();
-		//void includeReplace();
+	//static std::unordered_map<std::string, glslshader> shader_list;
 
-		GLuint _id;
-		std::string _src;
-		GLuint _type;
+protected:
+	//void Compile();
+	//void includeReplace();
+
+	GLuint      _id;
+	std::string _src;
+	GLuint      _type;
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-		const std::string& GetError() const;
-		std::string err;
+	const std::string& GetError() const;
+	std::string        err;
 #endif
-		
-	};
-}
-
+};
+} // namespace glapp

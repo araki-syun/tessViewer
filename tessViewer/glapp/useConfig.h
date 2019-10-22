@@ -2,9 +2,6 @@
 
 #include "config.h"
 
-namespace glapp{
-	Config config;
+namespace glapp {
+Config config;
 }
-
-
-

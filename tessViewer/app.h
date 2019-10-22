@@ -21,26 +21,36 @@
 #include "glQuery.h"
 #include "material.h"
 
-class app
-{
+class app {
 public:
 	app(boost::program_options::variables_map& vm);
 	~app(void);
 	void Run();
 
-	static void osdErrorCallback(OpenSubdiv::Far::ErrorType err, const char *message);
-	static void osdWarningCallback(const char *message);
+	static void osdErrorCallback(OpenSubdiv::Far::ErrorType err,
+								 const char*                message);
+	static void osdWarningCallback(const char* message);
 	static void glfwErrorCallback(int code, const char* message);
 
-	static void KeyDefaultCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
-	static void KeyFlyModeCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void KeyDefaultCallback(
+		GLFWwindow* window, int key, int scancode, int action, int mods);
+	static void KeyFlyModeCallback(
+		GLFWwindow* window, int key, int scancode, int action, int mods);
 	static void DragCameraRotate(GLFWwindow* window, double x, double y);
 	static void DragCameraTranslation(GLFWwindow* window, double x, double y);
 	static void DragCameraFlyMode(GLFWwindow* window, double x, double y);
-	static void MouseButtonDfaultCallback(GLFWwindow* window, int button, int action, int mods);
-	static void MouseButtonFlayModeCallback(GLFWwindow* window, int button, int action, int mods);
-	static void MouseScrollFovCallback(GLFWwindow* window, double up, double down);
-	static void MouseScrollLengthCallback(GLFWwindow* window, double up, double down);
+	static void MouseButtonDfaultCallback(GLFWwindow* window,
+										  int         button,
+										  int         action,
+										  int         mods);
+	static void MouseButtonFlayModeCallback(GLFWwindow* window,
+											int         button,
+											int         action,
+											int         mods);
+	static void
+	MouseScrollFovCallback(GLFWwindow* window, double up, double down);
+	static void
+	MouseScrollLengthCallback(GLFWwindow* window, double up, double down);
 
 	static void WindowResizeCallback(GLFWwindow* window, int x, int y);
 
@@ -50,30 +60,30 @@ private:
 	void UpdateUBO();
 
 	std::unique_ptr<glapp::window> win;
-	std::string current_model;
-	std::vector<tv::model> models;
-	std::shared_ptr<tv::material> material;
+	std::string                    current_model;
+	std::vector<tv::model>         models;
+	std::shared_ptr<tv::material>  material;
 	//std::shared_ptr<glslProgram> shader_default;
 	tv::ShaderManager shader_manage;
 
 	tv::glslStringDraw* draw_string;
-	GLuint default_diffuse_texture=0;
+	GLuint              default_diffuse_texture = 0;
 
-	bool mainloop;
+	bool       mainloop;
 	glm::ivec2 window_size;
-	float frametime;
+	float      frametime;
 	struct Camera {
 		glm::vec3 Pos;
 		glm::vec3 Angle;
 		glm::vec3 LookPoint;
 		glm::vec3 Right;
 		glm::vec3 Up;
-		float Fov;
+		float     Fov;
 		glm::vec2 Move;
-		bool fly_mode;
+		bool      fly_mode;
 	} camera;
-	int tess_fact;
-	int max_tess_fact;
+	int       tess_fact;
+	int       max_tess_fact;
 	glm::vec2 mouseMove;
 	glm::vec2 previousMousePos;
 
@@ -93,27 +103,24 @@ private:
 	} light;
 	struct Tessellation {
 		float TessLevel;
-		void Update(int t) {
-			TessLevel = static_cast<float>(1 << t);
-		}
+		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
 	} tess;
 
 	struct Setting {
-		bool window_full_screen;
-		int window_resolution_x;
-		int window_resolution_y;
-		float window_fov;
-		bool window_vsync;
-		int graphics_osd_patch_level_default;
-		int graphics_osd_patch_level_max;
-		int  graphics_osd_tess_level_default;
-		int graphics_osd_tess_level_max;
-		bool ui_user_interface;
-		std::string ui_font_file;
-		int ui_font_size;
+		bool         window_full_screen;
+		int          window_resolution_x;
+		int          window_resolution_y;
+		float        window_fov;
+		bool         window_vsync;
+		int          graphics_osd_patch_level_default;
+		int          graphics_osd_patch_level_max;
+		int          graphics_osd_tess_level_default;
+		int          graphics_osd_tess_level_max;
+		bool         ui_user_interface;
+		std::string  ui_font_file;
+		int          ui_font_size;
 		std::uint8_t ui_font_color;
 	} setting;
 
 	boost::format formater;
 };
-

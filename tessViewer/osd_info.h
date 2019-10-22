@@ -5,9 +5,15 @@
 #include "opensubdiv\far\patchDescriptor.h"
 
 struct osd_info {
-	enum Elem_Type
-	{
-		FVAR_WIDTH, PATCH_TYPE, NUM_PRIM_PER_VERTEX, IS_ADAPTIVE, SCREEN_SPACE_TESS, FRACTIONAL, PATCH_CULL, SINGLE_CREASE_PATCH
+	enum Elem_Type {
+		FVAR_WIDTH,
+		PATCH_TYPE,
+		NUM_PRIM_PER_VERTEX,
+		IS_ADAPTIVE,
+		SCREEN_SPACE_TESS,
+		FRACTIONAL,
+		PATCH_CULL,
+		SINGLE_CREASE_PATCH
 	};
 	union Element {
 		struct {
@@ -29,6 +35,6 @@ struct osd_info {
 
 	osd_info();
 	osd_info(const osd_info& info);
-	void set(Elem_Type e, unsigned int value);
+	void              set(Elem_Type e, unsigned int value);
 	const std::string str() const;
 };

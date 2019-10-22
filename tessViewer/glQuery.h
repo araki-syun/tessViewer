@@ -2,15 +2,14 @@
 
 #include <GL\glew.h>
 
-class glQuery
-{
+class glQuery {
 public:
 	glQuery() = delete;
 	glQuery(GLenum target);
 	~glQuery();
 
-	void Start();
-	void End();
+	void   Start();
+	void   End();
 	GLuint Get();
 
 private:
@@ -18,4 +17,3 @@ private:
 	GLuint id;
 	GLuint value;
 };
-
