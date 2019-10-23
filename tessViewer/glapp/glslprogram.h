@@ -29,7 +29,7 @@ protected:
 	void                 setIndexAttrib();
 
 protected:
-	GLuint _program;
+	GLuint _program = 0;
 
 	std::array<std::string, 5>             shader_list;
 	std::unordered_map<std::string, GLint> attribList, uniformList;

@@ -65,5 +65,5 @@ private:
 	std::map<std::string, std::unique_ptr<tv::glShaderUniform>>   uniform_map;
 	std::map<std::string, std::unique_ptr<tv::glShaderUniformBlock>>
 		  uniformBlock_map;
-	GLint fragment;
+	GLint fragment = -1;
 };
