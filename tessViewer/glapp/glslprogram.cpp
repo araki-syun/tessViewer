@@ -3,6 +3,11 @@
 #include <boost\format.hpp>
 
 namespace glapp {
+glslprogram::glslprogram(void) {}
+glslprogram::glslprogram(std::initializer_list<std::string> list) {
+	SetShaderName(list);
+}
+glslprogram::~glslprogram(void) {}
 const GLuint glslprogram::GetProgram() const { return _program; }
 
 void glslprogram::SetShaderName(std::initializer_list<std::string> list) {
