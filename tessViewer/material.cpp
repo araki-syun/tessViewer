@@ -2,7 +2,7 @@
 
 namespace tv {
 material::material(const nlohmann::json& j) : texture(0) {
-	for (nlohmann::json& mat : j.array()) {
+	for (auto& mat : j) {
 		auto& element = mat["element"];
 		material_data.emplace_back(element);
 		names.emplace_back(mat["material_name"].get<std::string>());
@@ -22,16 +22,20 @@ material::material(const nlohmann::json& j) : texture(0) {
 	glDeleteBuffers(1, &buffer);
 }
 material::~material() {
-	if (texture)
+	if (texture != 0U) {
 		glDeleteTextures(1, &texture);
+	}
 }
 
 GLuint material::GetTexture() { return texture; }
 
 int material::GetIndex(const std::string& name) {
-	for (int i = 0; i < (int)names.size(); ++i)
-		if (name == names[i])
+	for (int i = 0; i < (int)names.size(); ++i) {
+		if (name == names[i]) {
 			return i;
+		}
+	}
+	return -1;
 }
 
 int material::GetElementSize() { return sizeof(Phong) / sizeof(float); }
@@ -44,15 +48,21 @@ material::Phong::Phong(const nlohmann::json& j) {
 	//picojson::array Kd = element["kd"].get<picojson::array>();
 	//picojson::array Ks = element["ks"].get<picojson::array>();
 
-	if (a.is_array())
-		for (int i = 0; i < 3; ++i)
+	if (a.is_array()) {
+		for (int i = 0; i < 3; ++i) {
 			ka[i] = a[i].get<double>();
-	if (d.is_array())
-		for (int i = 0; i < 3; ++i)
+		}
+	}
+	if (d.is_array()) {
+		for (int i = 0; i < 3; ++i) {
 			kd[i] = d[i].get<double>();
-	if (s.is_array())
-		for (int i = 0; i < 3; ++i)
+		}
+	}
+	if (s.is_array()) {
+		for (int i = 0; i < 3; ++i) {
 			ks[i] = s[i].get<double>();
+		}
+	}
 	shine = j["shine"].get<double>();
 	//for (int i = 0; i < (int)Ka.size(); ++i)
 	//	ka[i] = (float)Ka[i].get<double>();
