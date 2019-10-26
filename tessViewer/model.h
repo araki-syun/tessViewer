@@ -13,7 +13,7 @@
 #include <opensubdiv\osd\glMesh.h>
 #include <opensubdiv\osd\glComputeEvaluator.h>
 
-#include "picojson.h"
+#include <nlohmann/json.hpp>
 
 #include "ShaderManager.h"
 #include "material.h"
@@ -23,12 +23,10 @@ class model : public boost::noncopyable {
 public:
 	model();
 	model(const tv::model& m);
-	model(
-		picojson::object&                                                 obj,
-		/*std::shared_ptr<glslProgram> p,*/ std::shared_ptr<tv::material> mat);
+	model(const nlohmann::json& obj, std::shared_ptr<tv::material> mat);
 	~model();
 
-	void               Reload(picojson::object& obj);
+	void               Reload(const nlohmann::json& obj);
 	void               Update(const float* v1,
 							  int          start1,
 							  int          size1,

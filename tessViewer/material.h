@@ -4,13 +4,13 @@
 
 #include <GL\glew.h>
 #include <glm\glm.hpp>
-#include <picojson.h>
+#include <nlohmann/json.hpp>
 
 namespace tv {
 class material {
 public:
 	material() = delete;
-	material(picojson::array& materials);
+	material(const nlohmann::json& j);
 	~material();
 
 	struct Phong {
@@ -18,7 +18,7 @@ public:
 		glm::vec3 kd;
 		glm::vec3 ks;
 		float     shine;
-		Phong(picojson::object& element);
+		Phong(const nlohmann::json& j);
 	};
 
 	GLuint GetTexture();
