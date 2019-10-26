@@ -7,7 +7,7 @@
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
 
-#include "picojson.h"
+#include <nlohmann/json.hpp>
 
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
@@ -82,20 +82,30 @@ app::app(boost::program_options::variables_map& vm) {
 	draw_string->SetWindowSize(setting.window_resolution_x,
 							   setting.window_resolution_y);
 
-	std::ifstream sdmj(current_model, std::ios::in);
+	// current_modelで指定されたsdmjファイルから読み込む
+	std::ifstream sdmj(current_model);
 	if (!sdmj)
 		throw std::runtime_error("File Open Error\n");
 
-	picojson::value   v;
-	std::string       err     = picojson::parse(v, sdmj);
-	picojson::object& o       = v.get<picojson::object>();
-	picojson::array&  objects = o["objects"].get<picojson::array>();
-	material.reset(new tv::material(o["materials"].get<picojson::array>()));
+	nlohmann::json j;
+	sdmj >> j;
+	auto& objects = j["objects"];
+	material      = std::make_shared<tv::material>(j["materials"]);
 	models.reserve(objects.size());
-	for (picojson::value& o : objects) {
-		models.emplace_back(o.get<picojson::object>(),
-							/*shader_default,*/ material);
+	for (auto& o : objects) {
+		models.emplace_back(o, material);
 	}
+
+	//picojson::value   v;
+	//std::string       err     = picojson::parse(v, sdmj);
+	//picojson::object& o       = v.get<picojson::object>();
+	//picojson::array&  objects = o["objects"].get<picojson::array>();
+	//material.reset(new tv::material(o["materials"].get<picojson::array>()));
+	//models.reserve(objects.size());
+	//for (picojson::value& o : objects) {
+	//	models.emplace_back(o.get<picojson::object>(),
+	//						/*shader_default,*/ material);
+	//}
 
 	window_size =
 		glm::ivec2(setting.window_resolution_x, setting.window_resolution_y);

@@ -4,7 +4,7 @@
 #include <memory>
 #include <functional>
 
-#include "picojson.h"
+//#include "picojson.h"
 
 class Setting {
 public:

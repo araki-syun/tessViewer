@@ -15,7 +15,7 @@
 #include "glapp\glapp_define.h"
 #include "glapp\config.h"
 
-#include "picojson.h"
+//#include "picojson.h"
 
 //OpenSubdiv::Far::TopologyRefiner* createRefiner(const picojson::object& obj);
 
@@ -32,11 +32,8 @@ model::model(const tv::model& m)
 	, modelMatrix(m.modelMatrix)
 	, texcoord_fvar_texture(0)
 	, material_index_texture(0) {}
-model::model(
-	picojson::object&                                                 obj,
-	/*std::shared_ptr<glslProgram> p,*/ std::shared_ptr<tv::material> mat)
+model::model(const nlohmann::json& obj, std::shared_ptr<tv::material> mat)
 	: vao(0), material(mat) {
-	//SetProgram(p);
 	Reload(obj);
 }
 model::~model() {
@@ -48,99 +45,127 @@ model::~model() {
 		glDeleteTextures(1, &material_index_texture);
 }
 
-void model::Reload(picojson::object& obj) {
+void model::Reload(const nlohmann::json& obj) {
 	using namespace OpenSubdiv;
 
 	Far::TopologyDescriptor desc;
 
-	picojson::array& vertex_positions =
-		obj["vertex_positions"].get<picojson::array>();
-	picojson::array& vertex_normals =
-		obj["vertex_normals"].get<picojson::array>();
-	picojson::array& vertex_uvs = obj["vertex_uvs"].get<picojson::array>();
-	picojson::array& faces      = obj["faces"].get<picojson::array>();
-	picojson::array& vert_per_face =
-		obj["vert_per_face"].get<picojson::array>();
-	picojson::array& crease_weights =
-		obj["crease_weights"].get<picojson::array>();
-	picojson::array& crease_points =
-		obj["crease_points"].get<picojson::array>();
-	picojson::array& crease_edges = obj["crease_edges"].get<picojson::array>();
-	picojson::array& vertex_groups =
-		obj["vertex_groups"].get<picojson::array>();
-	picojson::array& face_groups = obj["face_groups"].get<picojson::array>();
-	picojson::array& material_per_face =
-		obj["material_per_face"].get<picojson::array>();
-	picojson::array& location = obj["location"].get<picojson::array>();
-	picojson::array& rotation = obj["rotation"].get<picojson::array>();
-	picojson::array& scale    = obj["scale"].get<picojson::array>();
+	auto& vertex_positions  = obj["vertex_positions"];
+	auto& vertex_normals    = obj["vertex_normals"];
+	auto& vertex_uvs        = obj["vertex_uvs"];
+	auto& faces             = obj["faces"];
+	auto& vert_per_face     = obj["vert_per_face"];
+	auto& crease_weights    = obj["crease_weights"];
+	auto& crease_points     = obj["crease_points"];
+	auto& crease_edges      = obj["crease_edges"];
+	auto& vertex_groups     = obj["vertex_groups"];
+	auto& face_groups       = obj["face_groups"];
+	auto& material_per_face = obj["material_per_face"];
+	auto& location          = obj["location"];
+	auto& rotation          = obj["rotation"];
+	auto& scale             = obj["scale"];
+
+	//picojson::array& vertex_positions =
+	//	obj["vertex_positions"].get<picojson::array>();
+	//picojson::array& vertex_normals =
+	//	obj["vertex_normals"].get<picojson::array>();
+	//picojson::array& vertex_uvs = obj["vertex_uvs"].get<picojson::array>();
+	//picojson::array& faces      = obj["faces"].get<picojson::array>();
+	//picojson::array& vert_per_face =
+	//	obj["vert_per_face"].get<picojson::array>();
+	//picojson::array& crease_weights =
+	//	obj["crease_weights"].get<picojson::array>();
+	//picojson::array& crease_points =
+	//	obj["crease_points"].get<picojson::array>();
+	//picojson::array& crease_edges = obj["crease_edges"].get<picojson::array>();
+	//picojson::array& vertex_groups =
+	//	obj["vertex_groups"].get<picojson::array>();
+	//picojson::array& face_groups = obj["face_groups"].get<picojson::array>();
+	//picojson::array& material_per_face =
+	//	obj["material_per_face"].get<picojson::array>();
+	//picojson::array& location = obj["location"].get<picojson::array>();
+	//picojson::array& rotation = obj["rotation"].get<picojson::array>();
+	//picojson::array& scale    = obj["scale"].get<picojson::array>();
+
 	vertex.reserve(vertex_positions.size());
 	normal.reserve(vertex_normals.size());
 
-	std::vector<float> v;
-	v.reserve(vertex_positions.size());
-	std::vector<float> n;
-	n.reserve(vertex_normals.size());
-	std::vector<float> u;
-	u.reserve(vertex_uvs.size());
-	std::vector<int> f;
-	f.reserve(faces.size());
-	std::vector<int> vf;
-	vf.reserve(vert_per_face.size());
-	std::vector<float> w;
-	w.reserve(crease_weights.size());
-	std::vector<int> p;
-	p.reserve(crease_points.size());
-	std::vector<int> e;
-	e.reserve(crease_edges.size());
+	std::vector<float>     v;
+	std::vector<float>     n;
+	std::vector<float>     u;
+	std::vector<int>       f;
+	std::vector<int>       vf;
+	std::vector<float>     w;
+	std::vector<int>       p;
+	std::vector<int>       e;
+	std::vector<int>       mpf;
+	std::vector<int>       uv_indices;
+	std::vector<glm::vec2> uv_pool;
+
 	std::map<std::string, std::vector<int>>          vg;
 	std::map<std::string, std::vector<int>>          fg;
 	std::vector<std::pair<std::string, std::string>> mf;
+
+	v.reserve(vertex_positions.size());
+	n.reserve(vertex_normals.size());
+	u.reserve(vertex_uvs.size());
+	f.reserve(faces.size());
+	vf.reserve(vert_per_face.size());
+	w.reserve(crease_weights.size());
+	p.reserve(crease_points.size());
+	e.reserve(crease_edges.size());
+	mpf.reserve(vert_per_face.size());
 	mf.reserve(material_per_face.size());
-	std::vector<int> mpf /*; materialPerFace.reserve*/ (vert_per_face.size());
-	std::vector<int> uv_indices;
 	uv_indices.reserve(faces.size());
-	std::vector<glm::vec2> uv_pool;
 	uv_pool.reserve(faces.size());
 
-	for (picojson::value& val : vertex_positions)
+	for (auto& val : vertex_positions)
 		v.emplace_back(val.get<double>());
-	for (picojson::value& val : vertex_normals)
+	for (auto& val : vertex_normals)
 		n.emplace_back(val.get<double>());
-	for (picojson::value& val : vertex_uvs)
+	for (auto& val : vertex_uvs)
 		u.emplace_back(val.get<double>());
-	for (picojson::value& val : faces)
+	for (auto& val : faces)
 		f.emplace_back(val.get<double>());
-	for (picojson::value& val : vert_per_face)
+	for (auto& val : vert_per_face)
 		vf.emplace_back(val.get<double>());
-	for (picojson::value& val : crease_weights)
+	for (auto& val : crease_weights)
 		w.emplace_back(val.get<double>() * 10.0);
-	for (picojson::value& val : crease_points)
+	for (auto& val : crease_points)
 		p.emplace_back(val.get<double>());
-	for (picojson::value& val : crease_edges)
+	for (auto& val : crease_edges)
 		e.emplace_back(val.get<double>());
-	for (picojson::value& val : vertex_groups) {
-		picojson::object& o        = val.get<picojson::object>();
-		std::vector<int>& indices  = vg[o["group_name"].get<std::string>()];
-		picojson::array&  vertices = o["vertices"].get<picojson::array>();
+	for (auto& val : vertex_groups) {
+		std::vector<int>& indices  = vg[val["group_name"].get<std::string>()];
+		auto&             vertices = val["vertices"];
 		indices.reserve(vertices.size());
-		for (picojson::value& index : vertices)
+		for (auto& index : vertices)
 			indices.emplace_back(index.get<double>());
+
+		//picojson::object& o        = val.get<picojson::object>();
+		//std::vector<int>& indices  = vg[o["group_name"].get<std::string>()];
+		//picojson::array&  vertices = o["vertices"].get<picojson::array>();
+		//indices.reserve(vertices.size());
+		//for (auto& index : vertices)
+		//	indices.emplace_back(index.get<double>());
 	}
-	for (picojson::value& val : face_groups) {
-		picojson::object& o       = val.get<picojson::object>();
-		std::vector<int>& indices = fg[o["group_name"].get<std::string>()];
-		picojson::array&  faces   = o["faces"].get<picojson::array>();
+	for (auto& val : face_groups) {
+		std::vector<int>& indices = fg[val["group_name"].get<std::string>()];
+		auto&             faces   = val["faces"];
+
+		//picojson::object& o       = val.get<picojson::object>();
+		//std::vector<int>& indices = fg[o["group_name"].get<std::string>()];
+		//picojson::array&  faces   = o["faces"].get<picojson::array>();
 		indices.reserve(faces.size());
-		for (picojson::value& index : faces)
+		for (auto& index : faces)
 			indices.emplace_back(index.get<double>());
 	}
-	for (picojson::value& val : material_per_face) {
-		picojson::object& o = val.get<picojson::object>();
+	for (auto& val : material_per_face) {
+		//picojson::object& o = val.get<picojson::object>();
 		mf.emplace_back(
-			std::make_pair(o["material_name"].get<std::string>(),
-						   o["face_group_name"].get<std::string>()));
-		o["face_group_name"].get<std::string>();
+			std::make_pair(val["material_name"].get<std::string>(),
+						   val["face_group_name"].get<std::string>()));
+		val["face_group_name"].get<std::string>();
 	}
 	for (std::pair<std::string, std::string>& p : mf) {
 		auto it     = fg.find(p.second);
