@@ -97,7 +97,7 @@
     <ClCompile Include="glapp\config.cpp" />
     <ClCompile Include="glapp\glapp.cpp" />
     <ClCompile Include="glapp\glslOSDprogram.cpp" />
-    <ClCompile Include="glapp\glslprogram.cpp" />
+    <ClCompile Include="glapp\glShaderProgram.cpp" />
     <ClCompile Include="glapp\glslshader.cpp" />
     <ClCompile Include="glapp\glslshader_mamager.cpp" />
     <ClCompile Include="glapp\material.cpp" />
@@ -126,7 +126,7 @@
     <ClInclude Include="glapp\glapp.hpp" />
     <ClInclude Include="glapp\glapp_define.h" />
     <ClInclude Include="glapp\glslOSDprogram.h" />
-    <ClInclude Include="glapp\glslprogram.h" />
+    <ClInclude Include="glapp\glShaderProgram.h" />
     <ClInclude Include="glapp\glslshader.h" />
     <ClInclude Include="glapp\glslshader_manager.h" />
     <ClInclude Include="glapp\material.h" />

@@ -9,11 +9,11 @@
 #include <opensubdiv\far\patchDescriptor.h>
 
 #include "glslshader_manager.h"
-#include "glslprogram.h"
+#include "glShaderProgram.h"
 #include "glapp_define.h"
 
 namespace glapp {
-class glslOSDprogram : glslprogram {
+class glslOSDprogram : glShaderProgram {
 public:
 	glslOSDprogram(void);
 	~glslOSDprogram(void);

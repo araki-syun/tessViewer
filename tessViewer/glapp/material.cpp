@@ -5,5 +5,5 @@ material::material(void) {}
 
 material::~material(void) {}
 
-const glslprogram* material::GetGLSLProgram() const { return program.get(); }
+const glShaderProgram* material::GetGLSLProgram() const { return program.get(); }
 } // namespace glapp

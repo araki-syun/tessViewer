@@ -11,11 +11,11 @@
 #include "glslshader_manager.h"
 
 namespace glapp {
-class glslprogram : boost::noncopyable {
+class glShaderProgram : boost::noncopyable {
 public:
-	glslprogram(void);
-	glslprogram(std::initializer_list<std::string> list);
-	~glslprogram(void);
+	glShaderProgram(void);
+	glShaderProgram(std::initializer_list<std::string> list);
+	~glShaderProgram(void);
 
 	const GLuint GetProgram() const;
 	void         SetShaderName(std::initializer_list<std::string> list);
@@ -43,8 +43,8 @@ protected:
 	};
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-	const std::string& GetError() const;
-	std::string        err;
+	std::string GetError() const;
+	std::string err;
 #endif
 };
 } // namespace glapp

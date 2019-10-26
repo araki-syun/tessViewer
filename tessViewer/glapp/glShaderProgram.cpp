@@ -1,16 +1,16 @@
-#include "glslprogram.h"
+#include "glShaderProgram.h"
 
 #include <boost\format.hpp>
 
 namespace glapp {
-glslprogram::glslprogram(void) {}
-glslprogram::glslprogram(std::initializer_list<std::string> list) {
+glShaderProgram::glShaderProgram(void) = default;
+glShaderProgram::glShaderProgram(std::initializer_list<std::string> list) {
 	SetShaderName(list);
 }
-glslprogram::~glslprogram(void) {}
-const GLuint glslprogram::GetProgram() const { return _program; }
+glShaderProgram::~glShaderProgram(void) = default;
+const GLuint glShaderProgram::GetProgram() const { return _program; }
 
-void glslprogram::SetShaderName(std::initializer_list<std::string> list) {
+void glShaderProgram::SetShaderName(std::initializer_list<std::string> list) {
 
 	for (const std::string& str : list) {
 		glslshader* p = glslshader_manager::GetPointer(str);
@@ -33,7 +33,7 @@ void glslprogram::SetShaderName(std::initializer_list<std::string> list) {
 	}
 }
 
-const GLint glslprogram::GetIndexAttrib(const std::string name) const {
+const GLint glShaderProgram::GetIndexAttrib(const std::string name) const {
 	std::unordered_map<std::string, GLint>::const_iterator it;
 	it = attribList.find(name);
 	if (it != attribList.cend())
@@ -41,7 +41,7 @@ const GLint glslprogram::GetIndexAttrib(const std::string name) const {
 	return -1;
 }
 
-const GLint glslprogram::GetIndexUniform(const std::string name) const {
+const GLint glShaderProgram::GetIndexUniform(const std::string name) const {
 	std::unordered_map<std::string, GLint>::const_iterator it;
 	it = uniformList.find(name);
 	if (it != uniformList.cend())
@@ -49,7 +49,7 @@ const GLint glslprogram::GetIndexUniform(const std::string name) const {
 	return -1;
 }
 
-void glslprogram::create() {
+void glShaderProgram::create() {
 	_program = glCreateProgram();
 
 	for (int i = 0; i < 5; ++i) {
@@ -89,7 +89,7 @@ void glslprogram::create() {
 	setIndexUniform();
 }
 
-const GLuint glslprogram::shaderCompile(const glslshader* shader) {
+const GLuint glShaderProgram::shaderCompile(const glslshader* shader) {
 	GLuint      id(0);
 	const char* str = shader->GetSource().c_str();
 	id              = glCreateShader(shader->GetType());
@@ -125,7 +125,7 @@ const GLuint glslprogram::shaderCompile(const glslshader* shader) {
 	}
 }
 
-void glslprogram::setIndexAttrib() {
+void glShaderProgram::setIndexAttrib() {
 	GLint max_len, num_attrib;
 
 	glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &max_len);
@@ -144,7 +144,11 @@ void glslprogram::setIndexAttrib() {
 	}
 }
 
-void glslprogram::setIndexUniform() {
+#ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
+std::string glShaderProgram::GetError() const { return "error"; }
+#endif
+
+void glShaderProgram::setIndexUniform() {
 	GLint max_len, num_uniform;
 
 	glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_len);

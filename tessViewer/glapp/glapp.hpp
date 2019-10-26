@@ -9,7 +9,7 @@
 
 #include "base_window.h"
 #include "config.h"
-#include "glslprogram.h"
+#include "glShaderProgram.h"
 
 namespace glapp {
 
@@ -35,7 +35,7 @@ public:
 	GLFWwindow*      GetWin();
 
 public:
-	//std::unique_ptr<glslprogram> program;
+	//std::unique_ptr<glShaderProgram> program;
 
 private:
 	GLFWwindow* _win;

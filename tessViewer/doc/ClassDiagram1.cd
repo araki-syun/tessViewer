@@ -36,13 +36,13 @@
     <NestedTypes>
       <Struct Name="glslProgram::glsl_info">
         <TypeIdentifier>
-          <NewMemberFileName>glslProgram.h</NewMemberFileName>
+          <NewMemberFileName>glShaderProgram.h</NewMemberFileName>
         </TypeIdentifier>
       </Struct>
     </NestedTypes>
     <TypeIdentifier>
       <HashCode>ALEBAAAAAAAAAACgBIAAgAAAAEEAAAAgAAAAAAAAAAA=</HashCode>
-      <FileName>glslProgram.h</FileName>
+      <FileName>glShaderProgram.h</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="glQuery" Collapsed="true">

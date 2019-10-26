@@ -14,7 +14,7 @@
 
 namespace glapp {
 class glslshader : boost::noncopyable {
-	friend class glslprogram;
+	friend class glShaderProgram;
 
 public:
 	glslshader(void);

@@ -60,7 +60,7 @@ window::window(const char* title,
 
 	glDebugMessageCallback(openGLDebugMessageCallback, nullptr);
 
-	//program.reset(new glslprogram());
+	//program.reset(new glShaderProgram());
 
 	glfwSwapInterval(vsync);
 
