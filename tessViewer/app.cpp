@@ -82,7 +82,7 @@ app::app(boost::program_options::variables_map& vm) {
 	draw_string->SetWindowSize(setting.window_resolution_x,
 							   setting.window_resolution_y);
 
-	// current_model‚Åw’è‚³‚ê‚½sdmjƒtƒ@ƒCƒ‹‚©‚ç“Ç‚İ‚Ş
+	// current_modelã§æŒ‡å®šã•ã‚ŒãŸsdmjãƒ•ã‚¡ã‚¤ãƒ«ã‹ã‚‰èª­ã¿è¾¼ã‚€
 	std::ifstream sdmj(current_model);
 	if (!sdmj)
 		throw std::runtime_error("File Open Error\n");
@@ -95,17 +95,6 @@ app::app(boost::program_options::variables_map& vm) {
 	for (auto& o : objects) {
 		models.emplace_back(o, material);
 	}
-
-	//picojson::value   v;
-	//std::string       err     = picojson::parse(v, sdmj);
-	//picojson::object& o       = v.get<picojson::object>();
-	//picojson::array&  objects = o["objects"].get<picojson::array>();
-	//material.reset(new tv::material(o["materials"].get<picojson::array>()));
-	//models.reserve(objects.size());
-	//for (picojson::value& o : objects) {
-	//	models.emplace_back(o.get<picojson::object>(),
-	//						/*shader_default,*/ material);
-	//}
 
 	window_size =
 		glm::ivec2(setting.window_resolution_x, setting.window_resolution_y);
