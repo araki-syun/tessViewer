@@ -3,10 +3,9 @@
 #include <fstream>
 #include <vector>
 #include <regex>
+#include <filesystem>
 
 #include <boost\format.hpp>
-#include <boost\filesystem.hpp>
-#include <boost\filesystem\path.hpp>
 
 //#include <opensubdiv\osd\glslPatchShaderSource.h>
 
@@ -16,10 +15,9 @@ namespace glapp {
 
 //std::unordered_map<std::string, glslshader> glslshader::shader_list;
 
-glslshader::glslshader(void) : _id(0) {}
-glslshader::glslshader(const std::string& filename) : _id(0) {
-	boost::filesystem::path file_path(filename);
-	if (!boost::filesystem::exists(file_path))
+	std::filesystem::path file_path(filename);
+
+	if (!std::filesystem::exists(file_path)) {
 		throw std::runtime_error(
 			(boost::format("NOT FOUND Shader File : %1%") % file_path).str());
 
@@ -70,17 +68,17 @@ const GLuint glslshader::GetType() const { return _type; }
 //		glShaderSource(_id, 1, &str, NULL);
 //		glCompileShader(_id);
 //
-//		// ¬”Û‚ğŠm”F
+//		// ï¿½ï¿½ï¿½Û‚ï¿½ï¿½mï¿½F
 //		GLint result;
 //		glGetShaderiv(_id, GL_COMPILE_STATUS, &result);
 //
-//		// ƒƒO‚ğæ“¾
+//		// ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½æ“¾
 //		if (result == GL_FALSE) {
-//			// ƒTƒCƒY‚ğæ“¾
+//			// ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½æ“¾
 //			GLint log_length;
 //			glGetShaderiv(_id, GL_INFO_LOG_LENGTH, &log_length);
 //
-//			// •¶š—ñ‚ğæ“¾
+//			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
 //			GLsizei max_length;
 //			GLsizei length;
 //			std::vector<GLchar> log(max_length);
