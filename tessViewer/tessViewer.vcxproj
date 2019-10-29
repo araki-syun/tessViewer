@@ -100,12 +100,6 @@
     <ClCompile Include="glapp\glShaderProgram.cpp" />
     <ClCompile Include="glapp\glslshader.cpp" />
     <ClCompile Include="glapp\glslshader_mamager.cpp" />
-    <ClCompile Include="glapp\material.cpp" />
-    <ClCompile Include="glapp\mesh.cpp" />
-    <ClCompile Include="glapp\model.cpp" />
-    <ClCompile Include="glapp\phongMaterial.cpp" />
-    <ClCompile Include="glapp\query.cpp" />
-    <ClCompile Include="glapp\transform.cpp" />
     <ClCompile Include="glShaderVariable.cpp" />
     <ClCompile Include="glslProgram.cpp" />
     <ClCompile Include="glslStringDraw.cpp" />
@@ -129,14 +123,6 @@
     <ClInclude Include="glapp\glShaderProgram.h" />
     <ClInclude Include="glapp\glslshader.h" />
     <ClInclude Include="glapp\glslshader_manager.h" />
-    <ClInclude Include="glapp\material.h" />
-    <ClInclude Include="glapp\mesh.h" />
-    <ClInclude Include="glapp\model.h" />
-    <ClInclude Include="glapp\node.h" />
-    <ClInclude Include="glapp\phongMaterial.h" />
-    <ClInclude Include="glapp\query.h" />
-    <ClInclude Include="glapp\transform.h" />
-    <ClInclude Include="glapp\useConfig.h" />
     <ClInclude Include="glShaderVariable.h" />
     <ClInclude Include="glslProgram.h" />
     <ClInclude Include="glslStringDraw.h" />
