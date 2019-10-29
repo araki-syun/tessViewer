@@ -11,7 +11,11 @@ class material {
 public:
 	material() = delete;
 	material(const nlohmann::json& j);
+	material(const material& mat)= delete;
+	material(material&& mat) noexcept;
 	~material();
+	material& operator=(const material& mat)= delete;
+	material& operator=(material&& mat) noexcept;
 
 	struct Phong {
 		glm::vec3 ka;

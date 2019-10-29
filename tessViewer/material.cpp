@@ -21,10 +21,26 @@ material::material(const nlohmann::json& j) : texture(0) {
 	glTextureBuffer(texture, GL_R32F, buffer);
 	glDeleteBuffers(1, &buffer);
 }
+material::material(material&& mat) noexcept
+	: names(std::move(mat.names))
+	, material_data(std::move(mat.material_data))
+	, texture(std::move(mat.texture)) {}
 material::~material() {
 	if (texture != 0U) {
 		glDeleteTextures(1, &texture);
 	}
+}
+material& material::operator=(material&& mat) noexcept {
+	if (this != &mat) {
+		names         = std::move(mat.names);
+		material_data = std::move(mat.material_data);
+		if (texture != 0U) {
+			glDeleteTextures(1, &texture);
+		}
+		texture = std::move(mat.texture);
+	}
+
+	return *this;
 }
 
 GLuint material::GetTexture() { return texture; }
