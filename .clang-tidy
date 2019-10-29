@@ -1,2 +1,2 @@
-Checks: "-*,cppcoreguidelines-*,modernize-*,readability-*,-modernize-use-trailing-return-type,-readability-convert-member-functions-to-static"
+Checks: "-*,cppcoreguidelines-*,modernize-*,readability-*,-modernize-use-trailing-return-type,-readability-convert-member-functions-to-static,-cppcoreguidelines-avoid-magic-numbers,-readability-static-accessed-through-instance,-readability-uppercase-literal-suffix,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-non-private-member-variables-in-classes"
 FormatStyle:     file
