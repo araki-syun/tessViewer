@@ -15,16 +15,20 @@ namespace glapp {
 
 //std::unordered_map<std::string, glslshader> glslshader::shader_list;
 
+glslshader::glslshader() = default;
+glslshader::glslshader(const std::string& filename) {
 	std::filesystem::path file_path(filename);
 
 	if (!std::filesystem::exists(file_path)) {
 		throw std::runtime_error(
 			(boost::format("NOT FOUND Shader File : %1%") % file_path).str());
+	}
 
 	std::ifstream ifs(filename);
-	if (ifs.fail())
+	if (ifs.fail()) {
 		throw std::runtime_error(
 			(boost::format("LOAD ERROR Shader File : %1%") % file_path).str());
+	}
 
 	std::string ext = file_path.extension().string();
 
@@ -50,7 +54,7 @@ namespace glapp {
 	_src = str;
 }
 
-glslshader::~glslshader(void) { glDeleteShader(_id); }
+glslshader::~glslshader() { glDeleteShader(_id); }
 
 const GLuint glslshader::GetShader() const { return _id; }
 

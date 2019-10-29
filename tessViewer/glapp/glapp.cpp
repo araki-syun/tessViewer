@@ -47,7 +47,9 @@ window::window(const char* title,
 
 	this->_win =
 		glfwCreateWindow(width, height, title,
-						 flag & inner::base_window::init_flag::FULLSCREEN
+						 static_cast<std::uint8_t>(flag) &
+								 static_cast<std::uint8_t>(
+									 inner::base_window::init_flag::FULLSCREEN)
 							 ? glfwGetPrimaryMonitor()
 							 : nullptr,
 						 nullptr);

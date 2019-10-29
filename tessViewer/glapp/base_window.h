@@ -6,20 +6,20 @@ namespace glapp {
 namespace inner {
 class base_window {
 public:
-	enum init_flag : unsigned int {
+	enum class init_flag : unsigned int {
 		DEFAULT    = 0x00000000,
 		FULLSCREEN = 0x00000001
 	};
-	base_window(void) = delete;
+	base_window() = delete;
 	explicit base_window(const char* title,
 						 int         width  = 1280,
 						 int         height = 720,
 						 init_flag   flag   = init_flag::DEFAULT);
-	virtual ~base_window(void) = 0;
-	base_window(base_window&)  = delete; // ƒRƒs[ƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	base_window& operator=(const base_window&) = delete; // ƒRƒs[‘ã“ü‰‰Zq
-	base_window(base_window&&) = delete; // ƒ€[ƒuƒRƒ“ƒXƒgƒ‰ƒNƒ^
-	base_window& operator=(const base_window&&) = delete; // ƒ€[ƒu‘ã“ü‰‰Zq
+	virtual ~base_window() = 0;
+	base_window(base_window&)  = delete; // ï¿½Rï¿½sï¿½[ï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
+	base_window& operator=(const base_window&) = delete; // ï¿½Rï¿½sï¿½[ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½q
+	base_window(base_window&&) = delete; // ï¿½ï¿½ï¿½[ï¿½uï¿½Rï¿½ï¿½ï¿½Xï¿½gï¿½ï¿½ï¿½Nï¿½^
+	base_window& operator=(const base_window&&) = delete; // ï¿½ï¿½ï¿½[ï¿½uï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Zï¿½q
 
 	virtual void GetWindowSize(int* w, int* h) const     = 0;
 	virtual void GetWindowPosition(int* x, int* y) const = 0;

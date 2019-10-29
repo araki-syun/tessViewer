@@ -17,9 +17,9 @@ class glslshader : boost::noncopyable {
 	friend class glShaderProgram;
 
 public:
-	glslshader(void);
+	glslshader();
 	glslshader(const std::string& filename);
-	virtual ~glslshader(void);
+	virtual ~glslshader();
 
 	const GLuint       GetShader() const;
 	const std::string& GetSource() const;
@@ -32,9 +32,9 @@ protected:
 	//void Compile();
 	//void includeReplace();
 
-	GLuint      _id;
+	GLuint      _id = 0;
 	std::string _src;
-	GLuint      _type;
+	GLuint      _type = 0;
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
 	const std::string& GetError() const;

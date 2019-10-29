@@ -8,9 +8,9 @@
 #include "glapp_define.h"
 
 namespace glapp {
-glslOSDprogram::glslOSDprogram(void) {}
+glslOSDprogram::glslOSDprogram():_type(OpenSubdiv::Far::PatchDescriptor::Type::REGULAR) {}
 
-glslOSDprogram::~glslOSDprogram(void) { glDeleteProgram(_program); }
+glslOSDprogram::~glslOSDprogram() { glDeleteProgram(_program); }
 
 //const GLuint glslOSDprogram::GetProgram() const{
 //	return _program;
@@ -27,11 +27,11 @@ glslOSDprogram::~glslOSDprogram(void) { glDeleteProgram(_program); }
 //		GLint result;
 //		glGetProgramiv(_program, GL_LINK_STATUS, &result);
 //		if (result == GL_FALSE) {
-//			// ƒTƒCƒY‚ğæ“¾
+//			// ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½æ“¾
 //			GLint log_length;
 //			glGetProgramiv(_program, GL_INFO_LOG_LENGTH, &log_length);
 //
-//			// •¶š—ñ‚ğæ“¾
+//			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
 //			GLsizei max_length;
 //			GLsizei length;
 //			std::vector<GLchar> log(max_length);
@@ -55,17 +55,17 @@ const GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
 	glShaderSource(id, 1, &str, nullptr);
 	glCompileShader(id);
 
-	// ¬”Û‚ğŠm”F
+	// ï¿½ï¿½ï¿½Û‚ï¿½ï¿½mï¿½F
 	GLint result;
 	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
 
-	// ƒƒO‚ğæ“¾
+	// ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½æ“¾
 	if (result == GL_FALSE) {
-		// ƒTƒCƒY‚ğæ“¾
+		// ï¿½Tï¿½Cï¿½Yï¿½ï¿½ï¿½æ“¾
 		GLint log_length;
 		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &log_length);
 
-		// •¶š—ñ‚ğæ“¾
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½æ“¾
 		GLsizei             max_length(log_length);
 		GLsizei             length;
 		std::vector<GLchar> log(max_length);
