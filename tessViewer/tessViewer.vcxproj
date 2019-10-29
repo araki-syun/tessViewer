@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -100,10 +100,8 @@
     <ClCompile Include="glapp\glShaderProgram.cpp" />
     <ClCompile Include="glapp\glslshader.cpp" />
     <ClCompile Include="glapp\glslshader_mamager.cpp" />
-    <ClCompile Include="glapp\material.cpp" />
     <ClCompile Include="glapp\mesh.cpp" />
     <ClCompile Include="glapp\model.cpp" />
-    <ClCompile Include="glapp\phongMaterial.cpp" />
     <ClCompile Include="glapp\query.cpp" />
     <ClCompile Include="glapp\transform.cpp" />
     <ClCompile Include="glShaderVariable.cpp" />
@@ -129,11 +127,9 @@
     <ClInclude Include="glapp\glShaderProgram.h" />
     <ClInclude Include="glapp\glslshader.h" />
     <ClInclude Include="glapp\glslshader_manager.h" />
-    <ClInclude Include="glapp\material.h" />
     <ClInclude Include="glapp\mesh.h" />
     <ClInclude Include="glapp\model.h" />
     <ClInclude Include="glapp\node.h" />
-    <ClInclude Include="glapp\phongMaterial.h" />
     <ClInclude Include="glapp\query.h" />
     <ClInclude Include="glapp\transform.h" />
     <ClInclude Include="glapp\useConfig.h" />
