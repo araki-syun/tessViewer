@@ -23,8 +23,14 @@
 
 class app {
 public:
+	app()           = delete;
+	app(const app&) = delete;
+	app(app&&)      = delete;
 	app(boost::program_options::variables_map& vm);
-	~app(void);
+	~app();
+	app& operator=(const app&) = delete;
+	app& operator=(app&&) = delete;
+
 	void Run();
 
 	static void osdErrorCallback(OpenSubdiv::Far::ErrorType err,
@@ -69,9 +75,9 @@ private:
 	tv::glslStringDraw* draw_string;
 	GLuint              default_diffuse_texture = 0;
 
-	bool       mainloop;
+	bool       mainloop{};
 	glm::ivec2 window_size;
-	float      frametime;
+	float      frametime{};
 	struct Camera {
 		glm::vec3 Pos;
 		glm::vec3 Angle;
@@ -104,7 +110,7 @@ private:
 	struct Tessellation {
 		float TessLevel;
 		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
-	} tess;
+	} tess{};
 
 	struct Setting {
 		bool         window_full_screen;
