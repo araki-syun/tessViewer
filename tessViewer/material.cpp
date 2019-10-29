@@ -7,12 +7,7 @@ material::material(const nlohmann::json& j) : texture(0) {
 		material_data.emplace_back(element);
 		names.emplace_back(mat["material_name"].get<std::string>());
 	}
-	//for (picojson::value& value : materials) {
-	//	picojson::object& mat     = value.get<picojson::object>();
-	//	picojson::object& element = mat["elements"].get<picojson::object>();
-	//	material_data.emplace_back(Phong(element));
-	//	names.emplace_back(mat["material_name"].get<std::string>());
-	//}
+
 	GLuint buffer;
 	glCreateBuffers(1, &buffer);
 	glNamedBufferData(buffer, material_data.size() * sizeof(Phong),
