@@ -1,1 +1,2 @@
 Checks: "-*,cppcoreguidelines-*,modernize-*,readability-*,-modernize-use-trailing-return-type,-readability-convert-member-functions-to-static"
+FormatStyle:     file
