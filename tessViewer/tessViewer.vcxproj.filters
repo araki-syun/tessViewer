@@ -66,10 +66,16 @@
     <ClCompile Include="glapp\glslshader_mamager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
+    <ClCompile Include="glapp\material.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
     <ClCompile Include="glapp\mesh.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glapp\model.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="glapp\phongMaterial.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="glapp\query.cpp">
@@ -140,6 +146,9 @@
     <ClInclude Include="glapp\glslshader_manager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="glapp\material.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
     <ClInclude Include="glapp\mesh.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
@@ -147,6 +156,9 @@
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="glapp\node.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="glapp\phongMaterial.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
     <ClInclude Include="glapp\query.h">
