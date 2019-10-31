@@ -35,9 +35,6 @@ material::Phong::Phong(const nlohmann::json& j) {
 	auto& a = j["Ka"];
 	auto& d = j["Kd"];
 	auto& s = j["Ks"];
-	//picojson::array Ka = element["ka"].get<picojson::array>();
-	//picojson::array Kd = element["kd"].get<picojson::array>();
-	//picojson::array Ks = element["ks"].get<picojson::array>();
 
 	if (a.is_array())
 		for (int i = 0; i < 3; ++i)
@@ -49,12 +46,5 @@ material::Phong::Phong(const nlohmann::json& j) {
 		for (int i = 0; i < 3; ++i)
 			ks[i] = s[i].get<double>();
 	shine = j["shine"].get<double>();
-	//for (int i = 0; i < (int)Ka.size(); ++i)
-	//	ka[i] = (float)Ka[i].get<double>();
-	//for (int i = 0; i < (int)Kd.size(); ++i)
-	//	kd[i] = (float)Kd[i].get<double>();
-	//for (int i = 0; i < (int)Ks.size(); ++i)
-	//	ks[i] = (float)Ks[i].get<double>();
-	//shine = (float)element["shine"].get<double>();
 }
 } // namespace tv
