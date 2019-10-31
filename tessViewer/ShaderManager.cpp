@@ -37,9 +37,9 @@
 //GLuint glShaderUniformBuffer::_bindindex = 0;
 
 namespace tv {
-ShaderManager::ShaderManager() {}
+ShaderManager::ShaderManager() = default;
 
-ShaderManager::~ShaderManager() {}
+ShaderManager::~ShaderManager() = default;
 
 ShaderManager::shader_iterator
 ShaderManager::add(const glslProgram::glsl_info& glsl) {
@@ -48,8 +48,8 @@ ShaderManager::add(const glslProgram::glsl_info& glsl) {
 								  std::forward_as_tuple(new glslProgram(glsl)));
 	if (it.second) {
 		return it.first;
-	} else
-		throw std::runtime_error("Shader Insert ERROR");
+	}
+	{ throw std::runtime_error("Shader Insert ERROR"); }
 }
 
 ShaderManager::shader_iterator
@@ -59,29 +59,27 @@ ShaderManager::add(const glslProgram::glsl_info& glsl, const osd_info& osd) {
 		std::forward_as_tuple(new glslProgram(glsl, osd)));
 	if (it.second) {
 		return it.first;
-	} else
-		throw std::runtime_error("Shader Insert ERROR");
+	}
+	{ throw std::runtime_error("Shader Insert ERROR"); }
 }
 
 const glslProgram& ShaderManager::Get(const glslProgram::glsl_info& glsl) {
 	auto it = shader_list.find(glsl.str());
-	if (it != shader_list.cend())
+	if (it != shader_list.cend()) {
 		return *(it->second.get());
-	else {
+	}
 		auto it2 = add(glsl);
 		return *(it2->second.get());
-	}
 }
 
 const glslProgram& ShaderManager::Get(const glslProgram::glsl_info& glsl,
 									  const osd_info&               osd) {
 	auto it = shader_list.find(glsl.str() + osd.str());
-	if (it != shader_list.cend())
+	if (it != shader_list.cend()) {
 		return *(it->second.get());
-	else {
+	}
 		auto it2 = add(glsl, osd);
 		return *(it2->second.get());
-	}
 }
 
 //const glShaderUniformBuffer * ShaderManager::GetUniformBuffer(const std::string & name)

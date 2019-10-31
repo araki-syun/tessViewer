@@ -5,9 +5,9 @@
 
 //glapp::Config glapp::Config::config;
 
-glapp::Config::Config(void) {}
+glapp::Config::Config() = default;
 
-glapp::Config::~Config(void) {}
+glapp::Config::~Config() = default;
 
 glapp::Config::Config(const std::string& filename) { Reset(filename); }
 

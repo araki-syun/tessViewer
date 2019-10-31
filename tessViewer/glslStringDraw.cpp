@@ -15,31 +15,38 @@ glslStringDraw::glslStringDraw()
 glslStringDraw::~glslStringDraw() {
 	FT_Done_Face(ftface);
 	FT_Done_FreeType(ftlib);
-	if (texture)
+	if (texture != 0u) {
 		glDeleteTextures(1, &texture);
-	if (sampler)
+	}
+	if (sampler != 0u) {
 		glDeleteSamplers(1, &sampler);
-	if (vao)
+	}
+	if (vao != 0u) {
 		glDeleteVertexArrays(1, &vao);
+	}
 }
 
 glslStringDraw* glslStringDraw::getInstance() { return &stringDraw; }
 
 void glslStringDraw::Initialize(int fontsize, const std::string& fontname) {
 	font_size = fontsize;
-	if (FT_Init_FreeType(&ftlib))
+	if (FT_Init_FreeType(&ftlib) != 0) {
 		throw std::exception("ERROR : freetype Initialize");
-	if (FT_New_Face(ftlib, fontname.c_str(), 0, &ftface))
+	}
+	if (FT_New_Face(ftlib, fontname.c_str(), 0, &ftface) != 0) {
 		throw std::exception("ERROR : font file Load\n");
-	if (FT_Set_Char_Size(ftface, 0, font_size * 64, 80, 80))
+	}
+	if (FT_Set_Char_Size(ftface, 0, font_size * 64, 80, 80) != 0) {
 		throw std::exception("ERROR : set font char size\n");
+	}
 	//if(FT_Set_Pixel_Sizes(this->_face, w, h))
 	//	throw std::exception("ERROR : font set pixel\n");
 
 	fonttex_size          = font_size * NUM_CBLOCK;
 	unsigned int tex_size = 1;
-	while (tex_size < (unsigned int)fonttex_size)
+	while (tex_size < (unsigned int)fonttex_size) {
 		tex_size <<= 1;
+	}
 	GLuint temp_texture;
 	glCreateTextures(GL_TEXTURE_2D, 1, &temp_texture);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -49,12 +56,14 @@ void glslStringDraw::Initialize(int fontsize, const std::string& fontname) {
 	list.resize('~' - ' ');
 	for (int i = ' '; i < '~'; ++i) {
 		FT_UInt index = FT_Get_Char_Index(ftface, i);
-		if (FT_Load_Char(ftface, i, FT_LOAD_DEFAULT))
+		if (FT_Load_Char(ftface, i, FT_LOAD_DEFAULT) != 0) {
 			throw std::runtime_error(
 				(boost::format("Load Char : %1%") % (char)i).str());
+		}
 		if (FT_Render_Glyph(ftface->glyph,
-							FT_Render_Mode::FT_RENDER_MODE_NORMAL))
+							FT_Render_Mode::FT_RENDER_MODE_NORMAL) != 0) {
 			throw std::runtime_error("Render Gliph");
+		}
 		FT_Bitmap& bm = ftface->glyph->bitmap;
 
 		glm::ivec2 pos((i & 0x0F) * (fonttex_size / font_size),
@@ -106,8 +115,8 @@ void glslStringDraw::Set(int x, int y, const std::string& str) {
 	glm::vec2 screen_coord((float)x * screen_trans.x - 1.f,
 						   float(window_size.y - y) * screen_trans.y - 1.f);
 	float     offset(0);
-	for (int i = 0; i < str.length(); ++i) {
-		int               code = str[i] - ' ';
+	for (char i : str) {
+		int               code = i - ' ';
 		const CharctorUV& uv   = list[(code < 0 ? 0 : code)];
 		buffer.emplace_back(screen_coord.x + offset, screen_coord.y);
 		buffer.emplace_back(uv.xy);
@@ -144,12 +153,14 @@ void glslStringDraw::Draw() {
 	//element.emplace_back(0 + element_offset);
 	//element.emplace_back(2 + element_offset);
 	//element.emplace_back(3 + element_offset);
-	if (element.empty())
+	if (element.empty()) {
 		return;
-	GLuint pos = program.GetAttrib("position")->GetIndex(),
-		   uv  = program.GetAttrib("uv_coord")->GetIndex();
-	if (!vao)
+	}
+	GLuint pos = program.GetAttrib("position")->GetIndex();
+	GLuint uv  = program.GetAttrib("uv_coord")->GetIndex();
+	if (vao == 0u) {
 		glCreateVertexArrays(1, &vao);
+	}
 	glBindVertexArray(vao);
 	glCreateBuffers(2, &vbo);
 	glVertexArrayElementBuffer(vao, ebo);

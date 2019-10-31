@@ -25,13 +25,13 @@ public:
 	struct glsl_info {
 		glsl_info();
 		glsl_info(const glsl_info& info);
-		glsl_info(const std::string& vert,
-				  const std::string& frag,
-				  const std::string& geom,
-				  const std::string& tcs,
-				  const std::string& tes);
+		glsl_info(std::string vert,
+				  std::string frag,
+				  std::string geom,
+				  std::string tcs,
+				  std::string tes);
 
-		const std::string str() const;
+		std::string str() const;
 
 		std::string vert, frag, geom, tcs, tes;
 
@@ -60,7 +60,8 @@ public:
 private:
 	void SetLocation();
 
-	GLuint                                                        _program;
+	GLuint _program{};
+	
 	std::map<std::string, std::unique_ptr<tv::glShaderAttribute>> attrib_map;
 	std::map<std::string, std::unique_ptr<tv::glShaderUniform>>   uniform_map;
 	std::map<std::string, std::unique_ptr<tv::glShaderUniformBlock>>

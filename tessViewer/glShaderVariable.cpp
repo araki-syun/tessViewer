@@ -2,8 +2,8 @@
 
 namespace tv {
 glShaderVariable::glShaderVariable() : _variable_location(-1) {}
-glShaderVariable::~glShaderVariable() {}
-const GLuint glShaderVariable::GetIndex() const { return _variable_location; }
+glShaderVariable::~glShaderVariable() = default;
+GLuint glShaderVariable::GetIndex() const { return _variable_location; }
 const std::string& glShaderVariable::GetVariableName() const {
 	return _variable_name;
 }
@@ -11,7 +11,7 @@ const std::string& glShaderVariable::GetVariableName() const {
 glShaderAttribute::glShaderAttribute(GLuint program, const char* name) {
 	this->Set(program, name);
 }
-glShaderAttribute::~glShaderAttribute() {}
+glShaderAttribute::~glShaderAttribute() = default;
 void glShaderAttribute::Set(GLuint program, const char* name) {
 	_variable_location = glGetAttribLocation(program, name);
 	if (_variable_location < 0) {
@@ -23,7 +23,7 @@ void glShaderAttribute::Set(GLuint program, const char* name) {
 glShaderUniform::glShaderUniform(GLuint program, const char* name) {
 	this->Set(program, name);
 }
-glShaderUniform::~glShaderUniform() {}
+glShaderUniform::~glShaderUniform() = default;
 void glShaderUniform::Set(GLuint program, const char* name) {
 	_variable_location = glGetUniformLocation(program, name);
 	if (_variable_location < 0) {
@@ -38,7 +38,7 @@ glShaderUniformBlock::glShaderUniformBlock(
 {
 	this->Set(program, name);
 }
-glShaderUniformBlock::~glShaderUniformBlock() {}
+glShaderUniformBlock::~glShaderUniformBlock() = default;
 void glShaderUniformBlock::Set(GLuint program, const char* name) {
 	_variable_location = glGetUniformBlockIndex(program, name);
 	if (_variable_location < 0) {
@@ -53,8 +53,9 @@ glShaderUniformBuffer::glShaderUniformBuffer(
 	this->Set(/*program, name*/);
 }
 glShaderUniformBuffer::~glShaderUniformBuffer() {
-	if (_buffer)
+	if (_buffer != 0u) {
 		glDeleteBuffers(1, &_buffer);
+	}
 	--_bindindex;
 }
 
@@ -64,8 +65,9 @@ void glShaderUniformBuffer::Update(const void* val) const {
 	glBindBufferBase(GL_UNIFORM_BUFFER, _binding, _buffer);
 }
 void glShaderUniformBuffer::Set() {
-	if (_buffer)
+	if (_buffer != 0u) {
 		glDeleteBuffers(1, &_buffer);
+	}
 	glCreateBuffers(1, &_buffer);
 	glNamedBufferData(_buffer, _bufSize, nullptr, GL_DYNAMIC_DRAW);
 }

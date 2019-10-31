@@ -36,10 +36,10 @@ private:
 
 	GLuint     texture;
 	GLuint     sampler;
-	FT_Library ftlib;
-	FT_Face    ftface;
-	int        font_size;
-	int        fonttex_size;
+	FT_Library ftlib{};
+	FT_Face    ftface{};
+	int        font_size{};
+	int        fonttex_size{};
 	glm::ivec2 window_size;
 	struct CharctorUV {
 		//glm::vec2 uv[4];
@@ -48,7 +48,7 @@ private:
 	std::vector<CharctorUV>   list;
 	std::vector<glm::vec2>    buffer;
 	std::vector<unsigned int> element;
-	int                       element_offset;
+	int                       element_offset{};
 	GLuint                    vao, vbo, ebo;
 	glslProgram               program;
 };

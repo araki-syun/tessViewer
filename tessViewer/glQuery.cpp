@@ -18,7 +18,8 @@ void glQuery::Start() {
 void glQuery::End() { glEndQuery(target); }
 
 GLuint glQuery::Get() {
-	if (value == 0)
+	if (value == 0) {
 		glGetQueryObjectuiv(id, GL_QUERY_RESULT, &value);
+	}
 	return value;
 }

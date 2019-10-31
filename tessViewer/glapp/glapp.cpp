@@ -15,8 +15,9 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 namespace glapp {
 
 void Initialize() {
-	if (glfwInit() != GL_TRUE)
+	if (glfwInit() != GL_TRUE) {
 		throw std::runtime_error("GLFW Initialize ERROR");
+	}
 }
 
 //window::window(){
@@ -47,9 +48,9 @@ window::window(const char* title,
 
 	this->_win =
 		glfwCreateWindow(width, height, title,
-						 static_cast<std::uint8_t>(flag) &
-								 static_cast<std::uint8_t>(
-									 inner::base_window::init_flag::FULLSCREEN)
+						 (static_cast<std::uint8_t>(flag) &
+						  static_cast<std::uint8_t>(
+							  inner::base_window::init_flag::FULLSCREEN)) != 0
 							 ? glfwGetPrimaryMonitor()
 							 : nullptr,
 						 nullptr);
@@ -57,8 +58,9 @@ window::window(const char* title,
 
 	glewExperimental = GL_TRUE;
 	GLenum err       = glewInit();
-	if (err != GLEW_OK)
+	if (err != GLEW_OK) {
 		throw std::runtime_error("GLEW Initialize ERROR");
+	}
 
 	glDebugMessageCallback(openGLDebugMessageCallback, nullptr);
 
@@ -81,7 +83,7 @@ void window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
 }
 
-const glm::ivec2 window::GetWindowSize() const {
+ glm::ivec2 window::GetWindowSize() const {
 	glm::ivec2 size(0);
 	GetWindowSize(&size.x, &size.y);
 	return size;
@@ -125,8 +127,9 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 		level           = 3;
 		break;
 	}
-	if (level < MASSAGE_LEVEL)
+	if (level < MASSAGE_LEVEL) {
 		return;
+}
 
 	std::cout << "---------------------opengl-callback-start------------"
 			  << std::endl;
@@ -148,8 +151,9 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 	std::cout << std::endl;
 
 	const char* errstr = (const char*)gluErrorString(id);
-	if (errstr)
+	if (errstr != nullptr) {
 		std::cout << "id: " << id << ' ' << errstr << std::endl;
+	}
 	std::cout << "severity: " << severity_string << std::endl;
 	//switch (severity) {
 	//case GL_DEBUG_SEVERITY_LOW:

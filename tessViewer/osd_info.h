@@ -31,10 +31,10 @@ struct osd_info {
 		bool operator==(const Element e) const;
 		OpenSubdiv::Far::PatchDescriptor::Type Get_patch_type() const;
 		void Set_patch_type(OpenSubdiv::Far::PatchDescriptor::Type type);
-	} elem;
+	} elem{};
 
 	osd_info();
 	osd_info(const osd_info& info);
-	void              set(Elem_Type e, unsigned int value);
-	const std::string str() const;
+	void        set(Elem_Type e, unsigned int value);
+	std::string str() const;
 };

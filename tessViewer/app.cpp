@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstdint>
 
+#include <memory>
 #include <opencv2\core.hpp>
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
@@ -39,27 +40,30 @@ app::app(boost::program_options::variables_map& vm) {
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
 			: OpenSubdiv::Far::PatchDescriptor::Type::REGULAR;
 
-	if (current_model.empty())
+	if (current_model.empty()) {
 		throw std::runtime_error("Model Import -o [file_path]\n");
+	}
 
 	OpenSubdiv::Far::SetErrorCallback(osdErrorCallback);
 	OpenSubdiv::Far::SetWarningCallback(osdWarningCallback);
 
 	glfwSetErrorCallback(glfwErrorCallback);
 
-	win.reset(new glapp::window(
+	win = std::make_unique<glapp::window>(
 		"tessViewer " TV_VERSION, setting.window_resolution_x,
 		setting.window_resolution_y, 4, 5, 4, (int)setting.window_vsync,
 		setting.window_full_screen ? glapp::window::init_flag::FULLSCREEN
-								   : glapp::window::init_flag::DEFAULT));
+								   : glapp::window::init_flag::DEFAULT);
 	win->SetBackColor(glm::vec4(glm::vec3(0.5f), 1));
 
-	if (GL_TRUE != glfwExtensionSupported("GL_ARB_direct_state_access"))
+	if (GL_TRUE != glfwExtensionSupported("GL_ARB_direct_state_access")) {
 		throw std::runtime_error(
 			"OpenGL Unsupported : GL_ARB_direct_state_access");
-	if (GL_TRUE != glfwExtensionSupported("GL_ARB_tessellation_shader"))
+	}
+	if (GL_TRUE != glfwExtensionSupported("GL_ARB_tessellation_shader")) {
 		throw std::runtime_error(
 			"OpenGL Unsupported : GL_ARB_tessellation_shader");
+	}
 
 	int mat_offset           = material->GetElementSize();
 	tv::model::shader_manage = &(app::shader_manage);
@@ -84,8 +88,9 @@ app::app(boost::program_options::variables_map& vm) {
 
 	// current_modelで指定されたsdmjファイルから読み込む
 	std::ifstream sdmj(current_model);
-	if (!sdmj)
+	if (!sdmj) {
 		throw std::runtime_error("File Open Error\n");
+	}
 
 	nlohmann::json j;
 	sdmj >> j;
@@ -133,9 +138,10 @@ app::app(boost::program_options::variables_map& vm) {
 						GL_LINEAR);
 	tv::model::default_texture = default_diffuse_texture;
 }
-app::~app(void) {
-	if (default_diffuse_texture)
+app::~app() {
+	if (default_diffuse_texture != 0u) {
 		glDeleteTextures(1, &default_diffuse_texture);
+	}
 }
 
 void app::Run() {
@@ -153,19 +159,20 @@ void app::Run() {
 			? "REGULAR"
 			: "GREGORY_BASIS");
 
-	query.reset(new glQuery(GL_PRIMITIVES_GENERATED));
+	query = std::make_unique<glQuery>(GL_PRIMITIVES_GENERATED);
 	//draw_string_query.reset(new glQuery(GL_PRIMITIVES_GENERATED));
 	glfwSetTime(0.0);
 	mainloop = true;
-	while (mainloop && !glfwWindowShouldClose(w)) {
+	while (mainloop && (glfwWindowShouldClose(w) == 0)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		tv::model::draw_call = 0;
 
 		UpdateUBO();
 
 		query->Start();
-		for (tv::model& model : models)
+		for (tv::model& model : models) {
 			model.Draw();
+		}
 		frametime = (float)glfwGetTime();
 		glfwSetTime(0.0);
 		query->End();

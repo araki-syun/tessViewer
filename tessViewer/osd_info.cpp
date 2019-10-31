@@ -24,20 +24,24 @@ void osd_info::set(Elem_Type e, unsigned int value) {
 	case osd_info::NUM_PRIM_PER_VERTEX:
 		elem.bits.num_prim_per_vertex = value;
 		break;
-	case osd_info::IS_ADAPTIVE: elem.bits.is_adaptive = (value ? 1 : 0); break;
+	case osd_info::IS_ADAPTIVE: elem.bits.is_adaptive = (value != 0u ? 1 : 0); break;
 	case osd_info::SCREEN_SPACE_TESS:
-		elem.bits.screen_space_tess = (value ? 1 : 0);
+		elem.bits.screen_space_tess = (value != 0u ? 1 : 0);
 		break;
-	case osd_info::FRACTIONAL: elem.bits.fractional = (value ? 1 : 0); break;
-	case osd_info::PATCH_CULL: elem.bits.patch_cull = (value ? 1 : 0); break;
+	case osd_info::FRACTIONAL:
+		elem.bits.fractional = (value != 0u ? 1 : 0);
+		break;
+	case osd_info::PATCH_CULL:
+		elem.bits.patch_cull = (value != 0u ? 1 : 0);
+		break;
 	case osd_info::SINGLE_CREASE_PATCH:
-		elem.bits.single_crease_patch = (value ? 1 : 0);
+		elem.bits.single_crease_patch = (value != 0u ? 1 : 0);
 		break;
 	default: break;
 	}
 }
 
-const std::string osd_info::str() const {
+std::string osd_info::str() const {
 	std::stringstream ss;
 	ss << std::hex << elem.data;
 	return ss.str();

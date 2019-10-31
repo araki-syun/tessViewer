@@ -12,7 +12,7 @@ public:
 	glShaderVariable();
 	virtual ~glShaderVariable() = 0;
 
-	const GLuint       GetIndex() const;
+	GLuint             GetIndex() const;
 	const std::string& GetVariableName() const;
 
 protected:
@@ -23,7 +23,7 @@ protected:
 class glShaderAttribute : public glShaderVariable {
 public:
 	glShaderAttribute(GLuint program, const char* name);
-	~glShaderAttribute();
+	~glShaderAttribute() override;
 
 	void Set(GLuint program, const char* name);
 };
@@ -31,7 +31,7 @@ public:
 class glShaderUniform : public glShaderVariable {
 public:
 	glShaderUniform(GLuint program, const char* name);
-	~glShaderUniform();
+	~glShaderUniform() override;
 
 	void Set(GLuint program, const char* name);
 };
@@ -40,7 +40,7 @@ class glShaderUniformBlock : public glShaderVariable {
 public:
 	glShaderUniformBlock(GLuint                        program,
 						 /*int buf_size,*/ const char* name);
-	~glShaderUniformBlock();
+	~glShaderUniformBlock() override;
 
 	void Set(GLuint program, const char* name);
 

@@ -13,18 +13,18 @@
 namespace glapp {
 class glShaderProgram : boost::noncopyable {
 public:
-	glShaderProgram(void);
+	glShaderProgram();
 	glShaderProgram(std::initializer_list<std::string> list);
-	~glShaderProgram(void);
+	~glShaderProgram();
 
-	const GLuint GetProgram() const;
+	GLuint       GetProgram() const;
 	void         SetShaderName(std::initializer_list<std::string> list);
-	const GLint  GetIndexAttrib(const std::string name) const;
-	const GLint  GetIndexUniform(const std::string name) const;
+	GLint        GetIndexAttrib(const std::string& name) const;
+	GLint        GetIndexUniform(const std::string& name) const;
 
 protected:
 	void                 create();
-	virtual const GLuint shaderCompile(const glslshader* shader);
+	virtual GLuint       shaderCompile(const glslshader* shader);
 	void                 setIndexUniform();
 	void                 setIndexAttrib();
 

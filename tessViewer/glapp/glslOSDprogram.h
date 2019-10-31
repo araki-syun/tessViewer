@@ -15,14 +15,14 @@
 namespace glapp {
 class glslOSDprogram : glShaderProgram {
 public:
-	glslOSDprogram(void);
-	~glslOSDprogram(void);
+	glslOSDprogram();
+	~glslOSDprogram();
 
 	//const GLuint GetProgram() const;
 
 protected:
 	//void create();
-	const GLuint       shaderCompile(const glslshader* shader) override;
+	GLuint             shaderCompile(const glslshader* shader) override;
 	const std::string& includeReplace(const glslshader* shader);
 
 protected:

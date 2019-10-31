@@ -25,14 +25,14 @@ public:
 					int         samples         = 2,
 					int         vsync           = 1,
 					init_flag   flag            = init_flag::DEFAULT);
-	virtual ~window();
+	~window() override;
 
-	void             SetBackColor(const glm::vec4& color);
-	const glm::ivec2 GetWindowSize() const;
-	void             GetWindowSize(int* w, int* h) const override;
-	void             GetWindowPosition(int* x, int* y) const override;
-	GLuint           GetFrameBuffer() const;
-	GLFWwindow*      GetWin();
+	void        SetBackColor(const glm::vec4& color);
+	glm::ivec2  GetWindowSize() const;
+	void        GetWindowSize(int* x, int* y) const override;
+	void        GetWindowPosition(int* x, int* y) const override;
+	GLuint      GetFrameBuffer() const;
+	GLFWwindow* GetWin();
 
 public:
 	//std::unique_ptr<glShaderProgram> program;

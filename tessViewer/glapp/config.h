@@ -8,8 +8,8 @@ class Config {
 public:
 	//static Config config;
 
-	Config(void);
-	~Config(void);
+	Config();
+	~Config();
 	Config(const std::string& filename);
 
 	void Reset(const std::string& filename);

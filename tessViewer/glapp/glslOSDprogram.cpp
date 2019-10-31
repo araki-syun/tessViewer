@@ -8,7 +8,8 @@
 #include "glapp_define.h"
 
 namespace glapp {
-glslOSDprogram::glslOSDprogram():_type(OpenSubdiv::Far::PatchDescriptor::Type::REGULAR) {}
+glslOSDprogram::glslOSDprogram()
+	: _type(OpenSubdiv::Far::PatchDescriptor::Type::REGULAR) {}
 
 glslOSDprogram::~glslOSDprogram() { glDeleteProgram(_program); }
 
@@ -48,7 +49,7 @@ glslOSDprogram::~glslOSDprogram() { glDeleteProgram(_program); }
 //		}
 //	}
 
-const GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
+GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
 	GLuint      id(0);
 	const char* str = includeReplace(shader).c_str();
 	id              = glCreateShader(shader->GetType());
@@ -82,6 +83,7 @@ const GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
 #endif
 		return id;
 	}
+	return 0;
 }
 
 const std::string& glslOSDprogram::includeReplace(const glslshader* shader) {

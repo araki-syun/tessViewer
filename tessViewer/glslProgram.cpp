@@ -2,7 +2,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include <boost\format.hpp>
@@ -50,15 +52,17 @@ glslProgram::glslProgram(const glsl_info& glsl, const osd_info& osd) {
 	SetProgram(glsl, osd);
 }
 glslProgram::~glslProgram() {
-	if (_program)
+	if (_program != 0u) {
 		glDeleteProgram(_program);
+	}
 }
 
 GLuint glslProgram::GetProgram() const { return _program; }
 
 void glslProgram::SetProgram(const glslProgram::glsl_info& glsl) {
-	if (_program)
+	if (_program != 0u) {
 		glDeleteProgram(_program);
+	}
 	_program = glCreateProgram();
 
 	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
@@ -144,8 +148,9 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl) {
 void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 							 const osd_info&               osd) {
 	using namespace OpenSubdiv;
-	if (_program)
+	if (_program != 0u) {
 		glDeleteProgram(_program);
+	}
 	_program = glCreateProgram();
 
 	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
@@ -172,7 +177,7 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 			   : (osd.elem.bits.single_crease_patch
 					  ? "#define OSD_PATCH_ENABLE_SINGLE_CREASE\n"
 					  : ""))
-	   << (osd.elem.bits.fvar_width
+	   << (osd.elem.bits.fvar_width != 0u
 			   ? (boost::format("#define OSD_FVAR_WIDTH %1%\n") %
 				  osd.elem.bits.fvar_width)
 					 .str()
@@ -289,8 +294,9 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 }
 
 void glslProgram::SetProgram(const std::string& vert, const std::string& frag) {
-	if (_program)
+	if (_program != 0u) {
 		glDeleteProgram(_program);
+	}
 	_program = glCreateProgram();
 
 	std::ifstream ifsv(vert, std::ios::in);
@@ -347,7 +353,8 @@ void glslProgram::SetLocation() {
 
 	{
 		attrib_map.clear();
-		int numAttrib, maxAttribsize;
+		int numAttrib;
+		int maxAttribsize;
 		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &numAttrib);
 		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH,
 					   &maxAttribsize);
@@ -355,41 +362,44 @@ void glslProgram::SetLocation() {
 			int               size;
 			GLenum            type;
 			std::vector<char> name(maxAttribsize);
-			glGetActiveAttrib(_program, i, maxAttribsize, NULL, &size, &type,
+			glGetActiveAttrib(_program, i, maxAttribsize, nullptr, &size, &type,
 							  name.data());
-			attrib_map[name.data()].reset(
-				new tv::glShaderAttribute(_program, name.data()));
+			attrib_map[name.data()] =
+				std::make_unique<tv::glShaderAttribute>(_program, name.data());
 		}
 	}
 	{
 		uniform_map.clear();
-		int numUniform, maxUniformsize;
+		int numUniform;
+		int maxUniformsize;
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &numUniform);
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformsize);
 		for (int i = 0; i < numUniform; ++i) {
 			std::vector<char> name(maxUniformsize);
-			glGetActiveUniformName(_program, i, maxUniformsize, NULL,
+			glGetActiveUniformName(_program, i, maxUniformsize, nullptr,
 								   name.data());
-			uniform_map[name.data()].reset(
-				new tv::glShaderUniform(_program, name.data()));
+			uniform_map[name.data()] =
+				std::make_unique<tv::glShaderUniform>(_program, name.data());
 		}
 	}
 	{
 		uniformBlock_map.clear();
-		int numUniformBlock, maxUniformBlocksize;
+		int numUniformBlock;
+		int maxUniformBlocksize;
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlock);
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH,
 					   &maxUniformBlocksize);
 		for (int i = 0; i < numUniformBlock; ++i) {
-			int               length, size;
+			int               length;
+			int               size;
 			std::vector<char> name_array(maxUniformBlocksize);
 			glGetActiveUniformBlockName(_program, i, maxUniformBlocksize,
 										&length, name_array.data());
 			glGetActiveUniformBlockiv(_program, i, GL_UNIFORM_BLOCK_DATA_SIZE,
 									  &size);
 			std::string name(name_array.data()); //cbegin(), name_array.cend());
-			uniformBlock_map[name].reset(
-				new tv::glShaderUniformBlock(_program, name.c_str()));
+			uniformBlock_map[name] = std::make_unique<tv::glShaderUniformBlock>(
+				_program, name.c_str());
 			glUniformBlockBinding(
 				_program, uniformBlock_map[name]->GetIndex(),
 				glsl_info::GetUniformBuffer(name)->GetBinding());
@@ -500,7 +510,7 @@ glslProgram::GetUniformBlock(const std::string& name) const {
 
 glslProgram::glsl_info::glsl_info() /* :
 	vert(DEFAULT_VERTEX_SHADER),frag(DEFAULT_FRAGMENT_SHADER),geom(DEFAULT_GEOMETRY_SHADER)*/
-{}
+	= default;
 
 glslProgram::glsl_info::glsl_info(const glsl_info& info)
 	: vert(info.vert)
@@ -509,14 +519,18 @@ glslProgram::glsl_info::glsl_info(const glsl_info& info)
 	, tcs(info.vert)
 	, tes(info.vert) {}
 
-glslProgram::glsl_info::glsl_info(const std::string& vert,
-								  const std::string& frag,
-								  const std::string& geom,
-								  const std::string& tcs,
-								  const std::string& tes)
-	: vert(vert), frag(frag), geom(geom), tcs(tcs), tes(tes) {}
+glslProgram::glsl_info::glsl_info(std::string vert,
+								  std::string frag,
+								  std::string geom,
+								  std::string tcs,
+								  std::string tes)
+	: vert(std::move(vert))
+	, frag(std::move(frag))
+	, geom(std::move(geom))
+	, tcs(std::move(tcs))
+	, tes(std::move(tes)) {}
 
-const std::string glslProgram::glsl_info::str() const {
+std::string glslProgram::glsl_info::str() const {
 	std::stringstream ss;
 	ss << vert << frag << geom << tcs << tes;
 	return ss.str();
@@ -525,12 +539,13 @@ const std::string glslProgram::glsl_info::str() const {
 void glslProgram::glsl_info::CreateUniformBuffer(const std::string& name,
 												 int                size) {
 	auto it = buffers.find(name);
-	if (it != buffers.end())
+	if (it != buffers.end()) {
 		;
-	else
+	} else {
 		buffers.emplace(
 			std::piecewise_construct, std::forward_as_tuple(name),
 			std::forward_as_tuple(new tv::glShaderUniformBuffer(size)));
+	}
 }
 
 const tv::glShaderUniformBuffer*

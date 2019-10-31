@@ -10,7 +10,7 @@
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
 
-void main(int argc, char* argv[]) {
+int main(int argc, char* argv[]) {
 	using namespace std::literals::string_literals;
 	using namespace boost::program_options;
 	options_description options("option");
@@ -63,19 +63,19 @@ void main(int argc, char* argv[]) {
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
-		return;
+		return -1;
 	}
-	if (vm.count("version")) {
+	if (vm.count("version") != 0u) {
 		std::cout << "tessViewer " TV_VERSION << std::endl;
-		return;
+		return 0;
 	}
-	if (vm.count("help")) {
+	if (vm.count("help") != 0u) {
 		std::cout << "tessViewer " TV_VERSION << std::endl;
 		std::cout << options << std::endl;
 		//std::cout << window_option << std::endl;
 		//std::cout << graphics_option << std::endl;
 		//std::cout << ui_option << std::endl;
-		return;
+		return 0;
 	}
 
 	try {
