@@ -39,6 +39,10 @@
 					"description": "垂直同期",
 					"type": "boolean",
 					"default": true
+				},
+				"background_color": {
+					"$ref": "#color_value",
+					"default": "#808080ff"
 				}
 			}
 		},
@@ -54,14 +58,38 @@
 						"angle": {
 							"$ref": "#vec3"
 						},
+						"quaternion": {
+							"type": "array",
+							"maxItems": 4,
+							"minItems": 4,
+							"items": {
+								"type": "number"
+							}
+						},
 						"fov": {
 							"description": "視野の広さ",
 							"type": "number",
 							"minimum": 10.0,
 							"maximum": 179.0,
 							"default": 60.0
+						},
+						"light": {
+							"description": "常にカメラ側から照らすライト",
+							"properties": {
+								"color": {
+									"$ref": "#color_value"
+								},
+								"direction": {
+									"$ref": "#vec3"
+								}
+							}
 						}
 					}
+				},
+				"model": {
+					"description": "コマンドライン引数によるモデルの指定がない場合読み込まれるモデル",
+					"format": "uri-reference",
+					"default": "data/model/cube.sdmj"
 				},
 				"osd": {
 					"description": "OpenSubdivに関する設定",
@@ -72,9 +100,10 @@
 								"type": {
 									"description": "パッチタイプ",
 									"enum": [
-										"REGULER",
+										"REGULAR",
 										"GREGORY_BASIS"
-									]
+									],
+									"default": "REGULAR"
 								},
 								"level": {
 									"description": "パッチ係数",
@@ -93,6 +122,9 @@
 							"default": 2
 						}
 					}
+				},
+				"shader": {
+					"properties": {}
 				}
 			}
 		},
