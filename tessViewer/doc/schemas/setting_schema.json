@@ -141,12 +141,22 @@
 								}
 							}
 						},
-						"tess_level": {
-							"description": "テッセレーション係数",
-							"type": "integer",
-							"minimum": 0,
-							"maximum": 10,
-							"default": 2
+						"tessellation": {
+							"properties": {
+								"level": {
+									"description": "テッセレーション係数",
+									"type": "integer",
+									"minimum": 0,
+									"maximum": 10,
+									"default": 2
+								},
+								"screen_space": {
+									"type": "boolean"
+								},
+								"fractional": {
+									"type": "boolean"
+								}
+							}
 						}
 					}
 				},
