@@ -28,13 +28,6 @@
 						}
 					}
 				},
-				"fov": {
-					"description": "視野の広さ",
-					"type": "number",
-					"minimum": 10.0,
-					"maximum": 179.0,
-					"default": 60.0
-				},
 				"vsync": {
 					"description": "垂直同期",
 					"type": "boolean",
@@ -43,6 +36,40 @@
 				"background_color": {
 					"$ref": "#color_value",
 					"default": "#808080ff"
+				},
+				"bit": {
+					"properties": {
+						"red": {
+							"type": "integer",
+							"default": 8
+						},
+						"green": {
+							"type": "integer",
+							"default": 8
+						},
+						"blue": {
+							"type": "integer",
+							"default": 8
+						},
+						"alpha": {
+							"type": "integer",
+							"default": 8
+						},
+						"depth": {
+							"type": "integer",
+							"default": 24
+						},
+						"stencil": {
+							"type": "integer",
+							"default": 8
+						}
+					}
+				},
+				"debug_level": {
+					"type": "integer",
+					"maximum": 4,
+					"minimum": 0,
+					"default": 0
 				}
 			}
 		},
