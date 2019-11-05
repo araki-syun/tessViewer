@@ -34,7 +34,7 @@
 					"default": true
 				},
 				"background_color": {
-					"$ref": "#color_value",
+					"$ref": "#color_hex_value",
 					"default": "#808080ff"
 				},
 				"bit": {
@@ -80,10 +80,20 @@
 				"camera": {
 					"properties": {
 						"position": {
-							"$ref": "#vec3"
+							"$ref": "#vec3",
+							"default": [
+								0.0,
+								0.0,
+								3.0
+							]
 						},
 						"angle": {
-							"$ref": "#vec3"
+							"$ref": "#vec3",
+							"default": [
+								0.0,
+								0.0,
+								-1.0
+							]
 						},
 						"quaternion": {
 							"type": "array",
@@ -103,11 +113,29 @@
 						"light": {
 							"description": "常にカメラ側から照らすライト",
 							"properties": {
+								"position": {
+									"$ref": "#vec3",
+									"default": [
+										1.0,
+										1.0,
+										1.0
+									]
+								},
 								"color": {
-									"$ref": "#color_value"
+									"$ref": "#color_hex_value",
+									"default": [
+										0.5,
+										0.5,
+										0.5
+									]
 								},
 								"direction": {
-									"$ref": "#vec3"
+									"$ref": "#vec3",
+									"default": [
+										0.0,
+										1.0,
+										0.0
+									]
 								}
 							}
 						}
@@ -191,11 +219,11 @@
 							"type": "object",
 							"properties": {
 								"primary": {
-									"$ref": "#color_value",
+									"$ref": "#color_hex_value",
 									"default": "#f0f0f0"
 								},
 								"secondary": {
-									"$ref": "#color_value",
+									"$ref": "#color_hex_value",
 									"default": "#0000000f"
 								}
 							},
@@ -223,8 +251,8 @@
 		},
 		"color": {
 			"definitions": {
-				"value": {
-					"$id": "color_value",
+				"hex_value": {
+					"$id": "color_hex_value",
 					"description": "16進数で色RGBAを指定する。最初のR値だけ指定するとGB値も同じ値になる。アルファ値はしていしない限りff",
 					"type": "string",
 					"minLength": 3,
