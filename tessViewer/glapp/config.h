@@ -8,7 +8,6 @@
 
 #include "nlohmann/json_fwd.hpp"
 #include "nlohmann/json.hpp"
-#include <string_view>
 
 namespace glapp {
 class Config {
@@ -21,7 +20,7 @@ public:
 	Config& operator=(const Config& config);
 	Config& operator=(Config&& config) noexcept;
 
-	const nlohmann::json& Json();
+	[[nodiscard]] const nlohmann::json& Json() const;
 	template <class T, class... ARGS>
 	T Value(ARGS... args) const {
 		return _key_value(args...).get<T>();
@@ -39,6 +38,7 @@ public:
 private:
 	static const Config         _config;
 	static const nlohmann::json _jschema;
+	static nlohmann::json       _load_schema();
 };
 
 template <class... ARGS>
