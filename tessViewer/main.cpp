@@ -2,6 +2,8 @@
 
 #include <iostream>
 #include <string>
+#include <fstream>
+
 #include <boost\program_options.hpp>
 
 #include "location_define.h"
