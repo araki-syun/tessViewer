@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "glapp_define.h"
+#include "config.h"
 
 namespace glapp {
 
@@ -24,19 +25,22 @@ window::window(const char* title,
 			   int         vsync,
 			   init_flag   flag)
 	: inner::base_window(title, width, height, flag) {
+	auto conf            = Config::GetSingleton();
+	auto conf_win        = conf.Relative("/window");
+	auto conf_bit        = conf_win.Relative("/bit");
+	window::_debug_level = conf_win.Value<int>("debug_level");
+
 	Initialize();
-#ifdef _DEBUG
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-#endif
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, _debug_level > 0 ? 1 : 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glversion_major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glversion_minor);
 	glfwWindowHint(GLFW_SAMPLES, samples);
-	glfwWindowHint(GLFW_RED_BITS, 8);
-	glfwWindowHint(GLFW_GREEN_BITS, 8);
-	glfwWindowHint(GLFW_BLUE_BITS, 8);
-	glfwWindowHint(GLFW_ALPHA_BITS, 8);
-	glfwWindowHint(GLFW_DEPTH_BITS, 24);
-	glfwWindowHint(GLFW_STENCIL_BITS, 8);
+	glfwWindowHint(GLFW_RED_BITS, conf_bit.Value<int>("red"));
+	glfwWindowHint(GLFW_GREEN_BITS, conf_bit.Value<int>("green"));
+	glfwWindowHint(GLFW_BLUE_BITS, conf_bit.Value<int>("blue"));
+	glfwWindowHint(GLFW_ALPHA_BITS, conf_bit.Value<int>("alpha"));
+	glfwWindowHint(GLFW_DEPTH_BITS, conf_bit.Value<int>("depth"));
+	glfwWindowHint(GLFW_STENCIL_BITS, conf_bit.Value<int>("stencil"));
 
 	this->_win =
 		glfwCreateWindow(width, height, title,
@@ -58,10 +62,11 @@ window::window(const char* title,
 
 	//program.reset(new glShaderProgram());
 
-	glfwSwapInterval(vsync);
+	glfwSwapInterval(conf_win.Value<bool>("vsync") ? 1 : 0);
 
-	glViewport(0, 0, width, height);
-	glClearColor(0, 0, 0, 1);
+	glViewport(0, 0, conf_win.Value<int>("resolution/width"),
+			   conf_win.Value<int>("resolution/height"));
+	SetBackColor(conf_win.Value<glm::vec4>("background_color"));
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
@@ -75,7 +80,7 @@ void window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
 }
 
- glm::ivec2 window::GetWindowSize() const {
+glm::ivec2 window::GetWindowSize() const {
 	glm::ivec2 size(0);
 	GetWindowSize(&size.x, &size.y);
 	return size;
@@ -92,12 +97,12 @@ GLFWwindow* window::GetWin() { return _win; }
 int             window::_debug_level          = 0;
 unsigned int    window::_debug_message_number = 0;
 void GLAPIENTRY window::openGLDebugMessageCallback(GLenum        source,
-										   GLenum        type,
-										   GLuint        id,
-										   GLenum        severity,
-										   GLsizei       length,
-										   const GLchar* message,
-										   const void*   userParam) {
+												   GLenum        type,
+												   GLuint        id,
+												   GLenum        severity,
+												   GLsizei       length,
+												   const GLchar* message,
+												   const void*   userParam) {
 	int         level = 0;
 	std::string severity_string;
 	switch (severity) {
@@ -120,7 +125,7 @@ void GLAPIENTRY window::openGLDebugMessageCallback(GLenum        source,
 	}
 	if (level < _debug_level) {
 		return;
-}
+	}
 
 	std::cout << "---------------------opengl-callback-start------------"
 			  << std::endl;
