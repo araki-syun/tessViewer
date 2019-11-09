@@ -5,12 +5,22 @@
 #include <string>
 #include <filesystem>
 #include <string_view>
+#include <type_traits>
 
 #include "nlohmann/detail/json_pointer.hpp"
 #include "nlohmann/json_fwd.hpp"
 #include "nlohmann/json.hpp"
 
 namespace glapp {
+template <class, class = void>
+struct is_less_then_comparable : std::false_type {};
+
+template <class T>
+struct is_less_then_comparable<
+	T,
+	std::void_t<decltype(std::declval<T&>() < std::declval<T&>())>>
+	: std::true_type {};
+
 class Config {
 public:
 	Config() = delete;
@@ -47,6 +57,7 @@ private:
 	static const nlohmann::json& _get_schema(std::string_view key);
 	template <class T>
 	static T _round_value(const nlohmann::json& schema, const T& value) {
+		if constexpr (is_less_then_comparable<T>::value) {
 		auto maximum = schema.find("maximum");
 		auto minimum = schema.find("minimum");
 		auto end     = schema.cend();
@@ -54,13 +65,15 @@ private:
 			return std::clamp(value, maximum->get<T>(), minimum->get<T>());
 		}
 		auto v = value;
-		if (max != schema.cend()) {
+			if (maximum != schema.cend()) {
 			v = std::min(value, maximum->get<T>());
 		}
-		if (min != schema.cend()) {
+			if (minimum != schema.cend()) {
 			v = std::max(value, minimum->get<T>());
 		}
 		return v;
+	}
+		return value;
 	}
 };
 } // namespace glapp
