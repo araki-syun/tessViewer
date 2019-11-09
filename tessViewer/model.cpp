@@ -4,8 +4,11 @@
 #include <memory>
 #include <algorithm>
 
-#include <glm\ext.hpp>
-#include <glm\gtx\quaternion.hpp>
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/quaternion.hpp>
+#include <glm/gtx/transform.hpp>
+#include <glm/gtx/euler_angles.hpp>
 #include <opensubdiv\far\topologyRefiner.h>
 #include <opensubdiv\far\stencilTable.h>
 #include <opensubdiv\far\primvarRefiner.h>

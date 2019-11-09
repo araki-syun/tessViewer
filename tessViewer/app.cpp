@@ -2,13 +2,18 @@
 
 #include <fstream>
 #include <cstdint>
-
 #include <memory>
+
 #include <opencv2\core.hpp>
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
 
 #include <nlohmann/json.hpp>
+
+#include <glm/glm.hpp>
+#include <glm/ext.hpp>
+#include <glm/gtx/rotate_vector.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
