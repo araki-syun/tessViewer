@@ -48,11 +48,11 @@ Config& Config::operator=(Config&& config) noexcept {
 const json& Config::Json() const { return *_jconfig; }
 Config Config::Relative(std::string_view key) { return Config(*this, key); }
 const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
-										 std::string_view      str) {
+										 std::string_view      str) const {
 	using namespace std::string_literals;
-	auto& j   = *_jconfig;
-	auto  def = schema.find("default");
-	auto  it  = j.find(std::string(str));
+	const auto& j   = *_jconfig;
+	auto        def = schema.find("default");
+	auto        it  = j.find(std::string(str));
 
 	const std::array<std::string, 5> types{"boolean", "integer", "number",
 										   "string", "null"};
