@@ -4,14 +4,6 @@
 
 #include "glapp_define.h"
 
-void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
-										   GLenum        type,
-										   GLuint        id,
-										   GLenum        severity,
-										   GLsizei       length,
-										   const GLchar* message,
-										   const void*   userParam);
-
 namespace glapp {
 
 void Initialize() {
@@ -96,18 +88,17 @@ void glapp::window::GetWindowPosition(int* x, int* y) const {
 }
 GLuint      glapp::window::GetFrameBuffer() const { return GLuint(); }
 GLFWwindow* window::GetWin() { return _win; }
-} // namespace glapp
 
-#define MASSAGE_LEVEL 1
-void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
+int             window::_debug_level          = 0;
+unsigned int    window::_debug_message_number = 0;
+void GLAPIENTRY window::openGLDebugMessageCallback(GLenum        source,
 										   GLenum        type,
 										   GLuint        id,
 										   GLenum        severity,
 										   GLsizei       length,
 										   const GLchar* message,
 										   const void*   userParam) {
-	static int  number = 0;
-	int         level  = 0;
+	int         level = 0;
 	std::string severity_string;
 	switch (severity) {
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
@@ -127,14 +118,14 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 		level           = 3;
 		break;
 	}
-	if (level < MASSAGE_LEVEL) {
+	if (level < _debug_level) {
 		return;
 }
 
 	std::cout << "---------------------opengl-callback-start------------"
 			  << std::endl;
 
-	std::cout << "No." << number << '\n';
+	std::cout << "No." << _debug_message_number << '\n';
 	std::cout << "type: ";
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR: std::cout << "ERROR"; break;
@@ -150,7 +141,7 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 	}
 	std::cout << std::endl;
 
-	const char* errstr = (const char*)gluErrorString(id);
+	auto errstr = reinterpret_cast<const char*>(gluErrorString(id));
 	if (errstr != nullptr) {
 		std::cout << "id: " << id << ' ' << errstr << std::endl;
 	}
@@ -184,5 +175,7 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 	std::cout << "message: " << message << std::endl;
 	std::cout << "---------------------opengl-callback-end--------------"
 			  << std::endl;
-	++number;
+	++_debug_message_number;
 }
+
+} // namespace glapp

@@ -39,6 +39,16 @@ public:
 
 private:
 	GLFWwindow* _win;
+
+	static int             _debug_level;
+	static unsigned int    _debug_message_number;
+	static void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
+													  GLenum        type,
+													  GLuint        id,
+													  GLenum        severity,
+													  GLsizei       length,
+													  const GLchar* message,
+													  const void*   userParam);
 };
 
 } // namespace glapp
