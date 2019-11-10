@@ -26,6 +26,7 @@ Config::Config(const std::filesystem::path& config_file) {
 		std::cerr << e.what();
 	}
 }
+Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
 Config::Config(const Config& config, std::string_view str)
 	: _jconfig(config._jconfig), _base(std::string(str)) {}
@@ -46,47 +47,54 @@ Config& Config::operator=(Config&& config) noexcept {
 	return *this;
 }
 const json& Config::Json() const { return *_jconfig; }
-Config Config::Relative(std::string_view key) { return Config(*this, key); }
-const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
-										 std::string_view      str) const {
-	using namespace std::string_literals;
-	const auto& j   = *_jconfig;
-	auto        def = schema.find("default");
-	auto        it  = j.find(std::string(str));
-
-	const std::array<std::string, 5> types{"boolean", "integer", "number",
-										   "string", "null"};
-	//スキーマが値型
-	if (auto result = std::find(std::cbegin(types), std::cend(types),
-								schema.at("type").get<std::string>());
-		result != std::cend(types)) {
-		//キーが存在する
-		if (it != j.end() && it->type_name() == *result) {
-			return *it;
-		}
-		//スキーマのデフォルト値が存在する
-		if (def != schema.end()) {
-			return *def;
-		}
-		throw std::domain_error("key : " + std::string(str) + "\n" +
-								"keyのデフォルト値は存在しません");
-	}
-	throw std::domain_error("key : " + std::string(str) + "\n" +
-							"keyは値型ではありません");
+Config      Config::Relative(std::string_view key) const {
+    return Config(*this, key);
 }
-const Config Config::_config = Config("setting.json");
-;
-const json Config::_jschema = Config::_load_schema();
-json       Config::_load_schema() {
+const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
+										 std::string_view      key) const {
+	std::string path(key);
+	if (Config::_argument().contains(path)) {
+		return Config::_argument()[path];
+	}
+	if (_jconfig->contains(path)) {
+		return _jconfig->operator[](path);
+	}
+	return schema.at("default");
+}
+
+Config Config::Get(std::string_view key) { return _config.Relative(key); }
+void   Config::CommandLineOptions(const nlohmann::json& j) {
+    if (_command_line_argument.empty()) {
+        _command_line_argument = j;
+    }
+}
+const Config Config::_config = Config(std::filesystem::path("setting.json"));
+json         Config::_command_line_argument = json();
+const json   Config::_jschema               = Config::_load_schema();
+const json&  Config::_argument() { return _command_line_argument; }
+json         Config::_load_schema() {
 #include "../doc/schemas/setting_schema.json.gen.h"
 	return json::parse(setting_json);
 }
-const json& Config::_get_schema(std::string_view key) {
-	std::istringstream iss((std::string(key)));
-	std::ostringstream oss;
-	for (std::string obj; std::getline(iss, obj, '/');) {
-		oss << "/properties" << obj;
-	}
-	return Config::_jschema.at(oss.str());
+const json& Config::_get_schema(Config::_json_pointer p, std::string_view key) {
+	auto path = [](std::string_view str) -> std::string {
+		std::istringstream iss((std::string(str)));
+		std::ostringstream oss;
+		for (std::string obj; std::getline(iss, obj, '/');) {
+			oss << "/properties" << obj;
+		}
+		return oss.str();
+	};
+	return Config::_jschema.at(path(p.to_string()) + path(key));
+}
+bool Config::_check_schema_value(const nlohmann::json& schema,
+								 const nlohmann::json& value) {
+	auto                             def = schema.find("default");
+	const std::array<std::string, 6> types{"boolean", "integer", "number",
+										   "string",  "array",   "object"};
+	//schemaとvalueが同じタイプ
+	auto result = std::find(std::cbegin(types), std::cend(types),
+							schema.at("type").get<std::string>());
+	return result != std::cend(types) && *result == value.type_name();
 }
 } // namespace glapp

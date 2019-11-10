@@ -25,8 +25,7 @@ window::window(const char* title,
 			   int         vsync,
 			   init_flag   flag)
 	: inner::base_window(title, width, height, flag) {
-	auto conf            = Config::GetSingleton();
-	auto conf_win        = conf.Relative("/window");
+	auto conf_win        = Config::Get("/window");
 	auto conf_bit        = conf_win.Relative("/bit");
 	window::_debug_level = conf_win.Value<int>("debug_level");
 
