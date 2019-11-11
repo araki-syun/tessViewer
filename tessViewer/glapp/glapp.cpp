@@ -16,15 +16,8 @@ void Initialize() {
 //window::window(){
 
 //}
-window::window(const char* title,
-			   int         width,
-			   int         height,
-			   int         glversion_major,
-			   int         glversion_minor,
-			   int         samples,
-			   int         vsync,
-			   init_flag   flag)
-	: inner::base_window(title, width, height, flag) {
+window::window(std::string_view title, int glversion_major, int glversion_minor)
+	: inner::base_window(title) {
 	auto conf_win        = Config::Get("/window");
 	auto conf_bit        = conf_win.Relative("/bit");
 	window::_debug_level = conf_win.Value<int>("debug_level");
@@ -33,7 +26,7 @@ window::window(const char* title,
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, _debug_level > 0 ? 1 : 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glversion_major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glversion_minor);
-	glfwWindowHint(GLFW_SAMPLES, samples);
+	glfwWindowHint(GLFW_SAMPLES, conf_win.Value<int>("/graphics/aa/samples"));
 	glfwWindowHint(GLFW_RED_BITS, conf_bit.Value<int>("red"));
 	glfwWindowHint(GLFW_GREEN_BITS, conf_bit.Value<int>("green"));
 	glfwWindowHint(GLFW_BLUE_BITS, conf_bit.Value<int>("blue"));
@@ -41,14 +34,11 @@ window::window(const char* title,
 	glfwWindowHint(GLFW_DEPTH_BITS, conf_bit.Value<int>("depth"));
 	glfwWindowHint(GLFW_STENCIL_BITS, conf_bit.Value<int>("stencil"));
 
-	this->_win =
-		glfwCreateWindow(width, height, title,
-						 (static_cast<std::uint8_t>(flag) &
-						  static_cast<std::uint8_t>(
-							  inner::base_window::init_flag::FULLSCREEN)) != 0
-							 ? glfwGetPrimaryMonitor()
-							 : nullptr,
-						 nullptr);
+	this->_win = glfwCreateWindow(
+		conf_win.Value<int>("resolution/width"),
+		conf_win.Value<int>("resolution/height"), std::string(title).c_str(),
+		conf_win.Value<bool>("fullscreen") ? glfwGetPrimaryMonitor() : nullptr,
+		nullptr);
 	glfwMakeContextCurrent(this->_win);
 
 	glewExperimental = GL_TRUE;
