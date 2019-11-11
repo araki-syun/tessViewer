@@ -85,6 +85,8 @@ private:
 		glm::vec3 Right;
 		glm::vec3 Up;
 		float     Fov;
+		float     Near;
+		float     Far;
 		glm::vec2 Move;
 		bool      fly_mode;
 	} camera;

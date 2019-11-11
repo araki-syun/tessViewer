@@ -14,13 +14,20 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <string>
 
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
 
+#include "glm/fwd.hpp"
 #include "version.h"
 
 app::app(boost::program_options::variables_map& vm) {
+	auto conf       = glapp::Config::Get();
+	auto conf_graph = conf.Relative("/graphics");
+	auto conf_osd   = conf_graph.Relative("/osd");
+	auto conf_font  = conf.Relative("/ui/font");
+
 	current_model = vm["object"].as<std::string>();
 
 	setting.window_full_screen  = vm.count(GLAPP_CONFIG_FULLSCREEN) > 0;
@@ -30,18 +37,14 @@ app::app(boost::program_options::variables_map& vm) {
 	setting.window_vsync        = vm[GLAPP_CONFIG_VSYNC].as<bool>();
 	setting.graphics_osd_patch_level_default =
 		vm[GLAPP_CONFIG_PATCH_LEVEL_DEFAULT].as<int>();
-	setting.graphics_osd_patch_level_max =
-		vm[GLAPP_CONFIG_PATCH_LEVEL_MAX].as<int>();
 	setting.graphics_osd_tess_level_default =
 		vm[GLAPP_CONFIG_TESS_LEVEL_DEFAULT].as<int>();
-	setting.graphics_osd_tess_level_max =
-		vm[GLAPP_CONFIG_TESS_LEVEL_MAX].as<int>();
 	setting.ui_user_interface = vm[GLAPP_CONFIG_USER_INTERFACE].as<bool>();
 	setting.ui_font_file      = std::string(FONT R"(ipaexg.ttf)");
 	setting.ui_font_size      = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
 	setting.ui_font_color     = vm[GLAPP_CONFIG_FONT_COLOR].as<std::uint8_t>();
 	tv::model::default_patch_type =
-		vm.count(GLAPP_CONFIG_PATCH_TYPE_GREGORY) > 0
+		conf.Value<std::string>("/graphics/osd/patch/type") == "GREGORY_BASIS"
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
 			: OpenSubdiv::Far::PatchDescriptor::Type::REGULAR;
 
@@ -54,12 +57,7 @@ app::app(boost::program_options::variables_map& vm) {
 
 	glfwSetErrorCallback(glfwErrorCallback);
 
-	win = std::make_unique<glapp::window>(
-		"tessViewer " TV_VERSION, setting.window_resolution_x,
-		setting.window_resolution_y, 4, 5, 4, (int)setting.window_vsync,
-		setting.window_full_screen ? glapp::window::init_flag::FULLSCREEN
-								   : glapp::window::init_flag::DEFAULT);
-	win->SetBackColor(glm::vec4(glm::vec3(0.5f), 1));
+	win = std::make_unique<glapp::window>("tessViewer " TV_VERSION, 4, 5);
 
 	if (GL_TRUE != glfwExtensionSupported("GL_ARB_direct_state_access")) {
 		throw std::runtime_error(
@@ -83,13 +81,15 @@ app::app(boost::program_options::variables_map& vm) {
 	tv::model::default_glsl_info.GetUniformBuffer("MaterialOffset")
 		->Update(&mat_offset);
 
-	tv::model::max_patch     = setting.graphics_osd_patch_level_max;
-	tv::model::default_patch = setting.graphics_osd_patch_level_default;
+	tv::model::default_patch = conf_osd.Value<int>("/patch/level");
+	tv::model::max_patch =
+		conf_osd.Schema("/patch/level").at("maximum").get<int>();
 
 	draw_string = tv::glslStringDraw::getInstance();
-	draw_string->Initialize(setting.ui_font_size, setting.ui_font_file);
-	draw_string->SetWindowSize(setting.window_resolution_x,
-							   setting.window_resolution_y);
+	draw_string->Initialize(conf_font.Value<int>("size"),
+							conf_font.Value<std::string>("file"));
+	draw_string->SetWindowSize(conf.Value<int>("/window/resolution/width"),
+							   conf.Value<int>("/window/resolution/height"));
 
 	// current_modelで指定されたsdmjファイルから読み込む
 	std::ifstream sdmj(current_model);
@@ -106,24 +106,30 @@ app::app(boost::program_options::variables_map& vm) {
 		models.emplace_back(o, material);
 	}
 
-	window_size =
-		glm::ivec2(setting.window_resolution_x, setting.window_resolution_y);
+	window_size = glm::ivec2(conf.Value<int>("/window/resolution/width"),
+							 conf.Value<int>("/window/resolution/height"));
 
-	camera.Pos       = glm::vec3(0.0f, 0.0f, 3.0f);
-	camera.LookPoint = glm::vec3(0.0f, 0.0f, 0.0f);
-	camera.Angle     = glm::normalize(camera.LookPoint - camera.Pos);
-	camera.Fov       = setting.window_fov;
+	auto conf_cam    = conf_graph.Relative("camera");
+	camera.Pos       = conf_cam.Value<glm::vec3>("position");
+	camera.Angle     = conf_cam.Value<glm::vec3>("angle");
+	camera.Fov       = conf_cam.Value<float>("fov");
+	camera.LookPoint = camera.Pos + camera.Angle;
 	camera.Right     = glm::cross(camera.Angle, glm::vec3(0, 1, 0));
 	camera.Up        = glm::cross(camera.Right, camera.Angle);
 
-	tess_fact     = setting.graphics_osd_tess_level_default;
-	max_tess_fact = setting.graphics_osd_tess_level_max;
+	tess_fact = conf_osd.Value<int>("/tessellation/level");
+	max_tess_fact =
+		conf_osd.Schema("/tessellation/level").at("maximum").get<int>();
 
 	UpdateView();
 	UpdateProjection();
-	light = {glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-			 glm::vec3(0.5f, 0.5f, 0.5f), glm::vec3(0.5f, 0.5f, 0.5f),
-			 glm::vec3(0.5f, 0.5f, 0.5f)};
+
+	auto light_color = conf_cam.Value<glm::vec3>("/light/position");
+
+	light = {conf_cam.Value<glm::vec3>("/light/position"),
+			 conf_cam.Value<glm::vec3>("/light/position"), light_color,
+			 light_color, light_color};
+
 	tess.Update(std::min(max_tess_fact, tess_fact));
 
 	formater = boost::format("%1$-12s : %2%\n");
@@ -237,8 +243,7 @@ void app::KeyDefaultCallback(
 			glfwSetScrollCallback(a->win->GetWin(), MouseScrollFovCallback);
 			break;
 		case GLFW_KEY_UP:
-			a->tess_fact = glm::min(a->tess_fact + 1,
-									a->setting.graphics_osd_tess_level_max);
+			a->tess_fact = glm::min(a->tess_fact + 1, a->max_tess_fact);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_DOWN:
@@ -288,8 +293,7 @@ void app::KeyFlyModeCallback(
 			std::cout << "Normal Mode" << std::endl;
 			break;
 		case GLFW_KEY_UP:
-			a->tess_fact = glm::min(a->tess_fact + 1,
-									a->setting.graphics_osd_tess_level_max);
+			a->tess_fact = glm::min(a->tess_fact + 1, a->max_tess_fact);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_DOWN:
@@ -496,7 +500,7 @@ void app::UpdateView() {
 void app::UpdateProjection() {
 	transform.projection = glm::perspective(
 		glm::radians(camera.Fov), (float)window_size.x / (float)window_size.y,
-		0.01f, 100.0f);
+		camera.Near, camera.Far);
 }
 void app::UpdateUBO() {
 	tess.Update(tess_fact);
