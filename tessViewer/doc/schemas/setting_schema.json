@@ -190,6 +190,20 @@
 				},
 				"shader": {
 					"properties": {}
+				},
+				"aa": {
+					"properties": {
+						"type": {
+							"type": "string",
+							"default": "msaa"
+						},
+						"samples": {
+							"type": "integer",
+							"maximum": 16,
+							"minimum": 0,
+							"default": 4
+						}
+					}
 				}
 			}
 		},
