@@ -50,6 +50,9 @@ const json& Config::Json() const { return *_jconfig; }
 Config      Config::Relative(std::string_view key) const {
     return Config(*this, key);
 }
+const json& Config::Schema(std::string_view key) const {
+	return _get_schema(_base, (key[0] == '/' ? "" : "/") + std::string(key));
+}
 const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
 										 std::string_view      key) const {
 	std::string path(key);

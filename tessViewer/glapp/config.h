@@ -45,7 +45,8 @@ public:
 		}
 		return _round_value(schema, value.get<T>());
 	}
-	Config Relative(std::string_view key) const;
+	Config                Relative(std::string_view key) const;
+	const nlohmann::json& Schema(std::string_view key) const;
 
 private:
 	using _json_pointer = nlohmann::json_pointer<nlohmann::json>;
@@ -57,7 +58,7 @@ private:
 
 public:
 	static Config Get(std::string_view key = "");
-	static void CommandLineOptions(const nlohmann::json& j);
+	static void   CommandLineOptions(const nlohmann::json& j);
 
 private:
 	static const Config          _config;
