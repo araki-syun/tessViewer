@@ -221,7 +221,7 @@ void app::glfwErrorCallback(int code, const char* message) {
 }
 void app::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
@@ -272,7 +272,7 @@ void app::KeyDefaultCallback(
 }
 void app::KeyFlyModeCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
@@ -328,7 +328,7 @@ void app::KeyFlyModeCallback(
 	a->UpdateView();
 }
 void app::DragCameraRotate(GLFWwindow* window, double x, double y) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	glm::vec2 move((float)x - a->previousMousePos.x,
 				   (float)y - a->previousMousePos.y);
@@ -355,7 +355,7 @@ void app::DragCameraRotate(GLFWwindow* window, double x, double y) {
 	a->UpdateView();
 }
 void app::DragCameraTranslation(GLFWwindow* window, double x, double y) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	glm::vec2 move((float)x - a->previousMousePos.x,
 				   (float)y - a->previousMousePos.y);
@@ -370,7 +370,7 @@ void app::DragCameraTranslation(GLFWwindow* window, double x, double y) {
 	a->UpdateView();
 }
 void app::DragCameraFlyMode(GLFWwindow* window, double x, double y) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	glm::vec2 move((float)x - a->previousMousePos.x,
 				   (float)y - a->previousMousePos.y);
@@ -397,7 +397,7 @@ void app::MouseButtonDfaultCallback(GLFWwindow* window,
 									int         button,
 									int         action,
 									int         mods) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (button) {
@@ -426,7 +426,7 @@ void app::MouseButtonFlayModeCallback(GLFWwindow* window,
 									  int         button,
 									  int         action,
 									  int         mods) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (button) {
@@ -452,7 +452,7 @@ void app::MouseButtonFlayModeCallback(GLFWwindow* window,
 	}
 }
 void app::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	a->camera.Fov += (float)(up - down);
 	a->camera.Fov =
@@ -463,14 +463,14 @@ void app::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 void app::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,
 									double      down) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	float length = glm::length(a->camera.Pos - a->camera.LookPoint);
 	a->camera.Pos += a->camera.Angle * (length * 0.1f) * (float)(down - up);
 	a->UpdateView();
 }
 void app::WindowResizeCallback(GLFWwindow* window, int x, int y) {
-	app* a = (app*)glfwGetWindowUserPointer(window);
+	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
 	glViewport(0, 0, x, y);
 	a->window_size.x = x;
