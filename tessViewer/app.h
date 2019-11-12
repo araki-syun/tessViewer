@@ -66,7 +66,6 @@ private:
 	void UpdateUBO();
 
 	std::unique_ptr<glapp::window> win;
-	std::string                    current_model;
 	std::vector<tv::model>         models;
 	std::shared_ptr<tv::material>  material;
 	//std::shared_ptr<glslProgram> shader_default;
@@ -85,6 +84,8 @@ private:
 		glm::vec3 Right;
 		glm::vec3 Up;
 		float     Fov;
+		float     maxFov;
+		float     minFov;
 		float     Near;
 		float     Far;
 		glm::vec2 Move;

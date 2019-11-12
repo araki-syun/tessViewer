@@ -28,8 +28,6 @@ app::app(boost::program_options::variables_map& vm) {
 	auto conf_osd   = conf_graph.Relative("/osd");
 	auto conf_font  = conf.Relative("/ui/font");
 
-	current_model = vm["object"].as<std::string>();
-
 	setting.window_full_screen  = vm.count(GLAPP_CONFIG_FULLSCREEN) > 0;
 	setting.window_resolution_x = vm[GLAPP_CONFIG_RESOLUTION_X].as<int>();
 	setting.window_resolution_y = vm[GLAPP_CONFIG_RESOLUTION_Y].as<int>();
@@ -47,10 +45,6 @@ app::app(boost::program_options::variables_map& vm) {
 		conf.Value<std::string>("/graphics/osd/patch/type") == "GREGORY_BASIS"
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
 			: OpenSubdiv::Far::PatchDescriptor::Type::REGULAR;
-
-	if (current_model.empty()) {
-		throw std::runtime_error("Model Import -o [file_path]\n");
-	}
 
 	OpenSubdiv::Far::SetErrorCallback(osdErrorCallback);
 	OpenSubdiv::Far::SetWarningCallback(osdWarningCallback);
@@ -82,8 +76,7 @@ app::app(boost::program_options::variables_map& vm) {
 		->Update(&mat_offset);
 
 	tv::model::default_patch = conf_osd.Value<int>("/patch/level");
-	tv::model::max_patch =
-		conf_osd.Schema("/patch/level").at("maximum").get<int>();
+	tv::model::max_patch = conf_osd.Schema("/patch/level/maximum").get<int>();
 
 	draw_string = tv::glslStringDraw::getInstance();
 	draw_string->Initialize(conf_font.Value<int>("size"),
@@ -91,8 +84,8 @@ app::app(boost::program_options::variables_map& vm) {
 	draw_string->SetWindowSize(conf.Value<int>("/window/resolution/width"),
 							   conf.Value<int>("/window/resolution/height"));
 
-	// current_modelで指定されたsdmjファイルから読み込む
-	std::ifstream sdmj(current_model);
+	// コマンドライン引数または設定で指定されたsdmjファイルから読み込む
+	std::ifstream sdmj(conf_graph.Value<std::string>("model"));
 	if (!sdmj) {
 		throw std::runtime_error("File Open Error\n");
 	}
@@ -113,13 +106,14 @@ app::app(boost::program_options::variables_map& vm) {
 	camera.Pos       = conf_cam.Value<glm::vec3>("position");
 	camera.Angle     = conf_cam.Value<glm::vec3>("angle");
 	camera.Fov       = conf_cam.Value<float>("fov");
+	camera.maxFov    = conf_cam.Schema("/fov/maximum").get<float>();
+	camera.maxFov    = conf_cam.Schema("/fov/minimum").get<float>();
 	camera.LookPoint = camera.Pos + camera.Angle;
 	camera.Right     = glm::cross(camera.Angle, glm::vec3(0, 1, 0));
 	camera.Up        = glm::cross(camera.Right, camera.Angle);
 
-	tess_fact = conf_osd.Value<int>("/tessellation/level");
-	max_tess_fact =
-		conf_osd.Schema("/tessellation/level").at("maximum").get<int>();
+	tess_fact     = conf_osd.Value<int>("/tessellation/level");
+	max_tess_fact = conf_osd.Schema("/tessellation/level/maximum").get<int>();
 
 	UpdateView();
 	UpdateProjection();
@@ -461,7 +455,8 @@ void app::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 	app* a = (app*)glfwGetWindowUserPointer(window);
 
 	a->camera.Fov += (float)(up - down);
-	a->camera.Fov = glm::clamp(a->camera.Fov, 5.f, 120.f);
+	a->camera.Fov =
+		glm::clamp(a->camera.Fov, a->camera.minFov, a->camera.maxFov);
 	a->UpdateProjection();
 	std::cout << "fov : " << a->camera.Fov << std::endl;
 }
