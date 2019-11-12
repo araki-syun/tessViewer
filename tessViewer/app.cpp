@@ -14,6 +14,7 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
+#include <stdexcept>
 #include <string>
 
 #include "glapp\config.h"
@@ -21,6 +22,8 @@
 
 #include "glm/fwd.hpp"
 #include "version.h"
+
+using namespace std::string_literals;
 
 app::app(boost::program_options::variables_map& vm) {
 	auto conf       = glapp::Config::Get();
@@ -215,15 +218,15 @@ void app::Run() {
 
 void app::osdErrorCallback(OpenSubdiv::Far::ErrorType err,
 						   const char*                message) {
-	using OpenSubdiv::Far::ErrorType;
-	std::cerr << "OpenSubdiv Error Type : " << err << '\n'
-			  << message << std::endl;
+	std::runtime_error("OpenSubdiv Error Type : " + std::to_string(err) + '\n' +
+					   message);
 }
 void app::osdWarningCallback(const char* message) {
-	std::cerr << message << std::endl;
+	// std::cerr << message << std::endl;
 }
 void app::glfwErrorCallback(int code, const char* message) {
-	std::cerr << "GLFW ERROR Code : " << code << '\n' << message << std::endl;
+	std::runtime_error("GLFW ERROR Code : " + std::to_string(code) + '\n' +
+					   message + '\n');
 }
 void app::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
