@@ -6,6 +6,7 @@
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
+#include <string_view>
 
 #include "base_window.h"
 #include "config.h"
@@ -17,14 +18,9 @@ void Initialize();
 
 class window : public inner::base_window {
 public:
-	explicit window(const char* title,
-					int         width           = 1280,
-					int         height          = 720,
-					int         glversion_major = 4,
-					int         glversion_minor = 3,
-					int         samples         = 2,
-					int         vsync           = 1,
-					init_flag   flag            = init_flag::DEFAULT);
+	explicit window(std::string_view title,
+					int              glversion_major,
+					int              glversion_minor);
 	~window() override;
 
 	void        SetBackColor(const glm::vec4& color);
@@ -39,6 +35,16 @@ public:
 
 private:
 	GLFWwindow* _win;
+
+	static int             _debug_level;
+	static unsigned int    _debug_message_number;
+	static void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
+													  GLenum        type,
+													  GLuint        id,
+													  GLenum        severity,
+													  GLsizei       length,
+													  const GLchar* message,
+													  const void*   userParam);
 };
 
 } // namespace glapp

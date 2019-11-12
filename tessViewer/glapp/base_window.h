@@ -1,19 +1,13 @@
 #pragma once
 
 #include <cstdint>
+#include <string_view>
 
 namespace glapp::inner {
 class base_window {
 public:
-	enum class init_flag : unsigned int {
-		DEFAULT    = 0x00000000,
-		FULLSCREEN = 0x00000001
-	};
 	base_window() = delete;
-	explicit base_window(const char* title,
-						 int         width  = 1280,
-						 int         height = 720,
-						 init_flag   flag   = init_flag::DEFAULT);
+	explicit base_window(std::string_view title);
 	virtual ~base_window() = 0;
 	base_window(base_window&) = delete; // �R�s�[�R���X�g���N�^
 	base_window& operator=(const base_window&) = delete; // �R�s�[������Z�q

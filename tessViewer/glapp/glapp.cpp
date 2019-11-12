@@ -3,14 +3,7 @@
 #include <iostream>
 
 #include "glapp_define.h"
-
-void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
-										   GLenum        type,
-										   GLuint        id,
-										   GLenum        severity,
-										   GLsizei       length,
-										   const GLchar* message,
-										   const void*   userParam);
+#include "config.h"
 
 namespace glapp {
 
@@ -23,37 +16,29 @@ void Initialize() {
 //window::window(){
 
 //}
-window::window(const char* title,
-			   int         width,
-			   int         height,
-			   int         glversion_major,
-			   int         glversion_minor,
-			   int         samples,
-			   int         vsync,
-			   init_flag   flag)
-	: inner::base_window(title, width, height, flag) {
+window::window(std::string_view title, int glversion_major, int glversion_minor)
+	: inner::base_window(title) {
+	auto conf_win        = Config::Get("/window");
+	auto conf_bit        = conf_win.Relative("/bit");
+	window::_debug_level = conf_win.Value<int>("debug_level");
+
 	Initialize();
-#ifdef _DEBUG
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, 1);
-#endif
+	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, _debug_level > 0 ? 1 : 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glversion_major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glversion_minor);
-	glfwWindowHint(GLFW_SAMPLES, samples);
-	glfwWindowHint(GLFW_RED_BITS, 8);
-	glfwWindowHint(GLFW_GREEN_BITS, 8);
-	glfwWindowHint(GLFW_BLUE_BITS, 8);
-	glfwWindowHint(GLFW_ALPHA_BITS, 8);
-	glfwWindowHint(GLFW_DEPTH_BITS, 24);
-	glfwWindowHint(GLFW_STENCIL_BITS, 8);
+	glfwWindowHint(GLFW_SAMPLES, conf_win.Value<int>("/graphics/aa/samples"));
+	glfwWindowHint(GLFW_RED_BITS, conf_bit.Value<int>("red"));
+	glfwWindowHint(GLFW_GREEN_BITS, conf_bit.Value<int>("green"));
+	glfwWindowHint(GLFW_BLUE_BITS, conf_bit.Value<int>("blue"));
+	glfwWindowHint(GLFW_ALPHA_BITS, conf_bit.Value<int>("alpha"));
+	glfwWindowHint(GLFW_DEPTH_BITS, conf_bit.Value<int>("depth"));
+	glfwWindowHint(GLFW_STENCIL_BITS, conf_bit.Value<int>("stencil"));
 
-	this->_win =
-		glfwCreateWindow(width, height, title,
-						 (static_cast<std::uint8_t>(flag) &
-						  static_cast<std::uint8_t>(
-							  inner::base_window::init_flag::FULLSCREEN)) != 0
-							 ? glfwGetPrimaryMonitor()
-							 : nullptr,
-						 nullptr);
+	this->_win = glfwCreateWindow(
+		conf_win.Value<int>("resolution/width"),
+		conf_win.Value<int>("resolution/height"), std::string(title).c_str(),
+		conf_win.Value<bool>("fullscreen") ? glfwGetPrimaryMonitor() : nullptr,
+		nullptr);
 	glfwMakeContextCurrent(this->_win);
 
 	glewExperimental = GL_TRUE;
@@ -66,10 +51,11 @@ window::window(const char* title,
 
 	//program.reset(new glShaderProgram());
 
-	glfwSwapInterval(vsync);
+	glfwSwapInterval(conf_win.Value<bool>("vsync") ? 1 : 0);
 
-	glViewport(0, 0, width, height);
-	glClearColor(0, 0, 0, 1);
+	glViewport(0, 0, conf_win.Value<int>("resolution/width"),
+			   conf_win.Value<int>("resolution/height"));
+	SetBackColor(conf_win.Value<glm::vec4>("background_color"));
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
@@ -83,7 +69,7 @@ void window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
 }
 
- glm::ivec2 window::GetWindowSize() const {
+glm::ivec2 window::GetWindowSize() const {
 	glm::ivec2 size(0);
 	GetWindowSize(&size.x, &size.y);
 	return size;
@@ -96,18 +82,17 @@ void glapp::window::GetWindowPosition(int* x, int* y) const {
 }
 GLuint      glapp::window::GetFrameBuffer() const { return GLuint(); }
 GLFWwindow* window::GetWin() { return _win; }
-} // namespace glapp
 
-#define MASSAGE_LEVEL 1
-void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
-										   GLenum        type,
-										   GLuint        id,
-										   GLenum        severity,
-										   GLsizei       length,
-										   const GLchar* message,
-										   const void*   userParam) {
-	static int  number = 0;
-	int         level  = 0;
+int             window::_debug_level          = 0;
+unsigned int    window::_debug_message_number = 0;
+void GLAPIENTRY window::openGLDebugMessageCallback(GLenum        source,
+												   GLenum        type,
+												   GLuint        id,
+												   GLenum        severity,
+												   GLsizei       length,
+												   const GLchar* message,
+												   const void*   userParam) {
+	int         level = 0;
 	std::string severity_string;
 	switch (severity) {
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
@@ -127,14 +112,14 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 		level           = 3;
 		break;
 	}
-	if (level < MASSAGE_LEVEL) {
+	if (level < _debug_level) {
 		return;
-}
+	}
 
 	std::cout << "---------------------opengl-callback-start------------"
 			  << std::endl;
 
-	std::cout << "No." << number << '\n';
+	std::cout << "No." << _debug_message_number << '\n';
 	std::cout << "type: ";
 	switch (type) {
 	case GL_DEBUG_TYPE_ERROR: std::cout << "ERROR"; break;
@@ -150,7 +135,7 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 	}
 	std::cout << std::endl;
 
-	const char* errstr = (const char*)gluErrorString(id);
+	auto errstr = reinterpret_cast<const char*>(gluErrorString(id));
 	if (errstr != nullptr) {
 		std::cout << "id: " << id << ' ' << errstr << std::endl;
 	}
@@ -184,5 +169,7 @@ void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
 	std::cout << "message: " << message << std::endl;
 	std::cout << "---------------------opengl-callback-end--------------"
 			  << std::endl;
-	++number;
+	++_debug_message_number;
 }
+
+} // namespace glapp
