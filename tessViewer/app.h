@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <boost\program_options.hpp>
 #include <boost\format.hpp>
 #include <cstdint>
 
@@ -23,10 +22,10 @@
 
 class app {
 public:
-	app()           = delete;
+	app();
 	app(const app&) = delete;
 	app(app&&)      = delete;
-	app(boost::program_options::variables_map& vm);
+	// app(boost::program_options::variables_map& vm);
 	~app();
 	app& operator=(const app&) = delete;
 	app& operator=(app&&) = delete;

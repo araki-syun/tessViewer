@@ -22,25 +22,12 @@
 #include "glm/fwd.hpp"
 #include "version.h"
 
-app::app(boost::program_options::variables_map& vm) {
+app::app() {
 	auto conf       = glapp::Config::Get();
 	auto conf_graph = conf.Relative("/graphics");
 	auto conf_osd   = conf_graph.Relative("/osd");
 	auto conf_font  = conf.Relative("/ui/font");
 
-	setting.window_full_screen  = vm.count(GLAPP_CONFIG_FULLSCREEN) > 0;
-	setting.window_resolution_x = vm[GLAPP_CONFIG_RESOLUTION_X].as<int>();
-	setting.window_resolution_y = vm[GLAPP_CONFIG_RESOLUTION_Y].as<int>();
-	setting.window_fov          = vm[GLAPP_CONFIG_FOV].as<float>();
-	setting.window_vsync        = vm[GLAPP_CONFIG_VSYNC].as<bool>();
-	setting.graphics_osd_patch_level_default =
-		vm[GLAPP_CONFIG_PATCH_LEVEL_DEFAULT].as<int>();
-	setting.graphics_osd_tess_level_default =
-		vm[GLAPP_CONFIG_TESS_LEVEL_DEFAULT].as<int>();
-	setting.ui_user_interface = vm[GLAPP_CONFIG_USER_INTERFACE].as<bool>();
-	setting.ui_font_file      = std::string(FONT R"(ipaexg.ttf)");
-	setting.ui_font_size      = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
-	setting.ui_font_color     = vm[GLAPP_CONFIG_FONT_COLOR].as<std::uint8_t>();
 	tv::model::default_patch_type =
 		conf.Value<std::string>("/graphics/osd/patch/type") == "GREGORY_BASIS"
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
