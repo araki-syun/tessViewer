@@ -130,6 +130,15 @@
 									]
 								}
 							}
+						},
+						"near": {
+							"type": "number",
+							"minimum": 0.00001,
+							"default": 0.01
+						},
+						"far": {
+							"type": "number",
+							"default": 100.0
 						}
 					}
 				},
