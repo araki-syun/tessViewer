@@ -114,21 +114,5 @@ private:
 		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
 	} tess{};
 
-	struct Setting {
-		bool         window_full_screen;
-		int          window_resolution_x;
-		int          window_resolution_y;
-		float        window_fov;
-		bool         window_vsync;
-		int          graphics_osd_patch_level_default;
-		int          graphics_osd_patch_level_max;
-		int          graphics_osd_tess_level_default;
-		int          graphics_osd_tess_level_max;
-		bool         ui_user_interface;
-		std::string  ui_font_file;
-		int          ui_font_size;
-		std::uint8_t ui_font_color;
-	} setting;
-
 	boost::format formater;
 };
