@@ -7,6 +7,7 @@
 #include <GLFW\glfw3.h>
 #include <glm\glm.hpp>
 #include <string_view>
+#include <vector>
 
 #include "base_window.h"
 #include "config.h"
@@ -18,9 +19,11 @@ void Initialize();
 
 class window : public inner::base_window {
 public:
-	explicit window(std::string_view title,
-					int              glversion_major,
-					int              glversion_minor);
+	explicit window(std::string_view                title,
+					int                             glversion_major,
+					int                             glversion_minor,
+					const std::vector<std::string>& required_ext);
+	window(const window&) = delete;
 	~window() override;
 
 	void        SetBackColor(const glm::vec4& color);

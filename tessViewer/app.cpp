@@ -15,6 +15,7 @@
 #include <glm/gtx/rotate_vector.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <string>
+#include <vector>
 
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
@@ -38,16 +39,10 @@ app::app() {
 
 	glfwSetErrorCallback(glfwErrorCallback);
 
-	win = std::make_unique<glapp::window>("tessViewer " TV_VERSION, 4, 5);
-
-	if (GL_TRUE != glfwExtensionSupported("GL_ARB_direct_state_access")) {
-		throw std::runtime_error(
-			"OpenGL Unsupported : GL_ARB_direct_state_access");
-	}
-	if (GL_TRUE != glfwExtensionSupported("GL_ARB_tessellation_shader")) {
-		throw std::runtime_error(
-			"OpenGL Unsupported : GL_ARB_tessellation_shader");
-	}
+	std::vector<std::string> extensions{"GL_ARB_direct_state_access",
+										"GL_ARB_tessellation_shader"};
+	win = std::make_unique<glapp::window>("tessViewer " TV_VERSION, 4, 5,
+										  extensions);
 
 	int mat_offset           = material->GetElementSize();
 	tv::model::shader_manage = &(app::shader_manage);
