@@ -19,12 +19,16 @@ void Initialize();
 
 class window : public inner::base_window {
 public:
+	window() = delete;
 	explicit window(std::string_view                title,
 					int                             glversion_major,
 					int                             glversion_minor,
 					const std::vector<std::string>& required_ext);
 	window(const window&) = delete;
+	window(window&& win) noexcept;
 	~window() override;
+	window& operator=(const window&) = delete;
+	window& operator                 =(window&& win) noexcept;
 
 	void        SetBackColor(const glm::vec4& color);
 	glm::ivec2  GetWindowSize() const;

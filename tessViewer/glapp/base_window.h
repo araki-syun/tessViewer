@@ -14,7 +14,11 @@ public:
 	base_window(base_window&&) = delete; // ���[�u�R���X�g���N�^
 	base_window& operator=(const base_window&&) = delete; // ���[�u������Z�q
 
-	virtual void GetWindowSize(int* w, int* h) const     = 0;
-	virtual void GetWindowPosition(int* x, int* y) const = 0;
+	virtual void     GetWindowSize(int* w, int* h) const     = 0;
+	virtual void     GetWindowPosition(int* x, int* y) const = 0;
+	std::string_view GetTitle() const;
+
+protected:
+	std::string _title;
 };
 } // namespace glapp::inner

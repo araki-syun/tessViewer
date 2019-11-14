@@ -70,9 +70,21 @@ window::window(std::string_view                title,
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 }
+window::window(window&& win) noexcept
+	: inner::base_window(win.GetTitle()), _win(win._win) {
+	win._win = nullptr;
+}
 window::~window() {
 	glfwDestroyWindow(this->_win);
 	glfwTerminate();
+}
+window& window::operator=(window&& win) noexcept {
+	if (this != &win) {
+		_win     = win._win;
+		win._win = nullptr;
+		_title   = std::move(win._title);
+	}
+	return *this;
 }
 
 void window::SetBackColor(const glm::vec4& color) {
