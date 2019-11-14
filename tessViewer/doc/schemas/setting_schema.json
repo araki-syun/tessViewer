@@ -95,14 +95,6 @@
 								-1.0
 							]
 						},
-						"quaternion": {
-							"type": "array",
-							"maxItems": 4,
-							"minItems": 4,
-							"items": {
-								"type": "number"
-							}
-						},
 						"fov": {
 							"description": "視野の広さ",
 							"type": "number",
