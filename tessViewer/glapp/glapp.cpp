@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "GLFW/glfw3.h"
 #include "glapp_define.h"
 #include "config.h"
 
@@ -16,7 +17,10 @@ void Initialize() {
 //window::window(){
 
 //}
-window::window(std::string_view title, int glversion_major, int glversion_minor)
+window::window(std::string_view                title,
+			   int                             glversion_major,
+			   int                             glversion_minor,
+			   const std::vector<std::string>& required_ext)
 	: inner::base_window(title) {
 	auto conf_win        = Config::Get("/window");
 	auto conf_bit        = conf_win.Relative("/bit");
@@ -49,6 +53,12 @@ window::window(std::string_view title, int glversion_major, int glversion_minor)
 
 	glDebugMessageCallback(openGLDebugMessageCallback, nullptr);
 
+	for (auto ext : required_ext) {
+		if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
+			throw std::runtime_error("OpenGL Unsupported : " + ext);
+		}
+	}
+
 	//program.reset(new glShaderProgram());
 
 	glfwSwapInterval(conf_win.Value<bool>("vsync") ? 1 : 0);
@@ -60,9 +70,21 @@ window::window(std::string_view title, int glversion_major, int glversion_minor)
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 }
+window::window(window&& win) noexcept
+	: inner::base_window(win.GetTitle()), _win(win._win) {
+	win._win = nullptr;
+}
 window::~window() {
 	glfwDestroyWindow(this->_win);
 	glfwTerminate();
+}
+window& window::operator=(window&& win) noexcept {
+	if (this != &win) {
+		_win     = win._win;
+		win._win = nullptr;
+		_title   = std::move(win._title);
+	}
+	return *this;
 }
 
 void window::SetBackColor(const glm::vec4& color) {
