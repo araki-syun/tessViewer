@@ -74,7 +74,7 @@ private:
 	GLuint              default_diffuse_texture = 0;
 
 	bool       mainloop{};
-	glm::ivec2 window_size;
+	glm::ivec2 window_size{};
 	float      frametime{};
 	struct Camera {
 		glm::vec3 Pos;
@@ -89,11 +89,11 @@ private:
 		float     Far;
 		glm::vec2 Move;
 		bool      fly_mode;
-	} camera;
+	} camera{};
 	int       tess_fact;
 	int       max_tess_fact;
-	glm::vec2 mouseMove;
-	glm::vec2 previousMousePos;
+	glm::vec2 mouseMove{};
+	glm::vec2 previousMousePos{};
 
 	std::unique_ptr<glQuery> query;
 	//std::unique_ptr<glQuery> draw_string_query;
@@ -101,14 +101,14 @@ private:
 	struct Transform {
 		glm::mat4 view;
 		glm::mat4 projection;
-	} transform;
+	} transform{};
 	struct LightInfo {
 		glm::vec3 pos;
 		glm::vec3 vector;
 		glm::vec3 ia;
 		glm::vec3 id;
 		glm::vec3 is;
-	} light;
+	} light{};
 	struct Tessellation {
 		float TessLevel;
 		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
