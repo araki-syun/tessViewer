@@ -394,3 +394,4 @@ tesseViewer/data/shader/gen.*
 compile_flags.txt
 .vscode/*
 tessViewer/doc/schemas/setting_schema.json.gen.h
+.clangd/*
