@@ -41,7 +41,7 @@ app::app() {
 
 	std::vector<std::string> extensions{"GL_ARB_direct_state_access",
 										"GL_ARB_tessellation_shader"};
-	win = std::make_unique<glapp::window>("tessViewer " TV_VERSION, 4, 5,
+	win = std::make_unique<glapp::Window>("tessViewer " TV_VERSION, 4, 5,
 										  extensions);
 
 	int mat_offset           = material->GetElementSize();

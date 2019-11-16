@@ -5,21 +5,20 @@
 
 #include <boost\noncopyable.hpp>
 
-#include "glslshader.h"
+#include "shader_object.h"
 
 namespace glapp {
-class glslshader_manager : boost::noncopyable {
-	glslshader_manager();
+class ShaderManager : boost::noncopyable {
+	ShaderManager();
 
 public:
 	//static glslshader_manager* GetInstance();
 
-	static glslshader* GetPointer(const std::string& name);
+	static Shader* GetPointer(const std::string& name);
 
 private:
 	//static std::unique_ptr<glslshader_manager> p;
 
-	static std::unordered_map<std::string, std::unique_ptr<glslshader>>
-		shader_list;
+	static std::unordered_map<std::string, std::unique_ptr<Shader>> shader_list;
 };
 } // namespace glapp

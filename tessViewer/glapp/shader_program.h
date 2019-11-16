@@ -6,35 +6,37 @@
 
 #include <GL\glew.h>
 
-#include <boost\noncopyable.hpp>
-
-#include "glslshader_manager.h"
+#include "shader_manager.h"
 
 namespace glapp {
-class glShaderProgram : boost::noncopyable {
+class ShaderProgram {
 public:
-	glShaderProgram();
-	glShaderProgram(std::initializer_list<std::string> list);
-	~glShaderProgram();
+	ShaderProgram();
+	ShaderProgram(std::initializer_list<std::string> list);
+	ShaderProgram(const ShaderProgram&) = delete;
+	ShaderProgram(ShaderProgram&& prog) noexcept;
+	~ShaderProgram();
+	ShaderProgram& operator=(const ShaderProgram&) = delete;
+	ShaderProgram& operator=(ShaderProgram&& prog) noexcept;
 
-	GLuint       GetProgram() const;
-	void         SetShaderName(std::initializer_list<std::string> list);
-	GLint        GetIndexAttrib(const std::string& name) const;
-	GLint        GetIndexUniform(const std::string& name) const;
+	GLuint GetProgram() const;
+	void   SetShaderName(std::initializer_list<std::string> list);
+	GLint  GetIndexAttrib(const std::string& name) const;
+	GLint  GetIndexUniform(const std::string& name) const;
 
 protected:
-	void                 create();
-	virtual GLuint       shaderCompile(const glslshader* shader);
-	void                 setIndexUniform();
-	void                 setIndexAttrib();
+	void           _Create();
+	virtual GLuint _ShaderCompile(const Shader* shader);
+	void           _SetIndexUniform();
+	void           _SetIndexAttrib();
 
 protected:
 	GLuint _program = 0;
 
-	std::array<std::string, 5>             shader_list;
-	std::unordered_map<std::string, GLint> attribList, uniformList;
+	std::array<std::string, 5>             _shader_list;
+	std::unordered_map<std::string, GLint> _attrib_list, _uniform_list;
 
-	enum shader_type : int {
+	enum ShaderType : int {
 		Vertex = 0,
 		Fragment,
 		Geometry,

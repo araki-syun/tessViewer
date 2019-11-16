@@ -11,24 +11,24 @@
 
 #include "base_window.h"
 #include "config.h"
-#include "glShaderProgram.h"
+#include "shader_program.h"
 
 namespace glapp {
 
 void Initialize();
 
-class window : public inner::base_window {
+class Window : public inner::BaseWindow {
 public:
-	window() = delete;
-	explicit window(std::string_view                title,
+	Window() = delete;
+	explicit Window(std::string_view                title,
 					int                             glversion_major,
 					int                             glversion_minor,
 					const std::vector<std::string>& required_ext);
-	window(const window&) = delete;
-	window(window&& win) noexcept;
-	~window() override;
-	window& operator=(const window&) = delete;
-	window& operator                 =(window&& win) noexcept;
+	Window(const Window&) = delete;
+	Window(Window&& win) noexcept;
+	~Window() override;
+	Window& operator=(const Window&) = delete;
+	Window& operator                 =(Window&& win) noexcept;
 
 	void        SetBackColor(const glm::vec4& color);
 	glm::ivec2  GetWindowSize() const;
@@ -43,15 +43,16 @@ public:
 private:
 	GLFWwindow* _win;
 
-	static int             _debug_level;
-	static unsigned int    _debug_message_number;
-	static void GLAPIENTRY openGLDebugMessageCallback(GLenum        source,
-													  GLenum        type,
-													  GLuint        id,
-													  GLenum        severity,
-													  GLsizei       length,
-													  const GLchar* message,
-													  const void*   userParam);
+	static int          _debug_level;
+	static unsigned int _debug_message_number;
+	static void GLAPIENTRY
+	_open_gl_debug_message_callback(GLenum        source,
+									GLenum        type,
+									GLuint        id,
+									GLenum        severity,
+									GLsizei       length,
+									const GLchar* message,
+									const void*   user_param);
 };
 
 } // namespace glapp

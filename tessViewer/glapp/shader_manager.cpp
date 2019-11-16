@@ -1,15 +1,15 @@
-#include "glslshader_manager.h"
+#include "shader_manager.h"
 
 namespace glapp {
-std::unordered_map<std::string, std::unique_ptr<glslshader>>
-	glslshader_manager::shader_list;
+std::unordered_map<std::string, std::unique_ptr<Shader>>
+	ShaderManager::shader_list;
 
-glslshader* glslshader_manager::GetPointer(const std::string& name) {
-	// std::unordered_map<std::string, std::unique_ptr<glslshader> >::_Pairib p;
+Shader* ShaderManager::GetPointer(const std::string& name) {
+	// std::unordered_map<std::string, std::unique_ptr<Shader> >::_Pairib p;
 	auto p = shader_list.insert(std::make_pair(name, nullptr));
 
 	if (p.second) {
-		std::unique_ptr<glslshader> g(new glslshader(name));
+		std::unique_ptr<Shader> g(new Shader(name));
 		if (g->GetSource().empty()) {
 			shader_list.erase(name);
 			return nullptr;

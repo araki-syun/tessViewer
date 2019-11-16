@@ -1,4 +1,4 @@
-#include "glslshader.h"
+#include "shader_object.h"
 
 #include <fstream>
 #include <vector>
@@ -13,10 +13,10 @@
 
 namespace glapp {
 
-//std::unordered_map<std::string, glslshader> glslshader::shader_list;
+//std::unordered_map<std::string, Shader> Shader::shader_list;
 
-glslshader::glslshader() = default;
-glslshader::glslshader(const std::string& filename) {
+Shader::Shader() = default;
+Shader::Shader(const std::string& filename) {
 	std::filesystem::path file_path(filename);
 
 	if (!std::filesystem::exists(file_path)) {
@@ -54,15 +54,14 @@ glslshader::glslshader(const std::string& filename) {
 	_src = str;
 }
 
-glslshader::~glslshader() { glDeleteShader(_id); }
+Shader::~Shader() { glDeleteShader(_id); }
 
-const GLuint glslshader::GetShader() const { return _id; }
+GLuint      Shader::GetShader() const { return _id; }
+std::string Shader::GetSource() const { return _src; }
+GLuint      Shader::GetType() const { return _type; }
+bool        Shader::Empty() const { return _id == 0; }
 
-const std::string& glslshader::GetSource() const { return _src; }
-
-const GLuint glslshader::GetType() const { return _type; }
-
-//	void glslshader::Compile(void)
+//	void Shader::Compile(void)
 //	{
 //		if(_id)
 //			return;
@@ -100,6 +99,6 @@ const GLuint glslshader::GetType() const { return _type; }
 //	}
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-const std::string& glslshader::GetError() const { return err; }
+const std::string& Shader::GetError() const { return err; }
 #endif
 } // namespace glapp
