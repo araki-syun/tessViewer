@@ -12,13 +12,39 @@
 
 namespace tv {
 class Camera {
-	// template <class BasicJsonType>
-	friend void to_json(nlohmann::json& j, const Camera& cam);
-	// template <class BasicJsonType>
-	friend void from_json(const nlohmann::json& j, Camera& cam);
+	template <class BASIC_JSON_TYPE>
+	friend void to_json(nlohmann::json& j, const Camera& cam); //NOLINT
+	template <class BASIC_JSON_TYPE>
+	friend void from_json(const nlohmann::json& j, Camera& cam); //NOLINT
 
 public:
 	Camera();
+	Camera(glm::vec3 pos, glm::vec3 angle);
+	// Camera(glm::vec3 pos, glm::vec3 look, glm::vec3 up);
+	Camera(glm::vec3 pos, glm::quat quat);
+	Camera(glm::vec3 pos, glm::vec3 angle, float fov, float near, float far);
+	// Camera(glm::vec3 pos,
+	// 	   glm::vec3 look,
+	// 	   glm::vec3 up,
+	// 	   float     fov,
+	// 	   float     near,
+	// 	   float     far);
+	Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far);
+
+	void      Move(glm::vec3 pos);
+	void      FpsMove(glm::vec3 move, float factor = 1.0f);
+	void      Rotate(float x, float y);
+	void      Rotate(glm::vec3 look);
+	void      Rotate(glm::quat quat);
+	float     Fov() const;
+	float     Fov(float fov);
+	void      Update();
+	glm::mat4 ViewMatrix() const;
+
+	static float MaxFov();
+	static float MaxFov(float max);
+	static float MinFov();
+	static float MinFov(float min);
 
 protected:
 	glm::vec3 _pos;
@@ -29,16 +55,17 @@ protected:
 	float     _fov;
 	float     _near;
 	float     _far;
+	glm::vec3 _move{0};
 
-	static float _max_fov;
-	static float _min_fov;
+	static inline float _max_fov = 179.0f;
+	static inline float _min_fov = 10.0f;
 
 	static constexpr glm::vec3 front = {0, 0, -1};
-	static constexpr glm::vec3 up    = {1, 0, 0};
-	static constexpr glm::vec3 right = {0, 1, 0};
+	static constexpr glm::vec3 up    = {0, 1, 0};
+	static constexpr glm::vec3 right = {1, 0, 0};
 };
-template <class BasicJsonType>
-void to_json(BasicJsonType& j, const Camera& cam) {
+template <class BASIC_JSON_TYPE>
+void to_json(BASIC_JSON_TYPE& j, const Camera& cam) { //NOLINT
 	j["position"]  = cam._pos;
 	j["angle"]     = glm::degrees(glm::eulerAngles(cam._quat));
 	j["lookpoint"] = cam._lookpoint;
@@ -46,8 +73,8 @@ void to_json(BasicJsonType& j, const Camera& cam) {
 	j["near"]      = cam._near;
 	j["far"]       = cam._far;
 }
-template <class BasicJsonType>
-void from_json(const BasicJsonType& j, Camera& cam) {
+template <class BASIC_JSON_TYPE>
+void from_json(const BASIC_JSON_TYPE& j, Camera& cam) { //NOLINT
 	auto schema    = glapp::Config::Get().Schema("/graphics/camera");
 	cam._pos       = j.at("position").get<glm::vec3>();
 	cam._quat      = glm::quat(j.at("angle").get<glm::vec3>());
