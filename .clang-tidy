@@ -19,7 +19,7 @@ CheckOptions:
   - key:   readability-magic-numbers.IgnorePowersOf2IntegerValues
     value: true
   - key:   readability-magic-numbers.IgnoredFloatingPointValues
-    value: 0.0;1.0;10.0;100.0;1000.0;1024.0;0.1;0.01;0.001;0.0001;
+    value: 0.0;1.0;10.0;60.0;100.0;179.0;1000.0;1024.0;0.1;0.01;0.001;0.0001;
   - key:   readability-identifier-naming.ClassCase
     value: CamelCase
   - key:   readability-identifier-naming.StructCase 
