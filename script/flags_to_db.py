@@ -1,16 +1,27 @@
 import json
-import os
 import pathlib
+import argparse
+
+parser = argparse.ArgumentParser(epilog="Example : python flags_to_db.py foo/compile_flags.txt")
+parser.add_argument("file",
+                    type=argparse.FileType("r"),
+                    help="compile option file")
+args = parser.parse_args()
 
 options = ""
+f = object()
+if args.file == None:
+    f = open("compile_flags.txt", 'r', encoding="utf-8")
+else:
+    f = args.file
+for option in f:
+    options += option.replace("\n", " ")
+f.close()
 
-with open("compile_flags.txt", 'r', encoding="utf-8") as flags:
-    for option in flags:
-        options += option.replace("\n", " ")
 options += " -c -o"
 
 current = pathlib.Path.cwd()
-print(current)
+print(f"project root : {current}")
 db = []
 for file in current.rglob(r"*"):
     if pathlib.re.search(r"^.*\.(h|hpp|c|cpp)$", file.name):
