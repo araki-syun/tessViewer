@@ -11,13 +11,13 @@ namespace nlohmann {
 template <size_t L, class T>
 struct adl_serializer<glm::vec<L, T>> {
 	using vec = glm::vec<L, T>;
-	template <typename BasicJsonType>
-	static void to_json(BasicJsonType& j, const vec& v) {
+	template <typename BASIC_JSON_TYPE>
+	static void to_json(BASIC_JSON_TYPE& j, const vec& v) { //NOLINT
 		for (auto i = 0; i < vec::length(); ++i)
 			j.push_back(v[i]);
 	}
-	template <typename BasicJsonType>
-	static void from_json(const BasicJsonType& j, vec& v) {
+	template <typename BASIC_JSON_TYPE>
+	static void from_json(const BASIC_JSON_TYPE& j, vec& v) { //NOLINT
 		vec value;
 		for (auto i = 0; i < j.size() && i < vec::length(); ++i) {
 			value[i] = j[i].template get<typename vec::value_type>();
@@ -28,8 +28,8 @@ struct adl_serializer<glm::vec<L, T>> {
 template <>
 struct adl_serializer<glm::vec<4, float>> {
 	using vec = glm::vec<4, float>;
-	template <typename BasicJsonType>
-	static void from_json(const BasicJsonType& j, vec& v) {
+	template <typename BASIC_JSON_TYPE>
+	static void from_json(const BASIC_JSON_TYPE& j, vec& v) { //NOLINT
 		vec val(0, 0, 0, 1);
 
 		if (j.is_array()) {

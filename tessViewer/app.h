@@ -64,7 +64,7 @@ private:
 	void UpdateProjection();
 	void UpdateUBO();
 
-	std::unique_ptr<glapp::window> win;
+	std::unique_ptr<glapp::Window> win;
 	std::vector<tv::model>         models;
 	std::shared_ptr<tv::material>  material;
 	//std::shared_ptr<glslProgram> shader_default;

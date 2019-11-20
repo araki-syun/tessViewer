@@ -392,5 +392,7 @@ MigrationBackup/
 tesseViewer/data/font/
 tesseViewer/data/shader/gen.*
 compile_flags.txt
+compile_commands.json
 .vscode/*
 tessViewer/doc/schemas/setting_schema.json.gen.h
+.clangd/*

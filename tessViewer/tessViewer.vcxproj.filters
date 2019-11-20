@@ -57,16 +57,16 @@
     <ClCompile Include="glapp\glapp.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="glapp\glslOSDprogram.cpp">
+    <ClCompile Include="glapp\osd_program.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="glapp\glslshader.cpp">
+    <ClCompile Include="glapp\shader_manager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="glapp\glslshader_mamager.cpp">
+    <ClCompile Include="glapp\shader_object.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="glapp\glShaderProgram.cpp">
+    <ClCompile Include="glapp\shader_program.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -119,16 +119,19 @@
     <ClInclude Include="glapp\glapp_define.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="glapp\glslOSDprogram.h">
+    <ClInclude Include="glapp\shader_program.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="glapp\glslshader.h">
+    <ClInclude Include="glapp\glm_conversion.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="glapp\glslshader_manager.h">
+    <ClInclude Include="glapp\osd_program.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="glapp\glShaderProgram.h">
+    <ClInclude Include="glapp\shader_manager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="glapp\shader_object.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

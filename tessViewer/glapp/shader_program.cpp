@@ -1,63 +1,80 @@
-#include "glShaderProgram.h"
+#include "shader_program.h"
 
 #include <boost\format.hpp>
+#include <type_traits>
 
 namespace glapp {
-glShaderProgram::glShaderProgram() = default;
-glShaderProgram::glShaderProgram(std::initializer_list<std::string> list) {
+ShaderProgram::ShaderProgram() = default;
+ShaderProgram::ShaderProgram(std::initializer_list<std::string> list) {
 	SetShaderName(list);
 }
-glShaderProgram::~glShaderProgram() = default;
-GLuint glShaderProgram::GetProgram() const { return _program; }
+ShaderProgram::~ShaderProgram() = default;
+ShaderProgram::ShaderProgram(ShaderProgram&& prog) noexcept
+	: _program(prog._program)
+	, _shader_list(std::move(prog._shader_list))
+	, _attrib_list(std::move(prog._attrib_list))
+	, _uniform_list(std::move(prog._uniform_list)) {
+	prog._program = 0;
+}
+ShaderProgram& ShaderProgram::operator=(ShaderProgram&& prog) noexcept {
+	if (this != &prog) {
+		std::swap(_program, prog._program);
+		_shader_list  = std::move(prog._shader_list);
+		_attrib_list  = std::move(prog._attrib_list);
+		_uniform_list = std::move(prog._uniform_list);
+	}
+	return *this;
+}
 
-void glShaderProgram::SetShaderName(std::initializer_list<std::string> list) {
+GLuint ShaderProgram::GetProgram() const { return _program; }
+void   ShaderProgram::SetShaderName(std::initializer_list<std::string> list) {
 
 	for (const std::string& str : list) {
-		glslshader* p = glslshader_manager::GetPointer(str);
+		Shader* p = ShaderManager::GetPointer(str);
 		switch (p->GetType()) {
-		case GL_VERTEX_SHADER: shader_list[shader_type::Vertex] = str; break;
+		case GL_VERTEX_SHADER: _shader_list[ShaderType::Vertex] = str; break;
 		case GL_FRAGMENT_SHADER:
-			shader_list[shader_type::Fragment] = str;
+			_shader_list[ShaderType::Fragment] = str;
 			break;
 		case GL_GEOMETRY_SHADER:
-			shader_list[shader_type::Geometry] = str;
+			_shader_list[ShaderType::Geometry] = str;
 			break;
 		case GL_TESS_CONTROL_SHADER:
-			shader_list[shader_type::Tess_Control] = str;
+			_shader_list[ShaderType::Tess_Control] = str;
 			break;
 		case GL_TESS_EVALUATION_SHADER:
-			shader_list[shader_type::Tess_Eval] = str;
+			_shader_list[ShaderType::Tess_Eval] = str;
 			break;
 		default: break;
 		}
 	}
 }
 
-GLint glShaderProgram::GetIndexAttrib(const std::string& name) const {
+GLint ShaderProgram::GetIndexAttrib(const std::string& name) const {
 	std::unordered_map<std::string, GLint>::const_iterator it;
-	it = attribList.find(name);
-	if (it != attribList.cend()) {
+	it = _attrib_list.find(name);
+	if (it != _attrib_list.cend()) {
 		return it->second;
 	}
 	return -1;
 }
 
-GLint glShaderProgram::GetIndexUniform(const std::string& name) const {
+GLint ShaderProgram::GetIndexUniform(const std::string& name) const {
 	std::unordered_map<std::string, GLint>::const_iterator it;
-	it = uniformList.find(name);
-	if (it != uniformList.cend()) {
+	it = _uniform_list.find(name);
+	if (it != _uniform_list.cend()) {
 		return it->second;
 	}
 	return -1;
 }
 
-void glShaderProgram::create() {
+void ShaderProgram::_Create() {
 	_program = glCreateProgram();
 
 	for (int i = 0; i < 5; ++i) {
-		glslshader* g = glslshader_manager::GetPointer(shader_list[i]);
+		Shader* g = ShaderManager::GetPointer(_shader_list.at(i));
 		if (g != nullptr) {
-			GLuint id = shaderCompile(g);
+			GLuint id = _ShaderCompile(g);
 			glAttachShader(_program, id);
 			glDeleteShader(id);
 		}
@@ -87,11 +104,11 @@ void glShaderProgram::create() {
 		err.append(log.data(), log.size());
 #endif
 	}
-	setIndexAttrib();
-	setIndexUniform();
+	_SetIndexAttrib();
+	_SetIndexUniform();
 }
 
-GLuint glShaderProgram::shaderCompile(const glslshader* shader) {
+GLuint ShaderProgram::_ShaderCompile(const Shader* shader) {
 	GLuint      id(0);
 	const char* str = shader->GetSource().c_str();
 	id              = glCreateShader(shader->GetType());
@@ -123,11 +140,11 @@ GLuint glShaderProgram::shaderCompile(const glslshader* shader) {
 #else
 		err.append(log.data(), log.size());
 #endif
-		return id;
 	}
+	return id;
 }
 
-void glShaderProgram::setIndexAttrib() {
+void ShaderProgram::_SetIndexAttrib() {
 	GLint max_len;
 	GLint num_attrib;
 
@@ -142,16 +159,16 @@ void glShaderProgram::setIndexAttrib() {
 		GLenum  type;
 		glGetActiveAttrib(_program, i, max_len, &len, &size, &type,
 						  name.data());
-		GLint loc               = glGetAttribLocation(_program, name.data());
-		attribList[name.data()] = loc;
+		GLint loc                 = glGetAttribLocation(_program, name.data());
+		_attrib_list[name.data()] = loc;
 	}
 }
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-std::string glShaderProgram::GetError() const { return "error"; }
+std::string ShaderProgram::GetError() const { return "error"; }
 #endif
 
-void glShaderProgram::setIndexUniform() {
+void ShaderProgram::_SetIndexUniform() {
 	GLint max_len;
 	GLint num_uniform;
 
@@ -166,8 +183,8 @@ void glShaderProgram::setIndexUniform() {
 		GLenum  type;
 		glGetActiveUniform(_program, i, max_len, &len, &size, &type,
 						   name.data());
-		GLint loc                = glGetUniformLocation(_program, name.data());
-		uniformList[name.data()] = loc;
+		GLint loc = glGetUniformLocation(_program, name.data());
+		_uniform_list[name.data()] = loc;
 	}
 }
 

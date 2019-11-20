@@ -13,18 +13,18 @@
 #define GLAPP_GL_COMPILE_ERROR_EXCEPTION
 
 namespace glapp {
-class glslshader : boost::noncopyable {
+class Shader : boost::noncopyable {
 	friend class glShaderProgram;
 
 public:
-	glslshader();
-	glslshader(const std::string& filename);
-	virtual ~glslshader();
+	Shader();
+	Shader(const std::string& filename);
+	virtual ~Shader();
 
-	const GLuint       GetShader() const;
-	const std::string& GetSource() const;
-	const GLuint       GetType() const;
-	const bool         Empty() const;
+	GLuint      GetShader() const;
+	std::string GetSource() const;
+	GLuint      GetType() const;
+	bool        Empty() const;
 
 	//static std::unordered_map<std::string, glslshader> shader_list;
 

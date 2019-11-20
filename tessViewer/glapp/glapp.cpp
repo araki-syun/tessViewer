@@ -17,14 +17,14 @@ void Initialize() {
 //window::window(){
 
 //}
-window::window(std::string_view                title,
+Window::Window(std::string_view                title,
 			   int                             glversion_major,
 			   int                             glversion_minor,
 			   const std::vector<std::string>& required_ext)
-	: inner::base_window(title) {
+	: inner::BaseWindow(title) {
 	auto conf_win        = Config::Get("/window");
 	auto conf_bit        = conf_win.Relative("/bit");
-	window::_debug_level = conf_win.Value<int>("debug_level");
+	Window::_debug_level = conf_win.Value<int>("debug_level");
 
 	Initialize();
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, _debug_level > 0 ? 1 : 0);
@@ -51,7 +51,7 @@ window::window(std::string_view                title,
 		throw std::runtime_error("GLEW Initialize ERROR");
 	}
 
-	glDebugMessageCallback(openGLDebugMessageCallback, nullptr);
+	glDebugMessageCallback(_open_gl_debug_message_callback, nullptr);
 
 	for (auto ext : required_ext) {
 		if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
@@ -70,15 +70,15 @@ window::window(std::string_view                title,
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
 }
-window::window(window&& win) noexcept
-	: inner::base_window(win.GetTitle()), _win(win._win) {
+Window::Window(Window&& win) noexcept
+	: inner::BaseWindow(win.GetTitle()), _win(win._win) {
 	win._win = nullptr;
 }
-window::~window() {
+Window::~Window() {
 	glfwDestroyWindow(this->_win);
 	glfwTerminate();
 }
-window& window::operator=(window&& win) noexcept {
+Window& Window::operator=(Window&& win) noexcept {
 	if (this != &win) {
 		_win     = win._win;
 		win._win = nullptr;
@@ -87,33 +87,34 @@ window& window::operator=(window&& win) noexcept {
 	return *this;
 }
 
-void window::SetBackColor(const glm::vec4& color) {
+void Window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
 }
 
-glm::ivec2 window::GetWindowSize() const {
+glm::ivec2 Window::GetWindowSize() const {
 	glm::ivec2 size(0);
 	GetWindowSize(&size.x, &size.y);
 	return size;
 }
-void window::GetWindowSize(int* x, int* y) const {
+void Window::GetWindowSize(int* x, int* y) const {
 	glfwGetWindowSize(_win, x, y);
 }
-void glapp::window::GetWindowPosition(int* x, int* y) const {
+void glapp::Window::GetWindowPosition(int* x, int* y) const {
 	glfwGetWindowPos(_win, x, y);
 }
-GLuint      glapp::window::GetFrameBuffer() const { return GLuint(); }
-GLFWwindow* window::GetWin() { return _win; }
+GLuint      glapp::Window::GetFrameBuffer() const { return GLuint(); }
+GLFWwindow* Window::GetWin() { return _win; }
 
-int             window::_debug_level          = 0;
-unsigned int    window::_debug_message_number = 0;
-void GLAPIENTRY window::openGLDebugMessageCallback(GLenum        source,
-												   GLenum        type,
-												   GLuint        id,
-												   GLenum        severity,
-												   GLsizei       length,
-												   const GLchar* message,
-												   const void*   userParam) {
+int          Window::_debug_level          = 0;
+unsigned int Window::_debug_message_number = 0;
+void GLAPIENTRY
+Window::_open_gl_debug_message_callback(GLenum        source,
+										GLenum        type,
+										GLuint        id,
+										GLenum        severity,
+										GLsizei       length,
+										const GLchar* message,
+										const void*   user_param) {
 	int         level = 0;
 	std::string severity_string;
 	switch (severity) {

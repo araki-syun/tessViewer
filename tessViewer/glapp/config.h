@@ -14,10 +14,10 @@
 
 namespace glapp {
 template <class, class = void>
-struct is_less_then_comparable : std::false_type {};
+struct is_less_then_comparable : std::false_type {};// NOLINT
 
 template <class T>
-struct is_less_then_comparable<
+struct is_less_then_comparable< // NOLINT
 	T,
 	std::void_t<decltype(std::declval<T&>() < std::declval<T&>())>>
 	: std::true_type {};
