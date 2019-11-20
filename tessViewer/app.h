@@ -19,6 +19,7 @@
 #include "glslStringDraw.h"
 #include "glQuery.h"
 #include "material.h"
+#include "camera.h"
 
 class app {
 public:

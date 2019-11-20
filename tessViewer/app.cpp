@@ -84,15 +84,9 @@ app::app() {
 	window_size = glm::ivec2(conf.Value<int>("/window/resolution/width"),
 							 conf.Value<int>("/window/resolution/height"));
 
-	auto conf_cam    = conf_graph.Relative("camera");
-	camera.Pos       = conf_cam.Value<glm::vec3>("position");
-	camera.Angle     = conf_cam.Value<glm::vec3>("angle");
-	camera.Fov       = conf_cam.Value<float>("fov");
-	camera.maxFov    = conf_cam.Schema("/fov/maximum").get<float>();
-	camera.maxFov    = conf_cam.Schema("/fov/minimum").get<float>();
-	camera.LookPoint = camera.Pos + camera.Angle;
-	camera.Right     = glm::cross(camera.Angle, glm::vec3(0, 1, 0));
-	camera.Up        = glm::cross(camera.Right, camera.Angle);
+	_camera.MaxFov(conf_graph.Schema("/camera/fov/maximum").get<float>());
+	_camera.MinFov(conf_graph.Schema("/camera/fov/minimum").get<float>());
+	_camera = conf_graph.Value<tv::Camera>("camera");
 
 	tess_fact     = conf_osd.Value<int>("/tessellation/level");
 	max_tess_fact = conf_osd.Schema("/tessellation/level/maximum").get<int>();
@@ -226,21 +220,24 @@ void app::KeyDefaultCallback(
 			a->tess_fact = glm::max(a->tess_fact - 1, 0);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
-		case GLFW_KEY_SPACE:
-			std::cout
-				//<< (a->format % "FPS" % (1.f / a->frametime)).str()
-				//<< (a->format % "Primitive" % (int)a->query->Get()).str()
-				//<< (a->format % "Text Prim" % (int)a->draw_string_query->Get()).str()
-				<< (a->formater % "Pos" % glm::to_string(a->camera.Pos)).str()
-				<< (a->formater % "Angle" % glm::to_string(a->camera.Angle))
+		case GLFW_KEY_SPACE: {
+			auto q = a->_camera.Quaternion();
+			std::cout << (a->_formater % "Pos" %
+						  glm::to_string(a->_camera.Position()))
 					   .str()
-				<< (a->formater % "LookPoint" %
-					glm::to_string(a->camera.LookPoint))
+					  << (a->_formater % "Angle" %
+						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
 					   .str()
-				<< (a->formater % "Right" % glm::to_string(a->camera.Right))
+					  << (a->_formater % "LookPoint" %
+						  glm::to_string(q * tv::Camera::front))
 					   .str()
-				<< (a->formater % "Up" % glm::to_string(a->camera.Up)).str();
-			break;
+					  << (a->_formater % "Right" %
+						  glm::to_string(q * tv::Camera::right))
+							 .str()
+					  << (a->_formater % "Up" %
+						  glm::to_string(q * tv::Camera::up))
+							 .str();
+		} break;
 		default: break;
 		}
 	} else if (action == GLFW_RELEASE) {
@@ -276,100 +273,66 @@ void app::KeyFlyModeCallback(
 			a->tess_fact = glm::max(a->tess_fact - 1, 0);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
-		case GLFW_KEY_W: a->camera.Move.y = 1.f; break;
-		case GLFW_KEY_S: a->camera.Move.y = -1.f; break;
-		case GLFW_KEY_D: a->camera.Move.x = 1.f; break;
-		case GLFW_KEY_A: a->camera.Move.x = -1.f; break;
-		case GLFW_KEY_SPACE:
-			std::cout
-				//<< (a->format % "FPS" % (1.f / a->frametime)).str()
-				//<< (a->format % "Primitive" % (int)a->query->Get()).str()
-				//<< (a->format % "Text Prim" % (int)a->draw_string_query->Get()).str()
-				<< (a->formater % "Pos" % glm::to_string(a->camera.Pos)).str()
-				<< (a->formater % "Angle" % glm::to_string(a->camera.Angle))
+		case GLFW_KEY_W: a->_camera.FpsMove(tv::Camera::front); break;
+		case GLFW_KEY_S: a->_camera.FpsMove(-tv::Camera::front); break;
+		case GLFW_KEY_D: a->_camera.FpsMove(tv::Camera::right); break;
+		case GLFW_KEY_A: a->_camera.FpsMove(-tv::Camera::right); break;
+		case GLFW_KEY_SPACE: {
+			auto q = a->_camera.Quaternion();
+			std::cout << (a->_formater % "Pos" %
+						  glm::to_string(a->_camera.Position()))
+							 .str()
+					  << (a->_formater % "Angle" %
+						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
 					   .str()
-				<< (a->formater % "LookPoint" %
-					glm::to_string(a->camera.LookPoint))
+					  << (a->_formater % "LookPoint" %
+						  glm::to_string(q * tv::Camera::front))
 					   .str()
-				<< (a->formater % "Right" % glm::to_string(a->camera.Right))
+					  << (a->_formater % "Right" %
+						  glm::to_string(q * tv::Camera::right))
 					   .str()
-				<< (a->formater % "Up" % glm::to_string(a->camera.Up)).str();
-			break;
+					  << (a->_formater % "Up" %
+						  glm::to_string(q * tv::Camera::up))
+							 .str();
+		} break;
 		default: break;
 		}
 	}
 	if (action == GLFW_RELEASE) {
 		switch (key) {
-		case GLFW_KEY_W: a->camera.Move.y = 0.f; break;
-		case GLFW_KEY_S: a->camera.Move.y = 0.f; break;
-		case GLFW_KEY_D: a->camera.Move.x = 0.f; break;
-		case GLFW_KEY_A: a->camera.Move.x = 0.f; break;
+		case GLFW_KEY_W: a->_camera.FpsMove(-tv::Camera::front); break;
+		case GLFW_KEY_S: a->_camera.FpsMove(tv::Camera::front); break;
+		case GLFW_KEY_D: a->_camera.FpsMove(-tv::Camera::right); break;
+		case GLFW_KEY_A: a->_camera.FpsMove(tv::Camera::right); break;
 		default: break;
 		}
 	}
 	a->UpdateView();
 }
-void app::DragCameraRotate(GLFWwindow* window, double x, double y) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	auto current = glm::vec2(x, y);
+	auto move    = (current - a->_previous_mouse_pos) * a->_frametime;
 
-	glm::vec2 move((float)x - a->previousMousePos.x,
-				   (float)y - a->previousMousePos.y);
-	move *= a->frametime;
-	if (move.x != 0.f) {
-		glm::vec3 o(a->camera.Pos - a->camera.LookPoint);
-		a->camera.Pos   = glm::rotateY(o, -move.x) + a->camera.LookPoint;
-		a->camera.Angle = glm::normalize(a->camera.LookPoint - a->camera.Pos);
-		a->camera.Right = glm::cross(a->camera.Angle, glm::vec3(0.f, 1.f, 0.f));
-		a->camera.Up    = glm::cross(a->camera.Right, a->camera.Angle);
+	a->_camera.RotateMove(move);
+
+	a->_previous_mouse_pos = current;
+	a->_update_view();
 	}
-	if (move.y != 0.f) {
-		glm::vec3 o(a->camera.Pos - a->camera.LookPoint);
-		a->camera.Pos = glm::rotate(a->camera.Pos - a->camera.LookPoint, move.y,
-									-a->camera.Right) +
-						a->camera.LookPoint;
-		a->camera.Angle = glm::normalize(a->camera.LookPoint - a->camera.Pos);
-		a->camera.Right = glm::cross(a->camera.Angle, glm::vec3(0.f, 1.f, 0.f));
-		a->camera.Up    = glm::cross(a->camera.Right, a->camera.Angle);
-	}
+
+	auto current = glm::vec2(x, y);
+	auto move =
+		glm::vec3((current - a->_previous_mouse_pos) * a->_frametime, 0);
+
+	a->_camera.FpsMove(move);
 
 	a->previousMousePos.x = (float)x;
 	a->previousMousePos.y = (float)y;
 	a->UpdateView();
 }
-void app::DragCameraTranslation(GLFWwindow* window, double x, double y) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
-	glm::vec2 move((float)x - a->previousMousePos.x,
-				   (float)y - a->previousMousePos.y);
-	move *=
-		a->frametime * 0.1f * glm::length(a->camera.Pos - a->camera.LookPoint);
-	glm::vec3 trans(a->camera.Right * -move.x + a->camera.Up * move.y);
-	a->camera.Pos += trans;
-	a->camera.LookPoint += trans;
+	auto current = glm::vec2(x, y);
+	auto move    = (current - a->_previous_mouse_pos) * a->_frametime;
 
-	a->previousMousePos.x = (float)x;
-	a->previousMousePos.y = (float)y;
-	a->UpdateView();
-}
-void app::DragCameraFlyMode(GLFWwindow* window, double x, double y) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
-
-	glm::vec2 move((float)x - a->previousMousePos.x,
-				   (float)y - a->previousMousePos.y);
-	move *= a->frametime;
-	if (move.x != 0.f) {
-		a->camera.Angle = glm::rotateY(a->camera.Angle, -move.x);
-		a->camera.Right = glm::cross(a->camera.Angle, glm::vec3(0, 1, 0));
-		a->camera.Up    = glm::cross(a->camera.Right, a->camera.Angle);
-		//a->camera.LookPoint = glm::rotateY(a->camera.LookPoint, -move.x);
-	}
-	if (move.y != 0.f) {
-		a->camera.Angle =
-			glm::rotate(a->camera.Angle, -move.y, a->camera.Right);
-		a->camera.Right = glm::cross(a->camera.Angle, glm::vec3(0, 1, 0));
-		a->camera.Up    = glm::cross(a->camera.Right, a->camera.Angle);
-		//a->camera.LookPoint = glm::rotate(a->camera.LookPoint, -move.y, a->camera.Right);
-	}
+	a->_camera.Rotate(move);
 
 	a->previousMousePos.x = (float)x;
 	a->previousMousePos.y = (float)y;
@@ -436,16 +399,15 @@ void app::MouseButtonFlayModeCallback(GLFWwindow* window,
 void app::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
 
-	a->camera.Fov += (float)(up - down);
-	a->camera.Fov =
-		glm::clamp(a->camera.Fov, a->camera.minFov, a->camera.maxFov);
-	a->UpdateProjection();
-	std::cout << "fov : " << a->camera.Fov << std::endl;
+	using namespace tv;
+	auto fov = a->_camera.Fov() + (float)(up - down);
+	a->_camera.Fov(glm::clamp(fov, Camera::MinFov(), Camera::MaxFov()));
+	std::cout << "fov : " << a->_camera.Fov() << std::endl;
 }
 void app::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,
 									double      down) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	a->_camera.Length((a->_camera.Length() * 0.1f) * (float)(down - up));
 
 	float length = glm::length(a->camera.Pos - a->camera.LookPoint);
 	a->camera.Pos += a->camera.Angle * (length * 0.1f) * (float)(down - up);
@@ -461,23 +423,12 @@ void app::WindowResizeCallback(GLFWwindow* window, int x, int y) {
 	a->draw_string->SetWindowSize(x, y);
 }
 
-void app::UpdateView() {
-	if (camera.fly_mode) {
-		if (glm::length(camera.Move) > 0.1f) {
-			glm::vec3 m = glm::normalize(camera.Angle * camera.Move.y +
-										 camera.Right * camera.Move.x) *
-						  frametime;
-			camera.Pos += m;
-			camera.LookPoint += m;
-		}
-	}
-	transform.view = glm::lookAt(camera.Pos, camera.Pos + camera.Angle,
-								 camera.Up); // glm::vec3(0, 1, 0));
-}
-void app::UpdateProjection() {
-	transform.projection = glm::perspective(
-		glm::radians(camera.Fov), (float)window_size.x / (float)window_size.y,
-		camera.Near, camera.Far);
+void App::_update_view() { _transform.view = _camera.ViewMatrix(); }
+void App::_update_projection() {
+	_transform.projection =
+		glm::perspective(glm::radians(_camera.Fov()),
+						 (float)_window_size.x / (float)_window_size.y,
+						 _camera.Near(), _camera.Far());
 }
 void app::UpdateUBO() {
 	tess.Update(tess_fact);
