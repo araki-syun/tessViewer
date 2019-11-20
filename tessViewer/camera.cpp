@@ -23,7 +23,7 @@ Camera::Camera(glm::vec3 pos, glm::vec3 angle, float fov, float near, float far)
 Camera::Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far)
 	: _pos(pos)
 	, _quat(quat)
-	, _lookpoint(_quat * Camera::front)
+	, _front(_quat * Camera::front)
 	, _right(_quat * Camera::right)
 	, _up(_quat * Camera::up)
 	, _fov(fov)
@@ -33,32 +33,46 @@ Camera::Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far)
 	assert(near < far);
 }
 void Camera::Move(glm::vec3 pos) { _pos = pos; }
-void Camera::FpsMove(glm::vec3 move, float factor) {
-	_move += (_quat * move) * factor;
-}
+void Camera::FpsMove(glm::vec3 move) { _move += move; }
 void Camera::Rotate(float x, float y) {
 	auto h = glm::angleAxis(x, _up);
 	auto v = glm::angleAxis(y, _right);
 	Rotate(h * v);
 }
+void Camera::Rotate(glm::vec2 xy) { Rotate(xy.x, xy.y); }
 void Camera::Rotate(glm::vec3 look) {
-	auto r = glm::rotation(_lookpoint, glm::normalize(look - _pos));
+	auto r = glm::rotation(_front, glm::normalize(look - _pos));
 	Rotate(r);
 }
 void Camera::Rotate(glm::quat quat) {
-	_quat      = quat * _quat;
-	_lookpoint = _quat * front;
-	_up        = _quat * up;
-	_right     = _quat * right;
+	_quat  = quat * _quat;
+	_front = _quat * front;
+	_up    = _quat * up;
+	_right = _quat * right;
 }
-float Camera::Fov() const { return _fov; }
+void Camera::RotateMove(glm::vec2 vh) {
+	auto look = ((_quat * front) * _length) + _pos; //注視点
+	Rotate(vh);                                     //カメラ回転
+	auto dir = ((_quat * front) * _length);         //回転後カメラ方向
+	Move(look - dir); //注視点 - 方向 = 移動位置
+}
 float Camera::Fov(float fov) {
 	assert(_max_fov > fov > _min_fov);
 	return _fov = fov;
 }
-void      Camera::Update() { _pos += _move; }
+float     Camera::Near(float near) { return _near = near; }
+float     Camera::Far(float far) { return _far = far; }
+float     Camera::Length(float length) { return _length = length; }
+void      Camera::Update(float factor) { _pos += _quat * _move * factor; }
+glm::vec3 Camera::Position() const { return _pos; }
+glm::vec3 Camera::Move() const { return _move; }
+glm::quat Camera::Quaternion() const { return _quat; }
+float     Camera::Fov() const { return _fov; }
+float     Camera::Near() const { return _near; }
+float     Camera::Far() const { return _far; }
+float     Camera::Length() const { return _length; }
 glm::mat4 Camera::ViewMatrix() const {
-	return glm::lookAt(_pos, _pos + _lookpoint, _up);
+	return glm::lookAt(_pos, _pos + _front, _up);
 }
 
 float Camera::MaxFov() { return _max_fov; }

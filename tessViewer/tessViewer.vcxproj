@@ -95,6 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="glapp\base_window.cpp" />
     <ClCompile Include="glapp\config.cpp" />
     <ClCompile Include="glapp\glapp.cpp" />
@@ -117,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="glapp\base_window.h" />
     <ClInclude Include="glapp\config.h" />
     <ClInclude Include="glapp\glapp.hpp" />

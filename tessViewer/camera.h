@@ -31,14 +31,26 @@ public:
 	// 	   float     far);
 	Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far);
 
-	void      Move(glm::vec3 pos);
-	void      FpsMove(glm::vec3 move, float factor = 1.0f);
-	void      Rotate(float x, float y);
-	void      Rotate(glm::vec3 look);
-	void      Rotate(glm::quat quat);
+	void  Move(glm::vec3 pos);
+	void  FpsMove(glm::vec3 move);
+	void  Rotate(float x, float y);
+	void  Rotate(glm::vec2 xy);
+	void  Rotate(glm::vec3 look);
+	void  Rotate(glm::quat quat);
+	void  RotateMove(glm::vec2 vh);
+	float Fov(float fov);
+	float Near(float near);
+	float Far(float far);
+	float Length(float length);
+	void  Update(float factor);
+
+	glm::vec3 Position() const;
+	glm::vec3 Move() const;
+	glm::quat Quaternion() const;
 	float     Fov() const;
-	float     Fov(float fov);
-	void      Update();
+	float     Near() const;
+	float     Far() const;
+	float     Length() const;
 	glm::mat4 ViewMatrix() const;
 
 	static float MaxFov();
@@ -46,23 +58,24 @@ public:
 	static float MinFov();
 	static float MinFov(float min);
 
+	static constexpr glm::vec3 front = {0, 0, -1};
+	static constexpr glm::vec3 up    = {0, 1, 0};
+	static constexpr glm::vec3 right = {1, 0, 0};
+
 protected:
 	glm::vec3 _pos;
 	glm::quat _quat;
-	glm::vec3 _lookpoint;
+	glm::vec3 _front;
 	glm::vec3 _right;
 	glm::vec3 _up;
 	float     _fov;
 	float     _near;
 	float     _far;
+	float     _length = 10.0f;
 	glm::vec3 _move{0};
 
 	static inline float _max_fov = 179.0f;
 	static inline float _min_fov = 10.0f;
-
-	static constexpr glm::vec3 front = {0, 0, -1};
-	static constexpr glm::vec3 up    = {0, 1, 0};
-	static constexpr glm::vec3 right = {1, 0, 0};
 };
 template <class BASIC_JSON_TYPE>
 void to_json(BASIC_JSON_TYPE& j, const Camera& cam) { //NOLINT
@@ -72,6 +85,7 @@ void to_json(BASIC_JSON_TYPE& j, const Camera& cam) { //NOLINT
 	j["fov"]       = cam._fov;
 	j["near"]      = cam._near;
 	j["far"]       = cam._far;
+	j["length"]    = cam._length;
 }
 template <class BASIC_JSON_TYPE>
 void from_json(const BASIC_JSON_TYPE& j, Camera& cam) { //NOLINT
@@ -92,5 +106,6 @@ void from_json(const BASIC_JSON_TYPE& j, Camera& cam) { //NOLINT
 		cam._near = schema.at("property/near/default").get<float>();
 		cam._far  = schema.at("property/far/default").get<float>();
 	}
+	cam._length = j.at("length").get<float>();
 }
 } // namespace tv
