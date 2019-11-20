@@ -42,10 +42,10 @@ ShaderManager::ShaderManager() = default;
 ShaderManager::~ShaderManager() = default;
 
 ShaderManager::shader_iterator
-ShaderManager::add(const glslProgram::glsl_info& glsl) {
-	auto it = shader_list.emplace(std::piecewise_construct,
-								  std::forward_as_tuple(glsl.str()),
-								  std::forward_as_tuple(new glslProgram(glsl)));
+ShaderManager::_add(const GlslProgram::GlslInfo& glsl) {
+	auto it = _shader_list.emplace(
+		std::piecewise_construct, std::forward_as_tuple(glsl.Str()),
+		std::forward_as_tuple(new GlslProgram(glsl)));
 	if (it.second) {
 		return it.first;
 	}
@@ -53,33 +53,33 @@ ShaderManager::add(const glslProgram::glsl_info& glsl) {
 }
 
 ShaderManager::shader_iterator
-ShaderManager::add(const glslProgram::glsl_info& glsl, const osd_info& osd) {
-	auto it = shader_list.emplace(
-		std::piecewise_construct, std::forward_as_tuple(glsl.str() + osd.str()),
-		std::forward_as_tuple(new glslProgram(glsl, osd)));
+ShaderManager::_add(const GlslProgram::GlslInfo& glsl, const OsdInfo& osd) {
+	auto it = _shader_list.emplace(
+		std::piecewise_construct, std::forward_as_tuple(glsl.Str() + osd.Str()),
+		std::forward_as_tuple(new GlslProgram(glsl, osd)));
 	if (it.second) {
 		return it.first;
 	}
 	{ throw std::runtime_error("Shader Insert ERROR"); }
 }
 
-const glslProgram& ShaderManager::Get(const glslProgram::glsl_info& glsl) {
-	auto it = shader_list.find(glsl.str());
-	if (it != shader_list.cend()) {
+const GlslProgram& ShaderManager::Get(const GlslProgram::GlslInfo& glsl) {
+	auto it = _shader_list.find(glsl.Str());
+	if (it != _shader_list.cend()) {
 		return *(it->second.get());
 	}
-		auto it2 = add(glsl);
-		return *(it2->second.get());
+	auto it2 = _add(glsl);
+	return *(it2->second.get());
 }
 
-const glslProgram& ShaderManager::Get(const glslProgram::glsl_info& glsl,
-									  const osd_info&               osd) {
-	auto it = shader_list.find(glsl.str() + osd.str());
-	if (it != shader_list.cend()) {
+const GlslProgram& ShaderManager::Get(const GlslProgram::GlslInfo& glsl,
+									  const OsdInfo&               osd) {
+	auto it = _shader_list.find(glsl.Str() + osd.Str());
+	if (it != _shader_list.cend()) {
 		return *(it->second.get());
 	}
-		auto it2 = add(glsl, osd);
-		return *(it2->second.get());
+	auto it2 = _add(glsl, osd);
+	return *(it2->second.get());
 }
 
 //const glShaderUniformBuffer * ShaderManager::GetUniformBuffer(const std::string & name)

@@ -21,53 +21,55 @@
 #include "glapp\glapp_define.h"
 
 #include "glm/fwd.hpp"
+#include "glm/gtc/quaternion.hpp"
+#include "glm/trigonometric.hpp"
 #include "version.h"
 
-app::app() {
+App::App() {
 	auto conf       = glapp::Config::Get();
 	auto conf_graph = conf.Relative("/graphics");
 	auto conf_osd   = conf_graph.Relative("/osd");
 	auto conf_font  = conf.Relative("/ui/font");
 
-	tv::model::default_patch_type =
+	tv::Model::default_patch_type =
 		conf.Value<std::string>("/graphics/osd/patch/type") == "GREGORY_BASIS"
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
 			: OpenSubdiv::Far::PatchDescriptor::Type::REGULAR;
 
-	OpenSubdiv::Far::SetErrorCallback(osdErrorCallback);
-	OpenSubdiv::Far::SetWarningCallback(osdWarningCallback);
+	OpenSubdiv::Far::SetErrorCallback(OsdErrorCallback);
+	OpenSubdiv::Far::SetWarningCallback(OsdWarningCallback);
 
-	glfwSetErrorCallback(glfwErrorCallback);
+	glfwSetErrorCallback(GlfwErrorCallback);
 
 	std::vector<std::string> extensions{"GL_ARB_direct_state_access",
 										"GL_ARB_tessellation_shader"};
-	win = std::make_unique<glapp::Window>("tessViewer " TV_VERSION, 4, 5,
-										  extensions);
+	_win = std::make_unique<glapp::Window>("tessViewer " TV_VERSION, 4, 5,
+										   extensions);
 
-	int mat_offset           = material->GetElementSize();
-	tv::model::shader_manage = &(app::shader_manage);
+	int mat_offset           = _material->GetElementSize();
+	tv::Model::shader_manage = &(App::_shader_manage);
 
-	tv::model::default_glsl_info.vert = DEFAULT_VERTEX_SHADER;
-	tv::model::default_glsl_info.frag = DEFAULT_FRAGMENT_SHADER;
-	tv::model::default_glsl_info.geom = DEFAULT_GEOMETRY_SHADER;
-	tv::model::default_glsl_info.CreateUniformBuffer("Transform", 128);
-	tv::model::default_glsl_info.CreateUniformBuffer("Tessellation", 16);
-	tv::model::default_glsl_info.CreateUniformBuffer("LightInfo", 80);
-	tv::model::default_glsl_info.CreateUniformBuffer("MaterialOffset", 16);
-	tv::model::default_glsl_info.GetUniformBuffer("MaterialOffset")
+	tv::Model::default_glsl_info.vert = DEFAULT_VERTEX_SHADER;
+	tv::Model::default_glsl_info.frag = DEFAULT_FRAGMENT_SHADER;
+	tv::Model::default_glsl_info.geom = DEFAULT_GEOMETRY_SHADER;
+	tv::Model::default_glsl_info.CreateUniformBuffer("Transform", 128);
+	tv::Model::default_glsl_info.CreateUniformBuffer("Tessellation", 16);
+	tv::Model::default_glsl_info.CreateUniformBuffer("LightInfo", 80);
+	tv::Model::default_glsl_info.CreateUniformBuffer("MaterialOffset", 16);
+	tv::Model::default_glsl_info.GetUniformBuffer("MaterialOffset")
 		->Update(&mat_offset);
 
-	tv::model::default_patch = conf_osd.Value<int>("/patch/level");
-	tv::model::max_patch = conf_osd.Schema("/patch/level/maximum").get<int>();
+	tv::Model::default_patch = conf_osd.Value<int>("/patch/level");
+	tv::Model::max_patch = conf_osd.Schema("/patch/level/maximum").get<int>();
 
-	draw_string = tv::glslStringDraw::getInstance();
-	draw_string->Initialize(conf_font.Value<int>("size"),
-							conf_font.Value<std::string>("file"));
-	draw_string->SetWindowSize(conf.Value<int>("/window/resolution/width"),
-							   conf.Value<int>("/window/resolution/height"));
+	_draw_string = tv::GlslStringDraw::GetInstance();
+	_draw_string->Initialize(conf_font.Value<int>("size"),
+							 conf_font.Value<std::string>("file"));
+	_draw_string->SetWindowSize(conf.Value<int>("/window/resolution/width"),
+								conf.Value<int>("/window/resolution/height"));
 
 	// コマンドライン引数または設定で指定されたsdmjファイルから読み込む
-	std::ifstream sdmj(conf_graph.Value<std::string>("model"));
+	std::ifstream sdmj(conf_graph.Value<std::string>("Model"));
 	if (!sdmj) {
 		throw std::runtime_error("File Open Error\n");
 	}
@@ -75,58 +77,58 @@ app::app() {
 	nlohmann::json j;
 	sdmj >> j;
 	auto& objects = j["objects"];
-	material      = std::make_shared<tv::material>(j["materials"]);
-	models.reserve(objects.size());
+	_material     = std::make_shared<tv::Material>(j["materials"]);
+	_models.reserve(objects.size());
 	for (auto& o : objects) {
-		models.emplace_back(o, material);
+		_models.emplace_back(o, _material);
 	}
 
-	window_size = glm::ivec2(conf.Value<int>("/window/resolution/width"),
-							 conf.Value<int>("/window/resolution/height"));
+	_window_size = glm::ivec2(conf.Value<int>("/window/resolution/width"),
+							  conf.Value<int>("/window/resolution/height"));
 
 	_camera.MaxFov(conf_graph.Schema("/camera/fov/maximum").get<float>());
 	_camera.MinFov(conf_graph.Schema("/camera/fov/minimum").get<float>());
 	_camera = conf_graph.Value<tv::Camera>("camera");
 
-	tess_fact     = conf_osd.Value<int>("/tessellation/level");
-	max_tess_fact = conf_osd.Schema("/tessellation/level/maximum").get<int>();
+	_tess_fact     = conf_osd.Value<int>("/tessellation/level");
+	_max_tess_fact = conf_osd.Schema("/tessellation/level/maximum").get<int>();
 
-	UpdateView();
-	UpdateProjection();
+	_update_view();
+	_update_projection();
 
-	auto light_color = conf_cam.Value<glm::vec3>("/light/position");
+	auto light_color = conf_osd.Value<glm::vec3>("/light/position");
 
-	light = {conf_cam.Value<glm::vec3>("/light/position"),
-			 conf_cam.Value<glm::vec3>("/light/position"), light_color,
-			 light_color, light_color};
+	_light = {conf_osd.Value<glm::vec3>("/light/position"),
+			  conf_osd.Value<glm::vec3>("/light/position"), light_color,
+			  light_color, light_color};
 
-	tess.Update(std::min(max_tess_fact, tess_fact));
+	_tess.Update(std::min(_max_tess_fact, _tess_fact));
 
-	formater = boost::format("%1$-12s : %2%\n");
+	_formater = boost::format("%1$-12s : %2%\n");
 
 	cv::Mat default_texture = cv::imread(TEXTURE "default_texture.png");
 	cv::Mat flip_texture(
 		cv::Size(default_texture.size[0], default_texture.size[1]), CV_8UC3);
 	cv::flip(default_texture, flip_texture, 0);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
-	glCreateTextures(GL_TEXTURE_2D, 1, &default_diffuse_texture);
-	glTextureImage2DEXT(default_diffuse_texture, GL_TEXTURE_2D, 0,
+	glCreateTextures(GL_TEXTURE_2D, 1, &_default_diffuse_texture);
+	glTextureImage2DEXT(_default_diffuse_texture, GL_TEXTURE_2D, 0,
 						GL_COMPRESSED_RGB, flip_texture.cols, flip_texture.rows,
 						0, GL_BGR, GL_UNSIGNED_BYTE, flip_texture.data);
-	glTextureParameteri(default_diffuse_texture, GL_TEXTURE_MAG_FILTER,
+	glTextureParameteri(_default_diffuse_texture, GL_TEXTURE_MAG_FILTER,
 						GL_LINEAR);
-	glTextureParameteri(default_diffuse_texture, GL_TEXTURE_MIN_FILTER,
+	glTextureParameteri(_default_diffuse_texture, GL_TEXTURE_MIN_FILTER,
 						GL_LINEAR);
-	tv::model::default_texture = default_diffuse_texture;
+	tv::Model::default_texture = _default_diffuse_texture;
 }
-app::~app() {
-	if (default_diffuse_texture != 0u) {
-		glDeleteTextures(1, &default_diffuse_texture);
+App::~App() {
+	if (_default_diffuse_texture != 0u) {
+		glDeleteTextures(1, &_default_diffuse_texture);
 	}
 }
 
-void app::Run() {
-	GLFWwindow* w = win->GetWin();
+void App::Run() {
+	GLFWwindow* w = _win->GetWin();
 
 	glfwSetWindowUserPointer(w, this);
 	glfwSetKeyCallback(w, KeyDefaultCallback);
@@ -135,102 +137,104 @@ void app::Run() {
 	glfwSetWindowSizeCallback(w, WindowResizeCallback);
 
 	std::string patch_type(
-		tv::model::default_patch_type ==
+		tv::Model::default_patch_type ==
 				OpenSubdiv::Far::PatchDescriptor::Type::REGULAR
 			? "REGULAR"
 			: "GREGORY_BASIS");
 
-	query = std::make_unique<glQuery>(GL_PRIMITIVES_GENERATED);
+	_query = std::make_unique<GlQuery>(GL_PRIMITIVES_GENERATED);
 	//draw_string_query.reset(new glQuery(GL_PRIMITIVES_GENERATED));
 	glfwSetTime(0.0);
-	mainloop = true;
-	while (mainloop && (glfwWindowShouldClose(w) == 0)) {
+	_mainloop = true;
+	while (_mainloop && (glfwWindowShouldClose(w) == 0)) {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		tv::model::draw_call = 0;
+		tv::Model::draw_call = 0;
 
-		UpdateUBO();
+		_update_ubo();
 
-		query->Start();
-		for (tv::model& model : models) {
+		_query->Start();
+		for (tv::Model& model : _models) {
 			model.Draw();
 		}
-		frametime = (float)glfwGetTime();
+		_frametime = (float)glfwGetTime();
 		glfwSetTime(0.0);
-		query->End();
+		_query->End();
 
 		//draw_string_query->Start();
-		draw_string->Set(
+		_draw_string->Set(
 			5, 0,
-			(boost::format("FPS          %.1f") % (1.f / frametime)).str());
-		draw_string->Set(5, 18, (formater % "Tess Level" % tess_fact).str());
-		draw_string->Set(5, 36, (formater % "Primitive" % query->Get()).str());
-		draw_string->Set(5, 54, (formater % "Patch Type" % patch_type).str());
-		draw_string->Set(
-			5, 72, (formater % "Patch Level" % tv::model::default_patch).str());
-		draw_string->Set(5, 90,
-						 (formater % "Draw Call" % tv::model::draw_call).str());
-		draw_string->Draw();
+			(boost::format("FPS          %.1f") % (1.f / _frametime)).str());
+		_draw_string->Set(5, 18, (_formater % "Tess Level" % _tess_fact).str());
+		_draw_string->Set(5, 36,
+						  (_formater % "Primitive" % _query->Get()).str());
+		_draw_string->Set(5, 54, (_formater % "Patch Type" % patch_type).str());
+		_draw_string->Set(
+			5, 72,
+			(_formater % "Patch Level" % tv::Model::default_patch).str());
+		_draw_string->Set(
+			5, 90, (_formater % "Draw Call" % tv::Model::draw_call).str());
+		_draw_string->Draw();
 		//draw_string_query->End();
 
 		glfwPollEvents();
 
 		glm::dvec2 temp;
 		glfwGetCursorPos(w, &temp.x, &temp.y);
-		previousMousePos = temp;
+		_previous_mouse_pos = temp;
 
 		glfwSwapBuffers(w);
 		glFlush();
 	}
 }
 
-void app::osdErrorCallback(OpenSubdiv::Far::ErrorType err,
+void App::OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 						   const char*                message) {
 	using OpenSubdiv::Far::ErrorType;
 	std::cerr << "OpenSubdiv Error Type : " << err << '\n'
 			  << message << std::endl;
 }
-void app::osdWarningCallback(const char* message) {
+void App::OsdWarningCallback(const char* message) {
 	std::cerr << message << std::endl;
 }
-void app::glfwErrorCallback(int code, const char* message) {
+void App::GlfwErrorCallback(int code, const char* message) {
 	std::cerr << "GLFW ERROR Code : " << code << '\n' << message << std::endl;
 }
-void app::KeyDefaultCallback(
+void App::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
-		case GLFW_KEY_ESCAPE: a->mainloop = false; break;
+		case GLFW_KEY_ESCAPE: a->_mainloop = false; break;
 		case GLFW_KEY_F:
 			//glfwSetCursorPosCallback(a->win->GetWin(), nullptr);
 			//glfwSetKeyCallback(a->win->GetWin(), KeyFlyModeCallback);
 			//glfwSetMouseButtonCallback(a->win->GetWin(), MouseButtonFlayModeCallback);
-			//a->camera.fly_mode = true;
+			//a->_fly_mode = true;
 			//std::cout << "Fly Mode" << std::endl;
 			break;
 		case GLFW_KEY_LEFT_SHIFT:
-			glfwSetScrollCallback(a->win->GetWin(), MouseScrollFovCallback);
+			glfwSetScrollCallback(a->_win->GetWin(), MouseScrollFovCallback);
 			break;
 		case GLFW_KEY_UP:
-			a->tess_fact = glm::min(a->tess_fact + 1, a->max_tess_fact);
+			a->_tess_fact = glm::min(a->_tess_fact + 1, a->_max_tess_fact);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_DOWN:
-			a->tess_fact = glm::max(a->tess_fact - 1, 0);
+			a->_tess_fact = glm::max(a->_tess_fact - 1, 0);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_SPACE: {
 			auto q = a->_camera.Quaternion();
 			std::cout << (a->_formater % "Pos" %
 						  glm::to_string(a->_camera.Position()))
-					   .str()
+							 .str()
 					  << (a->_formater % "Angle" %
 						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
-					   .str()
+							 .str()
 					  << (a->_formater % "LookPoint" %
 						  glm::to_string(q * tv::Camera::front))
-					   .str()
+							 .str()
 					  << (a->_formater % "Right" %
 						  glm::to_string(q * tv::Camera::right))
 							 .str()
@@ -243,34 +247,34 @@ void app::KeyDefaultCallback(
 	} else if (action == GLFW_RELEASE) {
 		switch (key) {
 		case GLFW_KEY_LEFT_SHIFT:
-			glfwSetScrollCallback(a->win->GetWin(), MouseScrollLengthCallback);
+			glfwSetScrollCallback(a->_win->GetWin(), MouseScrollLengthCallback);
 			break;
 		default: break;
 		}
 	}
 }
-void app::KeyFlyModeCallback(
+void App::KeyFlyModeCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (key) {
-		case GLFW_KEY_ESCAPE: a->mainloop = false; break;
+		case GLFW_KEY_ESCAPE: a->_mainloop = false; break;
 		case GLFW_KEY_F:
-			glfwSetCursorPosCallback(a->win->GetWin(), nullptr);
-			glfwSetKeyCallback(a->win->GetWin(), KeyDefaultCallback);
-			glfwSetMouseButtonCallback(a->win->GetWin(),
+			glfwSetCursorPosCallback(a->_win->GetWin(), nullptr);
+			glfwSetKeyCallback(a->_win->GetWin(), KeyDefaultCallback);
+			glfwSetMouseButtonCallback(a->_win->GetWin(),
 									   MouseButtonDfaultCallback);
-			a->camera.fly_mode = false;
+			a->_fly_mode = false;
 			DragCameraRotate(window, 0.0, 0.0);
 			std::cout << "Normal Mode" << std::endl;
 			break;
 		case GLFW_KEY_UP:
-			a->tess_fact = glm::min(a->tess_fact + 1, a->max_tess_fact);
+			a->_tess_fact = glm::min(a->_tess_fact + 1, a->_max_tess_fact);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_DOWN:
-			a->tess_fact = glm::max(a->tess_fact - 1, 0);
+			a->_tess_fact = glm::max(a->_tess_fact - 1, 0);
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_W: a->_camera.FpsMove(tv::Camera::front); break;
@@ -284,13 +288,13 @@ void app::KeyFlyModeCallback(
 							 .str()
 					  << (a->_formater % "Angle" %
 						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
-					   .str()
+							 .str()
 					  << (a->_formater % "LookPoint" %
 						  glm::to_string(q * tv::Camera::front))
-					   .str()
+							 .str()
 					  << (a->_formater % "Right" %
 						  glm::to_string(q * tv::Camera::right))
-					   .str()
+							 .str()
 					  << (a->_formater % "Up" %
 						  glm::to_string(q * tv::Camera::up))
 							 .str();
@@ -307,8 +311,11 @@ void app::KeyFlyModeCallback(
 		default: break;
 		}
 	}
-	a->UpdateView();
+	a->_update_view();
 }
+void App::DragCameraRotate(GLFWwindow* window, double x, double y) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
+
 	auto current = glm::vec2(x, y);
 	auto move    = (current - a->_previous_mouse_pos) * a->_frametime;
 
@@ -316,7 +323,9 @@ void app::KeyFlyModeCallback(
 
 	a->_previous_mouse_pos = current;
 	a->_update_view();
-	}
+}
+void App::DragCameraTranslation(GLFWwindow* window, double x, double y) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	auto current = glm::vec2(x, y);
 	auto move =
@@ -324,35 +333,35 @@ void app::KeyFlyModeCallback(
 
 	a->_camera.FpsMove(move);
 
-	a->previousMousePos.x = (float)x;
-	a->previousMousePos.y = (float)y;
-	a->UpdateView();
+	a->_previous_mouse_pos = current;
+	a->_update_view();
 }
+void App::DragCameraFlyMode(GLFWwindow* window, double x, double y) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	auto current = glm::vec2(x, y);
 	auto move    = (current - a->_previous_mouse_pos) * a->_frametime;
 
 	a->_camera.Rotate(move);
 
-	a->previousMousePos.x = (float)x;
-	a->previousMousePos.y = (float)y;
-	a->UpdateView();
+	a->_previous_mouse_pos = current;
+	a->_update_view();
 }
-void app::MouseButtonDfaultCallback(GLFWwindow* window,
+void App::MouseButtonDfaultCallback(GLFWwindow* window,
 									int         button,
 									int         action,
 									int         mods) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_MIDDLE:
 			if (mods == GLFW_MOD_SHIFT) {
-				glfwSetCursorPosCallback(a->win->GetWin(),
+				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
 				std::cout << "Camera Translation" << std::endl;
 			} else {
-				glfwSetCursorPosCallback(a->win->GetWin(), DragCameraRotate);
+				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraRotate);
 				std::cout << "Camera Rotate" << std::endl;
 			}
 			break;
@@ -361,27 +370,27 @@ void app::MouseButtonDfaultCallback(GLFWwindow* window,
 	} else if (action == GLFW_RELEASE) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_MIDDLE:
-			glfwSetCursorPosCallback(a->win->GetWin(), nullptr);
+			glfwSetCursorPosCallback(a->_win->GetWin(), nullptr);
 			break;
 		default: break;
 		}
 	}
 }
-void app::MouseButtonFlayModeCallback(GLFWwindow* window,
+void App::MouseButtonFlayModeCallback(GLFWwindow* window,
 									  int         button,
 									  int         action,
 									  int         mods) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_MIDDLE:
 			if (mods == GLFW_MOD_SHIFT) {
-				glfwSetCursorPosCallback(a->win->GetWin(),
+				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
 				std::cout << "Camera Translation" << std::endl;
 			} else {
-				glfwSetCursorPosCallback(a->win->GetWin(), DragCameraFlyMode);
+				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraFlyMode);
 				std::cout << "Camera Rotate" << std::endl;
 			}
 			break;
@@ -390,37 +399,37 @@ void app::MouseButtonFlayModeCallback(GLFWwindow* window,
 	} else if (action == GLFW_RELEASE) {
 		switch (button) {
 		case GLFW_MOUSE_BUTTON_MIDDLE:
-			glfwSetCursorPosCallback(a->win->GetWin(), nullptr);
+			glfwSetCursorPosCallback(a->_win->GetWin(), nullptr);
 			break;
 		default: break;
 		}
 	}
 }
-void app::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+void App::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	using namespace tv;
 	auto fov = a->_camera.Fov() + (float)(up - down);
 	a->_camera.Fov(glm::clamp(fov, Camera::MinFov(), Camera::MaxFov()));
+	a->_update_projection();
 	std::cout << "fov : " << a->_camera.Fov() << std::endl;
 }
-void app::MouseScrollLengthCallback(GLFWwindow* window,
+void App::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,
 									double      down) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
+
 	a->_camera.Length((a->_camera.Length() * 0.1f) * (float)(down - up));
 
-	float length = glm::length(a->camera.Pos - a->camera.LookPoint);
-	a->camera.Pos += a->camera.Angle * (length * 0.1f) * (float)(down - up);
-	a->UpdateView();
+	a->_update_view();
 }
-void app::WindowResizeCallback(GLFWwindow* window, int x, int y) {
-	app* a = static_cast<app*>(glfwGetWindowUserPointer(window));
+void App::WindowResizeCallback(GLFWwindow* window, int x, int y) {
+	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	glViewport(0, 0, x, y);
-	a->window_size.x = x;
-	a->window_size.y = y;
-	a->UpdateProjection();
-	a->draw_string->SetWindowSize(x, y);
+	a->_window_size = glm::ivec2(x, y);
+	a->_update_projection();
+	a->_draw_string->SetWindowSize(x, y);
 }
 
 void App::_update_view() { _transform.view = _camera.ViewMatrix(); }
@@ -430,12 +439,12 @@ void App::_update_projection() {
 						 (float)_window_size.x / (float)_window_size.y,
 						 _camera.Near(), _camera.Far());
 }
-void app::UpdateUBO() {
-	tess.Update(tess_fact);
-	tv::model::default_glsl_info.GetUniformBuffer("Transform")
-		->Update(&transform);
-	tv::model::default_glsl_info.GetUniformBuffer("LightInfo")->Update(&light);
-	tv::model::default_glsl_info.GetUniformBuffer("Tessellation")
-		->Update(&tess);
+void App::_update_ubo() {
+	_tess.Update(_tess_fact);
+	tv::Model::default_glsl_info.GetUniformBuffer("Transform")
+		->Update(&_transform);
+	tv::Model::default_glsl_info.GetUniformBuffer("LightInfo")->Update(&_light);
+	tv::Model::default_glsl_info.GetUniformBuffer("Tessellation")
+		->Update(&_tess);
 	//shader_default->BindUniformBlock();
 }

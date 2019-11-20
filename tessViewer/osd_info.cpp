@@ -4,7 +4,7 @@
 
 #include <sstream>
 
-osd_info::osd_info() {
+OsdInfo::OsdInfo() {
 	elem.bits.fvar_width = 0;
 	elem.bits.patch_type = OpenSubdiv::Far::PatchDescriptor::Type::NON_PATCH;
 	elem.bits.num_prim_per_vertex = 3;
@@ -15,48 +15,49 @@ osd_info::osd_info() {
 	elem.bits.single_crease_patch = 0;
 }
 
-osd_info::osd_info(const osd_info& info) { elem.data = info.elem.data; }
+OsdInfo::OsdInfo(const OsdInfo& info) { elem.data = info.elem.data; }
 
-void osd_info::set(Elem_Type e, unsigned int value) {
+void OsdInfo::Set(ElemType e, unsigned int value) {
 	switch (e) {
-	case osd_info::FVAR_WIDTH: elem.bits.fvar_width = value; break;
-	case osd_info::PATCH_TYPE: elem.bits.patch_type = value; break;
-	case osd_info::NUM_PRIM_PER_VERTEX:
+	case OsdInfo::FVAR_WIDTH: elem.bits.fvar_width = value; break;
+	case OsdInfo::PATCH_TYPE: elem.bits.patch_type = value; break;
+	case OsdInfo::NUM_PRIM_PER_VERTEX:
 		elem.bits.num_prim_per_vertex = value;
 		break;
-	case osd_info::IS_ADAPTIVE: elem.bits.is_adaptive = (value != 0u ? 1 : 0); break;
-	case osd_info::SCREEN_SPACE_TESS:
+	case OsdInfo::IS_ADAPTIVE:
+		elem.bits.is_adaptive = (value != 0u ? 1 : 0);
+		break;
+	case OsdInfo::SCREEN_SPACE_TESS:
 		elem.bits.screen_space_tess = (value != 0u ? 1 : 0);
 		break;
-	case osd_info::FRACTIONAL:
+	case OsdInfo::FRACTIONAL:
 		elem.bits.fractional = (value != 0u ? 1 : 0);
 		break;
-	case osd_info::PATCH_CULL:
+	case OsdInfo::PATCH_CULL:
 		elem.bits.patch_cull = (value != 0u ? 1 : 0);
 		break;
-	case osd_info::SINGLE_CREASE_PATCH:
+	case OsdInfo::SINGLE_CREASE_PATCH:
 		elem.bits.single_crease_patch = (value != 0u ? 1 : 0);
 		break;
 	default: break;
 	}
 }
 
-std::string osd_info::str() const {
+std::string OsdInfo::Str() const {
 	std::stringstream ss;
 	ss << std::hex << elem.data;
 	return ss.str();
 }
 
-bool osd_info::Element::operator==(const osd_info::Element e) const {
+bool OsdInfo::Element::operator==(const OsdInfo::Element e) const {
 	return data == e.data;
 }
 
-OpenSubdiv::Far::PatchDescriptor::Type
-osd_info::Element::Get_patch_type() const {
+OpenSubdiv::Far::PatchDescriptor::Type OsdInfo::Element::GetPatchType() const {
 	return OpenSubdiv::Far::PatchDescriptor::Type(bits.patch_type);
 }
 
-void osd_info::Element::Set_patch_type(
+void OsdInfo::Element::SetPatchType(
 	OpenSubdiv::Far::PatchDescriptor::Type type) {
 	bits.patch_type = type;
 }

@@ -17,15 +17,15 @@ GLuint CompileShader(GLenum type, std::string& src) {
 	GLint compiled;
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
 	if (compiled != GL_TRUE) {
-		GLint logSize;
+		GLint log_size;
 		GLint length;
 
 		/* ログの長さは、最後のNULL文字も含む */
-		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &logSize);
-		std::vector<GLchar> log(logSize);
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_size);
+		std::vector<GLchar> log(log_size);
 
-		if (logSize > 1) {
-			glGetShaderInfoLog(shader, logSize, &length, log.data());
+		if (log_size > 1) {
+			glGetShaderInfoLog(shader, log_size, &length, log.data());
 			std::cerr << log.data() << std::endl;
 		}
 		glDeleteShader(shader);
@@ -46,20 +46,20 @@ GLuint CompileShader(GLenum type, std::string& src) {
 	return shader;
 }
 
-glslProgram::glslProgram() : _program(0) {}
-glslProgram::glslProgram(const glsl_info& glsl) { SetProgram(glsl); }
-glslProgram::glslProgram(const glsl_info& glsl, const osd_info& osd) {
+GlslProgram::GlslProgram() = default;
+GlslProgram::GlslProgram(const GlslInfo& glsl) { SetProgram(glsl); }
+GlslProgram::GlslProgram(const GlslInfo& glsl, const OsdInfo& osd) {
 	SetProgram(glsl, osd);
 }
-glslProgram::~glslProgram() {
+GlslProgram::~GlslProgram() {
 	if (_program != 0u) {
 		glDeleteProgram(_program);
 	}
 }
 
-GLuint glslProgram::GetProgram() const { return _program; }
+GLuint GlslProgram::GetProgram() const { return _program; }
 
-void glslProgram::SetProgram(const glslProgram::glsl_info& glsl) {
+void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl) {
 	if (_program != 0u) {
 		glDeleteProgram(_program);
 	}
@@ -142,11 +142,11 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl) {
 		std::string err = "GLSL Program Link ERROR\n";
 		throw std::runtime_error(err.append(log.data()));
 	}
-	SetLocation();
+	_set_location();
 }
 
-void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
-							 const osd_info&               osd) {
+void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
+							 const OsdInfo&               osd) {
 	using namespace OpenSubdiv;
 	if (_program != 0u) {
 		glDeleteProgram(_program);
@@ -200,7 +200,7 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 		ss << common << osd_def << "#define VERTEX_SHADER\n"
 		   << str
 		   << Osd::GLSLPatchShaderSource::GetVertexShaderSource(
-				  osd.elem.Get_patch_type());
+				  osd.elem.GetPatchType());
 		shader_src[0] = ss.str();
 		std::ofstream ofs(SHADER "gen.vert", std::ios::trunc);
 		ofs << shader_src[0] << std::endl;
@@ -248,7 +248,7 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 			ss << str;
 		}
 		ss << Osd::GLSLPatchShaderSource::GetTessEvalShaderSource(
-			osd.elem.Get_patch_type());
+			osd.elem.GetPatchType());
 		shader_src[3] = ss.str();
 		std::ofstream ofs(SHADER "gen.tese", std::ios::trunc);
 		ofs << shader_src[3] << std::endl;
@@ -265,7 +265,7 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 							std::istreambuf_iterator<char>());
 		}
 		ss << Osd::GLSLPatchShaderSource::GetTessControlShaderSource(
-			osd.elem.Get_patch_type());
+			osd.elem.GetPatchType());
 		shader_src[4] = ss.str();
 		std::ofstream ofs(SHADER "gen.tesc", std::ios::trunc);
 		ofs << shader_src[4] << std::endl;
@@ -290,10 +290,10 @@ void glslProgram::SetProgram(const glslProgram::glsl_info& glsl,
 		std::string err = "GLSL Program Link ERROR\n";
 		throw std::runtime_error(err.append(log.data()));
 	}
-	SetLocation();
+	_set_location();
 }
 
-void glslProgram::SetProgram(const std::string& vert, const std::string& frag) {
+void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	if (_program != 0u) {
 		glDeleteProgram(_program);
 	}
@@ -346,84 +346,86 @@ void glslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 		std::string err = "GLSL Program Link ERROR\n";
 		throw std::runtime_error(err.append(log.data()));
 	}
-	SetLocation();
+	_set_location();
 }
 
-void glslProgram::SetLocation() {
+void GlslProgram::_set_location() {
 
 	{
-		attrib_map.clear();
-		int numAttrib;
-		int maxAttribsize;
-		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &numAttrib);
+		_attrib_map.clear();
+		int num_attrib;
+		int max_attribsize;
+		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTES, &num_attrib);
 		glGetProgramiv(_program, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH,
-					   &maxAttribsize);
-		for (int i = 0; i < numAttrib; ++i) {
+					   &max_attribsize);
+		for (int i = 0; i < num_attrib; ++i) {
 			int               size;
 			GLenum            type;
-			std::vector<char> name(maxAttribsize);
-			glGetActiveAttrib(_program, i, maxAttribsize, nullptr, &size, &type,
-							  name.data());
-			attrib_map[name.data()] =
-				std::make_unique<tv::glShaderAttribute>(_program, name.data());
+			std::vector<char> name(max_attribsize);
+			glGetActiveAttrib(_program, i, max_attribsize, nullptr, &size,
+							  &type, name.data());
+			_attrib_map[name.data()] =
+				std::make_unique<tv::GlShaderAttribute>(_program, name.data());
 		}
 	}
 	{
-		uniform_map.clear();
-		int numUniform;
-		int maxUniformsize;
-		glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &numUniform);
-		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxUniformsize);
-		for (int i = 0; i < numUniform; ++i) {
-			std::vector<char> name(maxUniformsize);
-			glGetActiveUniformName(_program, i, maxUniformsize, nullptr,
+		_uniform_map.clear();
+		int num_uniform;
+		int max_uniformsize;
+		glGetProgramiv(_program, GL_ACTIVE_UNIFORMS, &num_uniform);
+		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_MAX_LENGTH,
+					   &max_uniformsize);
+		for (int i = 0; i < num_uniform; ++i) {
+			std::vector<char> name(max_uniformsize);
+			glGetActiveUniformName(_program, i, max_uniformsize, nullptr,
 								   name.data());
-			uniform_map[name.data()] =
-				std::make_unique<tv::glShaderUniform>(_program, name.data());
+			_uniform_map[name.data()] =
+				std::make_unique<tv::GlShaderUniform>(_program, name.data());
 		}
 	}
 	{
-		uniformBlock_map.clear();
-		int numUniformBlock;
-		int maxUniformBlocksize;
-		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_BLOCKS, &numUniformBlock);
+		_uniform_block_map.clear();
+		int num_uniform_block;
+		int max_uniform_blocksize;
+		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_BLOCKS, &num_uniform_block);
 		glGetProgramiv(_program, GL_ACTIVE_UNIFORM_BLOCK_MAX_NAME_LENGTH,
-					   &maxUniformBlocksize);
-		for (int i = 0; i < numUniformBlock; ++i) {
+					   &max_uniform_blocksize);
+		for (int i = 0; i < num_uniform_block; ++i) {
 			int               length;
 			int               size;
-			std::vector<char> name_array(maxUniformBlocksize);
-			glGetActiveUniformBlockName(_program, i, maxUniformBlocksize,
+			std::vector<char> name_array(max_uniform_blocksize);
+			glGetActiveUniformBlockName(_program, i, max_uniform_blocksize,
 										&length, name_array.data());
 			glGetActiveUniformBlockiv(_program, i, GL_UNIFORM_BLOCK_DATA_SIZE,
 									  &size);
 			std::string name(name_array.data()); //cbegin(), name_array.cend());
-			uniformBlock_map[name] = std::make_unique<tv::glShaderUniformBlock>(
-				_program, name.c_str());
+			_uniform_block_map[name] =
+				std::make_unique<tv::GlShaderUniformBlock>(_program,
+														   name.c_str());
 			glUniformBlockBinding(
-				_program, uniformBlock_map[name]->GetIndex(),
-				glsl_info::GetUniformBuffer(name)->GetBinding());
+				_program, _uniform_block_map[name]->GetIndex(),
+				GlslInfo::GetUniformBuffer(name)->GetBinding());
 		}
 	}
-	fragment = glGetFragDataLocation(_program, "fragment");
+	_fragment = glGetFragDataLocation(_program, "fragment");
 }
 
-const tv::glShaderAttribute*
-glslProgram::GetAttrib(const std::string& name) const {
-	return attrib_map.at(name).get();
+const tv::GlShaderAttribute*
+GlslProgram::GetAttrib(const std::string& name) const {
+	return _attrib_map.at(name).get();
 }
 
-const tv::glShaderUniform*
-glslProgram::GetUniform(const std::string& name) const {
-	return uniform_map.at(name).get();
+const tv::GlShaderUniform*
+GlslProgram::GetUniform(const std::string& name) const {
+	return _uniform_map.at(name).get();
 }
 
-const tv::glShaderUniformBlock*
-glslProgram::GetUniformBlock(const std::string& name) const {
-	return uniformBlock_map.at(name).get();
+const tv::GlShaderUniformBlock*
+GlslProgram::GetUniformBlock(const std::string& name) const {
+	return _uniform_block_map.at(name).get();
 }
 
-//glslProgram::glsl_info::glsl_info() :
+//GlslProgram::GlslInfo::GlslInfo() :
 //	vert(DEFAULT_VERTEX_SHADER),
 //	frag(DEFAULT_FRAGMENT_SHADER),
 //	geom(DEFAULT_GEOMETRY_SHADER)
@@ -438,11 +440,11 @@ glslProgram::GetUniformBlock(const std::string& name) const {
 //	elem.bits.single_crease_patch = 0;
 //}
 //
-//glslProgram::glsl_info::glsl_info(const glsl_info & info)
+//GlslProgram::GlslInfo::GlslInfo(const GlslInfo & info)
 //{
 //}
 //
-//glslProgram::glsl_info::glsl_info(
+//GlslProgram::GlslInfo::GlslInfo(
 //	const std::string & vert,
 //	const std::string & frag,
 //	const std::string & geom,
@@ -452,32 +454,32 @@ glslProgram::GetUniformBlock(const std::string& name) const {
 //{
 //}
 //
-//void glslProgram::glsl_info::set(Elem_Type e, unsigned int value)
+//void GlslProgram::GlslInfo::set(Elem_Type e, unsigned int value)
 //{
 //	switch (e)
 //	{
-//	case glslProgram::glsl_info::FVAR_WIDTH:
+//	case GlslProgram::GlslInfo::FVAR_WIDTH:
 //		elem.bits.fvar_width = value;
 //		break;
-//	case glslProgram::glsl_info::PATCH_TYPE:
+//	case GlslProgram::GlslInfo::PATCH_TYPE:
 //		elem.bits.patch_type = value;
 //		break;
-//	case glslProgram::glsl_info::NUM_PRIM_PER_VERTEX:
+//	case GlslProgram::GlslInfo::NUM_PRIM_PER_VERTEX:
 //		elem.bits.num_prim_per_vertex = value;
 //		break;
-//	case glslProgram::osd_info::IS_ADAPTIVE:
+//	case GlslProgram::OsdInfo::IS_ADAPTIVE:
 //		elem.bits.is_adaptive = (value ? 1 : 0);
 //		break;
-//	case glslProgram::osd_info::SCREEN_SPACE_TESS:
+//	case GlslProgram::OsdInfo::SCREEN_SPACE_TESS:
 //		elem.bits.screen_space_tess = (value ? 1 : 0);
 //		break;
-//	case glslProgram::osd_info::FRACTIONAL:
+//	case GlslProgram::OsdInfo::FRACTIONAL:
 //		elem.bits.fractional = (value ? 1 : 0);
 //		break;
-//	case glslProgram::osd_info::PATCH_CULL:
+//	case GlslProgram::OsdInfo::PATCH_CULL:
 //		elem.bits.patch_cull = (value ? 1 : 0);
 //		break;
-//	case glslProgram::osd_info::SINGLE_CREASE_PATCH:
+//	case GlslProgram::OsdInfo::SINGLE_CREASE_PATCH:
 //		elem.bits.single_crease_patch = (value ? 1 : 0);
 //		break;
 //	default:
@@ -485,7 +487,7 @@ glslProgram::GetUniformBlock(const std::string& name) const {
 //	}
 //}
 //
-//const std::string glslProgram::glsl_info::str() const
+//const std::string GlslProgram::GlslInfo::str() const
 //{
 //	std::stringstream ss;
 //	//std::stringstream::fmtflags flag = ss.flags();
@@ -493,63 +495,63 @@ glslProgram::GetUniformBlock(const std::string& name) const {
 //	return ss.str();
 //}
 //
-//bool glslProgram::osd_info::Element::operator==(const glslProgram::osd_info::Element e) const
+//bool GlslProgram::OsdInfo::Element::operator==(const GlslProgram::OsdInfo::Element e) const
 //{
 //	return data == e.data;
 //}
 //
-//OpenSubdiv::Far::PatchDescriptor::Type glslProgram::osd_info::Element::Get_patch_type() const
+//OpenSubdiv::Far::PatchDescriptor::Type GlslProgram::OsdInfo::Element::Get_patch_type() const
 //{
 //	return OpenSubdiv::Far::PatchDescriptor::Type(bits.patch_type);
 //}
 //
-//void glslProgram::osd_info::Element::Set_patch_type(OpenSubdiv::Far::PatchDescriptor::Type type)
+//void GlslProgram::OsdInfo::Element::Set_patch_type(OpenSubdiv::Far::PatchDescriptor::Type type)
 //{
 //	bits.patch_type = type;
 //}
 
-glslProgram::glsl_info::glsl_info() /* :
+GlslProgram::GlslInfo::GlslInfo() /* :
 	vert(DEFAULT_VERTEX_SHADER),frag(DEFAULT_FRAGMENT_SHADER),geom(DEFAULT_GEOMETRY_SHADER)*/
 	= default;
 
-glslProgram::glsl_info::glsl_info(const glsl_info& info)
-	: vert(info.vert)
-	, frag(info.vert)
-	, geom(info.vert)
-	, tcs(info.vert)
-	, tes(info.vert) {}
+// GlslProgram::GlslInfo::GlslInfo(const GlslInfo& info)
+// 	: vert(info.vert)
+// 	, frag(info.vert)
+// 	, geom(info.vert)
+// 	, tcs(info.vert)
+// 	, tes(info.vert) {}
 
-glslProgram::glsl_info::glsl_info(std::string vert,
-								  std::string frag,
-								  std::string geom,
-								  std::string tcs,
-								  std::string tes)
+GlslProgram::GlslInfo::GlslInfo(std::string vert,
+								std::string frag,
+								std::string geom,
+								std::string tcs,
+								std::string tes)
 	: vert(std::move(vert))
 	, frag(std::move(frag))
 	, geom(std::move(geom))
 	, tcs(std::move(tcs))
 	, tes(std::move(tes)) {}
 
-std::string glslProgram::glsl_info::str() const {
+std::string GlslProgram::GlslInfo::Str() const {
 	std::stringstream ss;
 	ss << vert << frag << geom << tcs << tes;
 	return ss.str();
 }
 
-void glslProgram::glsl_info::CreateUniformBuffer(const std::string& name,
-												 int                size) {
+void GlslProgram::GlslInfo::CreateUniformBuffer(const std::string& name,
+												int                size) {
 	auto it = buffers.find(name);
 	if (it != buffers.end()) {
 		;
 	} else {
 		buffers.emplace(
 			std::piecewise_construct, std::forward_as_tuple(name),
-			std::forward_as_tuple(new tv::glShaderUniformBuffer(size)));
+			std::forward_as_tuple(new tv::GlShaderUniformBuffer(size)));
 	}
 }
 
-const tv::glShaderUniformBuffer*
-glslProgram::glsl_info::GetUniformBuffer(const std::string& name) {
+const tv::GlShaderUniformBuffer*
+GlslProgram::GlslInfo::GetUniformBuffer(const std::string& name) {
 	try {
 		return buffers.at(name).get();
 	}
@@ -559,5 +561,5 @@ glslProgram::glsl_info::GetUniformBuffer(const std::string& name) {
 	}
 }
 
-std::map<std::string, std::unique_ptr<tv::glShaderUniformBuffer>>
-	glslProgram::glsl_info::buffers;
+std::map<std::string, std::unique_ptr<tv::GlShaderUniformBuffer>>
+	GlslProgram::GlslInfo::buffers;
