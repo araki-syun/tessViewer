@@ -2,7 +2,8 @@ import json
 import pathlib
 import argparse
 
-parser = argparse.ArgumentParser(epilog="Example : python flags_to_db.py foo/compile_flags.txt")
+parser = argparse.ArgumentParser(
+    epilog="Example : python flags_to_db.py foo/compile_flags.txt")
 parser.add_argument("file",
                     type=argparse.FileType("r"),
                     help="compile option file")
@@ -15,7 +16,7 @@ if args.file == None:
 else:
     f = args.file
 for option in f:
-    options += option.replace("\n", " ")
+    options += "\"" + option.replace("\n", "") + "\" "
 f.close()
 
 options += " -c -o"
