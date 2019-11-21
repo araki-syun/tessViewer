@@ -13,9 +13,9 @@
 namespace tv {
 class Camera {
 	template <class BASIC_JSON_TYPE>
-	friend void to_json(nlohmann::json& j, const Camera& cam); //NOLINT
+	friend void to_json(BASIC_JSON_TYPE& j, const Camera& cam); //NOLINT
 	template <class BASIC_JSON_TYPE>
-	friend void from_json(const nlohmann::json& j, Camera& cam); //NOLINT
+	friend void from_json(const BASIC_JSON_TYPE& j, Camera& cam); //NOLINT
 
 public:
 	Camera();
@@ -81,7 +81,7 @@ template <class BASIC_JSON_TYPE>
 void to_json(BASIC_JSON_TYPE& j, const Camera& cam) { //NOLINT
 	j["position"]  = cam._pos;
 	j["angle"]     = glm::degrees(glm::eulerAngles(cam._quat));
-	j["lookpoint"] = cam._lookpoint;
+	j["lookpoint"] = cam._front;
 	j["fov"]       = cam._fov;
 	j["near"]      = cam._near;
 	j["far"]       = cam._far;
@@ -89,19 +89,20 @@ void to_json(BASIC_JSON_TYPE& j, const Camera& cam) { //NOLINT
 }
 template <class BASIC_JSON_TYPE>
 void from_json(const BASIC_JSON_TYPE& j, Camera& cam) { //NOLINT
-	auto schema    = glapp::Config::Get().Schema("/graphics/camera");
-	cam._pos       = j.at("position").get<glm::vec3>();
-	cam._quat      = glm::quat(j.at("angle").get<glm::vec3>());
-	cam._lookpoint = cam._quat * Camera::front;
-	cam._right     = cam._quat * Camera::right;
-	cam._up        = cam._quat * Camera::up;
-	cam._fov       = std::clamp(j.at("fov").get<float>(),
+	auto schema = glapp::Config::Get().Schema("/graphics/camera");
+	cam._pos    = j.at("position").get<glm::vec3>();
+	cam._quat   = glm::quat(j.at("angle").get<glm::vec3>());
+	cam._front  = cam._quat * Camera::front;
+	cam._right  = cam._quat * Camera::right;
+	cam._up     = cam._quat * Camera::up;
+	cam._fov    = std::clamp(j.at("fov").get<float>(),
                           schema.at("property/fov/minimum").get<float>(),
                           schema.at("property/fov/maximum").get<float>());
-	if (auto near = j.at("near").get<float>(), far = j.at("far").get<float>();
-		near < far) {
-		cam._near = j.at("near").get<float>();
-		cam._far  = j.at("far").get<float>();
+	float n     = j.at("near").get<float>();
+	float f     = j.at("far").get<float>();
+	if (n < f) {
+		cam._near = n;
+		cam._far  = f;
 	} else {
 		cam._near = schema.at("property/near/default").get<float>();
 		cam._far  = schema.at("property/far/default").get<float>();

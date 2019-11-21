@@ -57,7 +57,7 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(BOOST_LIB)\$(Configuration);$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;$(LIB_PATH)\lib\opensubdiv\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300d.lib;opencv\opencv_highgui300d.lib;opencv\opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;libglew32.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300d.lib;opencv\opencv_highgui300d.lib;opencv\opencv_imgcodecs300d.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
@@ -85,7 +85,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(BOOST_LIB)\$(Configuration);$(LIB_PATH)\lib\$(Configuration);$(LIB_PATH)\lib;$(LIB_PATH)\lib\opensubdiv\lib\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glu32.lib;glew32s.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300.lib;opencv\opencv_highgui300.lib;opencv\opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glu32.lib;libglew32.lib;glfw3.lib;osdCPU.lib;osdGPU.lib;freetype.lib;libboost_program_options.lib;opencv\opencv_core300.lib;opencv\opencv_highgui300.lib;opencv\opencv_imgcodecs300.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Console</SubSystem>
     </Link>
     <PreBuildEvent>
