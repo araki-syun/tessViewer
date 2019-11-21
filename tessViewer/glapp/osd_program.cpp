@@ -1,4 +1,4 @@
-#include "glslOSDprogram.h"
+#include "osd_program.h"
 
 #include <regex>
 #include <boost\format.hpp>
@@ -8,16 +8,16 @@
 #include "glapp_define.h"
 
 namespace glapp {
-glslOSDprogram::glslOSDprogram()
+OSDProgram::OSDProgram()
 	: _type(OpenSubdiv::Far::PatchDescriptor::Type::REGULAR) {}
 
-glslOSDprogram::~glslOSDprogram() { glDeleteProgram(_program); }
+OSDProgram::~OSDProgram() { glDeleteProgram(_program); }
 
-//const GLuint glslOSDprogram::GetProgram() const{
+//const GLuint OSDProgram::GetProgram() const{
 //	return _program;
 //}
 
-//	void glslOSDprogram::create(){
+//	void OSDProgram::create(){
 //		_program = glCreateProgram();
 //
 //		for(std::string& str : shader_list){
@@ -49,9 +49,9 @@ glslOSDprogram::~glslOSDprogram() { glDeleteProgram(_program); }
 //		}
 //	}
 
-GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
+GLuint OSDProgram::_ShaderCompile(const Shader* shader) {
 	GLuint      id(0);
-	const char* str = includeReplace(shader).c_str();
+	const char* str = _IncludeReplace(shader).c_str();
 	id              = glCreateShader(shader->GetType());
 	glShaderSource(id, 1, &str, nullptr);
 	glCompileShader(id);
@@ -86,7 +86,7 @@ GLuint glslOSDprogram::shaderCompile(const glslshader* shader) {
 	return 0;
 }
 
-const std::string& glslOSDprogram::includeReplace(const glslshader* shader) {
+std::string OSDProgram::_IncludeReplace(const Shader* shader) {
 	using namespace OpenSubdiv::Osd;
 
 	std::string src;
@@ -113,7 +113,7 @@ const std::string& glslOSDprogram::includeReplace(const glslshader* shader) {
 }
 
 #ifndef GLAPP_GL_COMPILE_ERROR_EXCEPTION
-const std::string& glslOSDprogram::GetError() const { return err; }
+const std::string& OSDProgram::GetError() const { return err; }
 #endif
 
 } // namespace glapp

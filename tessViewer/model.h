@@ -19,12 +19,12 @@
 #include "material.h"
 
 namespace tv {
-class model : public boost::noncopyable {
+class Model : public boost::noncopyable {
 public:
-	model();
-	model(const tv::model& m);
-	model(const nlohmann::json& obj, std::shared_ptr<tv::material> mat);
-	~model();
+	Model();
+	Model(const tv::Model& m);
+	Model(const nlohmann::json& obj, std::shared_ptr<tv::Material> mat);
+	~Model();
 
 	void               Reload(const nlohmann::json& obj);
 	void               Update(const float* v1,
@@ -34,28 +34,28 @@ public:
 							  int          start2 = 0,
 							  int          size2  = 0);
 	void               Draw();
-	const glslProgram* GetProgram() const;
-	void               SetProgram(std::shared_ptr<glslProgram> prog);
+	const GlslProgram* GetProgram() const;
+	void               SetProgram(std::shared_ptr<GlslProgram> prog);
 
 	static int                                    draw_call;
 	static int                                    max_patch;
 	static int                                    default_patch;
 	static OpenSubdiv::Far::PatchDescriptor::Type default_patch_type;
 	static GLuint                                 default_texture;
-	static glslProgram::glsl_info                 default_glsl_info;
+	static GlslProgram::GlslInfo                  default_glsl_info;
 	static ShaderManager*                         shader_manage;
 
 private:
-	std::string        name;
-	std::vector<float> vertex, normal;
-	GLuint             vao; //	Vertex Attrib Object
-	std::unique_ptr<OpenSubdiv::Osd::GLMeshInterface> mesh;
-	std::shared_ptr<glslProgram>                      program;
-	osd_info                                          shader_osd_info;
-	glm::mat4                                         modelMatrix;
-	GLuint                                            texcoord_fvar_texture;
-	GLuint                                            material_index_texture;
-	std::shared_ptr<tv::material>                     material;
+	std::string        _name;
+	std::vector<float> _vertex, _normal;
+	GLuint             _vao{0}; //	Vertex Attrib Object
+	std::unique_ptr<OpenSubdiv::Osd::GLMeshInterface> _mesh;
+	std::shared_ptr<GlslProgram>                      _program;
+	OsdInfo                                           _shader_osd_info;
+	glm::mat4                                         _model_matrix{};
+	GLuint _texcoord_fvar_texture {0};
+	GLuint _material_index_texture {0};
+	std::shared_ptr<tv::Material>                     _material;
 
 	static OpenSubdiv::Osd::EvaluatorCacheT<OpenSubdiv::Osd::GLComputeEvaluator>
 		evaluator;

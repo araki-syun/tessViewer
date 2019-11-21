@@ -7,10 +7,10 @@
 #include "opensubdiv\osd\opengl.h"
 
 namespace tv {
-class glShaderVariable {
+class GlShaderVariable {
 public:
-	glShaderVariable();
-	virtual ~glShaderVariable() = 0;
+	GlShaderVariable();
+	virtual ~GlShaderVariable() = 0;
 
 	GLuint             GetIndex() const;
 	const std::string& GetVariableName() const;
@@ -20,27 +20,27 @@ protected:
 	std::string _variable_name;
 };
 
-class glShaderAttribute : public glShaderVariable {
+class GlShaderAttribute : public GlShaderVariable {
 public:
-	glShaderAttribute(GLuint program, const char* name);
-	~glShaderAttribute() override;
+	GlShaderAttribute(GLuint program, const char* name);
+	~GlShaderAttribute() override;
 
 	void Set(GLuint program, const char* name);
 };
 
-class glShaderUniform : public glShaderVariable {
+class GlShaderUniform : public GlShaderVariable {
 public:
-	glShaderUniform(GLuint program, const char* name);
-	~glShaderUniform() override;
+	GlShaderUniform(GLuint program, const char* name);
+	~GlShaderUniform() override;
 
 	void Set(GLuint program, const char* name);
 };
 
-class glShaderUniformBlock : public glShaderVariable {
+class GlShaderUniformBlock : public GlShaderVariable {
 public:
-	glShaderUniformBlock(GLuint                        program,
+	GlShaderUniformBlock(GLuint                        program,
 						 /*int buf_size,*/ const char* name);
-	~glShaderUniformBlock() override;
+	~GlShaderUniformBlock() override;
 
 	void Set(GLuint program, const char* name);
 
@@ -48,11 +48,11 @@ public:
 		int _buf_size;*/
 };
 
-class glShaderUniformBuffer {
+class GlShaderUniformBuffer {
 public:
-	glShaderUniformBuffer(
+	GlShaderUniformBuffer(
 		/*GLuint program,*/ int buf_size /*, const char* name*/);
-	~glShaderUniformBuffer();
+	~GlShaderUniformBuffer();
 
 	void   Update(const void* val) const;
 	void   Set(/*GLuint program, const char* name*/);
@@ -63,7 +63,7 @@ private:
 	static GLuint _bindindex;
 	GLuint        _binding;
 	GLuint        _buffer;
-	int           _bufSize;
+	int           _buf_size;
 };
 
 } // namespace tv

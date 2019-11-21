@@ -1,10 +1,11 @@
 #include "base_window.h"
 
 namespace glapp::inner {
-//base_window::base_window(void)
+//BaseWindow::BaseWindow(void)
 //{
 //}
-base_window::base_window(std::string_view title) {}
-base_window::~base_window() = default;
+BaseWindow::BaseWindow(std::string_view title) : _title(title) {}
+BaseWindow::~BaseWindow() = default;
 
+std::string_view BaseWindow::GetTitle() const { return _title; }
 } // namespace glapp::inner

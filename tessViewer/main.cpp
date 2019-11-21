@@ -80,7 +80,7 @@ int main(int argc, char* argv[]) {
 	}
 
 	try {
-		app a(vm);
+		App a;
 		a.Run();
 	}
 	catch (boost::bad_any_cast& e) {

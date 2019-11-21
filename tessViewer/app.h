@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <boost\program_options.hpp>
 #include <boost\format.hpp>
 #include <cstdint>
 
@@ -20,23 +19,24 @@
 #include "glslStringDraw.h"
 #include "glQuery.h"
 #include "material.h"
+#include "camera.h"
 
-class app {
+class App {
 public:
-	app()           = delete;
-	app(const app&) = delete;
-	app(app&&)      = delete;
-	app(boost::program_options::variables_map& vm);
-	~app();
-	app& operator=(const app&) = delete;
-	app& operator=(app&&) = delete;
+	App();
+	App(const App&) = delete;
+	App(App&&)      = delete;
+	// app(boost::program_options::variables_map& vm);
+	~App();
+	App& operator=(const App&) = delete;
+	App& operator=(App&&) = delete;
 
 	void Run();
 
-	static void osdErrorCallback(OpenSubdiv::Far::ErrorType err,
+	static void OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 								 const char*                message);
-	static void osdWarningCallback(const char* message);
-	static void glfwErrorCallback(int code, const char* message);
+	static void OsdWarningCallback(const char* message);
+	static void GlfwErrorCallback(int code, const char* message);
 
 	static void KeyDefaultCallback(
 		GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -61,74 +61,47 @@ public:
 	static void WindowResizeCallback(GLFWwindow* window, int x, int y);
 
 private:
-	void UpdateView();
-	void UpdateProjection();
-	void UpdateUBO();
+	void _update_view();
+	void _update_projection();
+	void _update_ubo();
 
-	std::unique_ptr<glapp::window> win;
-	std::string                    current_model;
-	std::vector<tv::model>         models;
-	std::shared_ptr<tv::material>  material;
+	std::unique_ptr<glapp::Window> _win;
+	std::vector<tv::Model>         _models;
+	std::shared_ptr<tv::Material>  _material;
 	//std::shared_ptr<glslProgram> shader_default;
-	tv::ShaderManager shader_manage;
+	tv::ShaderManager _shader_manage;
 
-	tv::glslStringDraw* draw_string;
-	GLuint              default_diffuse_texture = 0;
+	tv::GlslStringDraw* _draw_string{};
+	GLuint              _default_diffuse_texture = 0;
 
-	bool       mainloop{};
-	glm::ivec2 window_size;
-	float      frametime{};
-	struct Camera {
-		glm::vec3 Pos;
-		glm::vec3 Angle;
-		glm::vec3 LookPoint;
-		glm::vec3 Right;
-		glm::vec3 Up;
-		float     Fov;
-		float     Near;
-		float     Far;
-		glm::vec2 Move;
-		bool      fly_mode;
-	} camera;
-	int       tess_fact;
-	int       max_tess_fact;
-	glm::vec2 mouseMove;
-	glm::vec2 previousMousePos;
+	bool       _mainloop{};
+	glm::ivec2 _window_size{};
+	float      _frametime{};
+	tv::Camera _camera;
+	bool       _fly_mode = false;
+	int        _tess_fact{};
+	int        _max_tess_fact{};
+	glm::vec2  _mouse_move{};
+	glm::vec2  _previous_mouse_pos{};
 
-	std::unique_ptr<glQuery> query;
+	std::unique_ptr<GlQuery> _query;
 	//std::unique_ptr<glQuery> draw_string_query;
 
 	struct Transform {
 		glm::mat4 view;
 		glm::mat4 projection;
-	} transform;
+	} _transform{};
 	struct LightInfo {
 		glm::vec3 pos;
 		glm::vec3 vector;
 		glm::vec3 ia;
 		glm::vec3 id;
 		glm::vec3 is;
-	} light;
+	} _light{};
 	struct Tessellation {
 		float TessLevel;
 		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
-	} tess{};
+	} _tess{};
 
-	struct Setting {
-		bool         window_full_screen;
-		int          window_resolution_x;
-		int          window_resolution_y;
-		float        window_fov;
-		bool         window_vsync;
-		int          graphics_osd_patch_level_default;
-		int          graphics_osd_patch_level_max;
-		int          graphics_osd_tess_level_default;
-		int          graphics_osd_tess_level_max;
-		bool         ui_user_interface;
-		std::string  ui_font_file;
-		int          ui_font_size;
-		std::uint8_t ui_font_color;
-	} setting;
-
-	boost::format formater;
+	boost::format _formater;
 };

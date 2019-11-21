@@ -8,22 +8,22 @@
 
 #include <opensubdiv\far\patchDescriptor.h>
 
-#include "glslshader_manager.h"
-#include "glShaderProgram.h"
+#include "shader_manager.h"
+#include "shader_program.h"
 #include "glapp_define.h"
 
 namespace glapp {
-class glslOSDprogram : glShaderProgram {
+class OSDProgram : ShaderProgram {
 public:
-	glslOSDprogram();
-	~glslOSDprogram();
+	OSDProgram();
+	~OSDProgram();
 
 	//const GLuint GetProgram() const;
 
 protected:
 	//void create();
-	GLuint             shaderCompile(const glslshader* shader) override;
-	const std::string& includeReplace(const glslshader* shader);
+	GLuint      _ShaderCompile(const Shader* shader) override;
+	std::string _IncludeReplace(const Shader* shader);
 
 protected:
 	//GLuint _program;

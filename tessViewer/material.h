@@ -7,21 +7,21 @@
 #include <nlohmann/json.hpp>
 
 namespace tv {
-class material {
+class Material {
 public:
-	material() = delete;
-	material(const nlohmann::json& j);
-	material(const material& mat)= delete;
-	material(material&& mat) noexcept;
-	~material();
-	material& operator=(const material& mat)= delete;
-	material& operator=(material&& mat) noexcept;
+	Material() = delete;
+	Material(const nlohmann::json& j);
+	Material(const Material& mat) = delete;
+	Material(Material&& mat) noexcept;
+	~Material();
+	Material& operator=(const Material& mat) = delete;
+	Material& operator                       =(Material&& mat) noexcept;
 
 	struct Phong {
-		glm::vec3 ka;
-		glm::vec3 kd;
-		glm::vec3 ks;
-		float     shine;
+		glm::vec3 ka{};
+		glm::vec3 kd{};
+		glm::vec3 ks{};
+		float     shine{};
 		Phong(const nlohmann::json& j);
 	};
 
@@ -30,8 +30,8 @@ public:
 	int    GetElementSize();
 
 private:
-	std::vector<std::string> names;
-	std::vector<Phong>       material_data;
-	GLuint                   texture;
+	std::vector<std::string> _names;
+	std::vector<Phong>       _material_data;
+	GLuint                   _texture;
 };
 } // namespace tv

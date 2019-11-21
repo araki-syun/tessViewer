@@ -21,32 +21,35 @@
 //OpenSubdiv::Far::TopologyRefiner* createRefiner(const picojson::object& obj);
 
 namespace tv {
-model::model() : vao(0), texcoord_fvar_texture(0), material_index_texture(0) {}
-model::model(const tv::model& m)
-	: name(m.name)
-	, vertex(m.vertex)
-	, normal(m.normal)
-	, vao(0)
-	, mesh(nullptr)
-	, program(m.program)
-	, shader_osd_info(m.shader_osd_info)
-	, modelMatrix(m.modelMatrix)
-	, texcoord_fvar_texture(0)
-	, material_index_texture(0) {}
-model::model(const nlohmann::json& obj, std::shared_ptr<tv::material> mat)
-	: vao(0), material(mat) {
+Model::Model() = default;
+Model::Model(const tv::Model& m)
+	: _name(m._name)
+	, _vertex(m._vertex)
+	, _normal(m._normal)
+	, _vao(0)
+	, _mesh(nullptr)
+	, _program(m._program)
+	, _shader_osd_info(m._shader_osd_info)
+	, _model_matrix(m._model_matrix)
+	, _texcoord_fvar_texture(0)
+	, _material_index_texture(0) {}
+Model::Model(const nlohmann::json& obj, std::shared_ptr<tv::Material> mat)
+	: _vao(0), _material(mat) {
 	Reload(obj);
 }
-model::~model() {
-	if (vao)
-		glDeleteVertexArrays(1, &vao);
-	if (texcoord_fvar_texture)
-		glDeleteTextures(1, &texcoord_fvar_texture);
-	if (material_index_texture)
-		glDeleteTextures(1, &material_index_texture);
+Model::~Model() {
+	if (_vao != 0u) {
+		glDeleteVertexArrays(1, &_vao);
+	}
+	if (_texcoord_fvar_texture != 0u) {
+		glDeleteTextures(1, &_texcoord_fvar_texture);
+	}
+	if (_material_index_texture != 0u) {
+		glDeleteTextures(1, &_material_index_texture);
+	}
 }
 
-void model::Reload(const nlohmann::json& obj) {
+void Model::Reload(const nlohmann::json& obj) {
 	using namespace OpenSubdiv;
 
 	Far::TopologyDescriptor desc;
@@ -66,8 +69,8 @@ void model::Reload(const nlohmann::json& obj) {
 	auto& rotation          = obj["rotation"];
 	auto& scale             = obj["scale"];
 
-	vertex.reserve(vertex_positions.size());
-	normal.reserve(vertex_normals.size());
+	_vertex.reserve(vertex_positions.size());
+	_normal.reserve(vertex_normals.size());
 
 	std::vector<float>     v;
 	std::vector<float>     n;
@@ -98,36 +101,46 @@ void model::Reload(const nlohmann::json& obj) {
 	uv_indices.reserve(faces.size());
 	uv_pool.reserve(faces.size());
 
-	for (auto& val : vertex_positions)
+	for (auto& val : vertex_positions) {
 		v.emplace_back(val.get<double>());
-	for (auto& val : vertex_normals)
+	}
+	for (auto& val : vertex_normals) {
 		n.emplace_back(val.get<double>());
-	for (auto& val : vertex_uvs)
+	}
+	for (auto& val : vertex_uvs) {
 		u.emplace_back(val.get<double>());
-	for (auto& val : faces)
+	}
+	for (auto& val : faces) {
 		f.emplace_back(val.get<double>());
-	for (auto& val : vert_per_face)
+	}
+	for (auto& val : vert_per_face) {
 		vf.emplace_back(val.get<double>());
-	for (auto& val : crease_weights)
+	}
+	for (auto& val : crease_weights) {
 		w.emplace_back(val.get<double>() * 10.0);
-	for (auto& val : crease_points)
+	}
+	for (auto& val : crease_points) {
 		p.emplace_back(val.get<double>());
-	for (auto& val : crease_edges)
+	}
+	for (auto& val : crease_edges) {
 		e.emplace_back(val.get<double>());
+	}
 	for (auto& val : vertex_groups) {
 		std::vector<int>& indices  = vg[val["group_name"].get<std::string>()];
 		auto&             vertices = val["vertices"];
 		indices.reserve(vertices.size());
-		for (auto& index : vertices)
+		for (auto& index : vertices) {
 			indices.emplace_back(index.get<double>());
+		}
 	}
 	for (auto& val : face_groups) {
 		std::vector<int>& indices = fg[val["group_name"].get<std::string>()];
 		auto&             faces   = val["faces"];
 
 		indices.reserve(faces.size());
-		for (auto& index : faces)
+		for (auto& index : faces) {
 			indices.emplace_back(index.get<double>());
+		}
 	}
 	for (auto& val : material_per_face) {
 		mf.emplace_back(
@@ -137,7 +150,7 @@ void model::Reload(const nlohmann::json& obj) {
 	}
 	for (std::pair<std::string, std::string>& p : mf) {
 		auto it     = fg.find(p.second);
-		int  mat_id = material->GetIndex(p.first);
+		int  mat_id = _material->GetIndex(p.first);
 		for (int id : it->second) {
 			mpf[id] = mat_id;
 		}
@@ -187,100 +200,102 @@ void model::Reload(const nlohmann::json& obj) {
 			desc, Far::TopologyRefinerFactory<Far::TopologyDescriptor>::Options(
 					  Sdc::SchemeType::SCHEME_CATMARK, opt)));
 
-	int numVertexElements = 3; // x, y, z
+	int num_vertex_elements = 3; // x, y, z
 	//int numVaryingElements = 3; // normal
 
-	shader_osd_info.elem.bits.fvar_width          = 2;
-	shader_osd_info.elem.bits.is_adaptive         = 1;
-	shader_osd_info.elem.bits.patch_cull          = 1;
-	shader_osd_info.elem.bits.screen_space_tess   = 1;
-	shader_osd_info.elem.bits.single_crease_patch = 1;
-	shader_osd_info.elem.bits.fractional          = 1;
-	shader_osd_info.elem.Set_patch_type(default_patch_type);
+	_shader_osd_info.elem.bits.fvar_width          = 2;
+	_shader_osd_info.elem.bits.is_adaptive         = 1;
+	_shader_osd_info.elem.bits.patch_cull          = 1;
+	_shader_osd_info.elem.bits.screen_space_tess   = 1;
+	_shader_osd_info.elem.bits.single_crease_patch = 1;
+	_shader_osd_info.elem.bits.fractional          = 1;
+	_shader_osd_info.elem.SetPatchType(default_patch_type);
 
 	Osd::MeshBitset bits;
 	bits.set(Osd::MeshAdaptive,
-			 shader_osd_info.elem.bits.is_adaptive == 1); // set adaptive
+			 _shader_osd_info.elem.bits.is_adaptive == 1); // set adaptive
 	bits.set(Osd::MeshEndCapBSplineBasis,
-			 shader_osd_info.elem.Get_patch_type() ==
+			 _shader_osd_info.elem.GetPatchType() ==
 				 Far::PatchDescriptor::Type::
 					 REGULAR); // use b-spline basis patch for endcap.
 	bits.set(Osd::MeshEndCapGregoryBasis,
-			 shader_osd_info.elem.Get_patch_type() ==
+			 _shader_osd_info.elem.GetPatchType() ==
 				 Far::PatchDescriptor::Type::GREGORY_BASIS);
 	bits.set(Osd::MeshUseSingleCreasePatch,
-			 shader_osd_info.elem.bits.single_crease_patch == 1);
-	bits.set(Osd::MeshFVarData, shader_osd_info.elem.bits.fvar_width != 0);
+			 _shader_osd_info.elem.bits.single_crease_patch == 1);
+	bits.set(Osd::MeshFVarData, _shader_osd_info.elem.bits.fvar_width != 0);
 
-	mesh.reset(new Osd::Mesh<Osd::GLVertexBuffer, Osd::GLStencilTableSSBO,
-							 Osd::GLComputeEvaluator, Osd::GLPatchTable>(
-		refiner, numVertexElements, 0, glm::clamp(default_patch, 0, max_patch),
-		bits, &evaluator));
+	_mesh =
+		std::make_unique<Osd::Mesh<Osd::GLVertexBuffer, Osd::GLStencilTableSSBO,
+								   Osd::GLComputeEvaluator, Osd::GLPatchTable>>(
+			refiner, num_vertex_elements, 0,
+			glm::clamp(default_patch, 0, max_patch), bits, &evaluator);
 
 	// Face Per Material
 	GLuint matbuffer;
 	glCreateBuffers(1, &matbuffer);
 	glNamedBufferData(matbuffer, mpf.size() * sizeof(int), mpf.data(),
 					  GL_STATIC_DRAW);
-	glCreateTextures(GL_TEXTURE_BUFFER, 1, &material_index_texture);
-	glTextureBuffer(material_index_texture, GL_R32I, matbuffer);
+	glCreateTextures(GL_TEXTURE_BUFFER, 1, &_material_index_texture);
+	glTextureBuffer(_material_index_texture, GL_R32I, matbuffer);
 	glDeleteBuffers(1, &matbuffer);
 
 	// Face-Varying
 	Far::PrimvarRefiner    primvar(*refiner);
 	std::vector<glm::vec2> fvaruv(uv_pool);
 	fvaruv.resize(refiner->GetNumFVarValuesTotal(0));
-	FVarUV* src = reinterpret_cast<FVarUV*>(fvaruv.data());
+	auto* src = reinterpret_cast<FVarUV*>(fvaruv.data());
 	for (int level = 1; level <= refiner->GetMaxLevel(); ++level) {
 		FVarUV* dst = src + refiner->GetLevel(level - 1).GetNumFVarValues(0);
 		primvar.InterpolateFaceVarying(level, src, dst, 0);
 		src = dst;
 	}
-	Far::ConstIndexArray   indices = mesh->GetFarPatchTable()->GetFVarValues(0);
+	Far::ConstIndexArray indices = _mesh->GetFarPatchTable()->GetFVarValues(0);
 	std::vector<glm::vec2> uv_data;
 	uv_data.reserve(indices.size()); // *FVarUV::GetWidth());
-	for (int i = 0; i < indices.size(); ++i) {
+	for (int indice : indices) {
 		//int index = indices[i];// *FVarUV::GetWidth();
 		//for (int j = 0; j < FVarUV::GetWidth(); ++j) {
-		uv_data.emplace_back(fvaruv[indices[i]]); // [j]);
-												  //}
+		uv_data.emplace_back(fvaruv[indice]); // [j]);
+											  //}
 	}
 	GLuint fvar_buffer;
 	glCreateBuffers(1, &fvar_buffer);
 	glNamedBufferData(fvar_buffer, uv_data.size() * sizeof(glm::vec2),
 					  uv_data.data(), GL_STATIC_DRAW);
-	glCreateTextures(GL_TEXTURE_BUFFER, 1, &texcoord_fvar_texture);
-	glTextureBuffer(texcoord_fvar_texture, GL_R32F, fvar_buffer);
+	glCreateTextures(GL_TEXTURE_BUFFER, 1, &_texcoord_fvar_texture);
+	glTextureBuffer(_texcoord_fvar_texture, GL_R32F, fvar_buffer);
 	glDeleteBuffers(1, &fvar_buffer);
 
 	Update(v.data(), 0, (int)v.size() / 3);
 
-	if (vao)
-		glDeleteVertexArrays(1, &vao);
-	glCreateVertexArrays(1, &vao);
+	if (_vao != 0u) {
+		glDeleteVertexArrays(1, &_vao);
+	}
+	glCreateVertexArrays(1, &_vao);
 
 	// インデックスバッファ
-	glVertexArrayElementBuffer(vao,
-							   mesh->GetPatchTable()->GetPatchIndexBuffer());
+	glVertexArrayElementBuffer(_vao,
+							   _mesh->GetPatchTable()->GetPatchIndexBuffer());
 	// 頂点バッファ
-	const glslProgram& program =
-		shader_manage->Get(default_glsl_info, shader_osd_info);
-	GLuint posIndex = program.GetAttrib("position")->GetIndex(),
-		   vertbuf  = mesh->BindVertexBuffer();
+	const GlslProgram& program =
+		shader_manage->Get(default_glsl_info, _shader_osd_info);
+	GLuint pos_index = program.GetAttrib("position")->GetIndex();
+	GLuint vertbuf   = _mesh->BindVertexBuffer();
 	//varybuf = mesh->BindVaryingBuffer();
 
 	// Vertex Position
-	glVertexArrayVertexBuffer(vao, 0, vertbuf, 0,
-							  sizeof(float) * numVertexElements);
-	glVertexArrayAttribFormat(vao, posIndex, numVertexElements, GL_FLOAT,
+	glVertexArrayVertexBuffer(_vao, 0, vertbuf, 0,
+							  sizeof(float) * num_vertex_elements);
+	glVertexArrayAttribFormat(_vao, pos_index, num_vertex_elements, GL_FLOAT,
 							  GL_FALSE, 0);
-	glVertexArrayAttribBinding(vao, posIndex, 0);
-	glEnableVertexArrayAttrib(vao, posIndex);
+	glVertexArrayAttribBinding(_vao, pos_index, 0);
+	glEnableVertexArrayAttrib(_vao, pos_index);
 
 	// パッチパラメータバッファ
 	//glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_BUFFER, mesh->GetPatchTable()->GetPatchParamTextureBuffer());
-	glBindTextureUnit(0, mesh->GetPatchTable()->GetPatchParamTextureBuffer());
+	glBindTextureUnit(0, _mesh->GetPatchTable()->GetPatchParamTextureBuffer());
 	//glBindTextureUnit(1, mesh->GetPatchTable()->GetPatchIndexTextureBuffer());
 
 	glm::mat4 trans = glm::translate(glm::vec3(location[0].get<double>(),
@@ -295,52 +310,57 @@ void model::Reload(const nlohmann::json& obj) {
 		glm::scale(glm::vec3(scale[0].get<double>(), scale[1].get<double>(),
 							 scale[2].get<double>()));
 
-	modelMatrix = trans * rot * sc;
+	_model_matrix = trans * rot * sc;
 }
 
-void model::Update(const float* v1,
+void Model::Update(const float* v1,
 				   int          start1,
 				   int          size1,
 				   const float* v2,
 				   int          start2,
 				   int          size2) {
-	mesh->UpdateVertexBuffer(v1, start1, size1);
-	if (v2)
-		mesh->UpdateVaryingBuffer(v2, start2, size2);
-	mesh->Refine();
-	mesh->Synchronize();
+	_mesh->UpdateVertexBuffer(v1, start1, size1);
+	if (v2 != nullptr) {
+		_mesh->UpdateVaryingBuffer(v2, start2, size2);
+	}
+	_mesh->Refine();
+	_mesh->Synchronize();
 }
 
-void model::Draw() {
+void Model::Draw() {
 	using namespace OpenSubdiv;
 
-	if (shader_osd_info.elem.bits.patch_cull == 0)
+	if (_shader_osd_info.elem.bits.patch_cull == 0) {
 		glDisable(GL_CULL_FACE);
-	mesh->BindVertexBuffer();
-	if (mesh->GetPatchTable()->GetPatchParamTextureBuffer())
+	}
+	_mesh->BindVertexBuffer();
+	if (_mesh->GetPatchTable()->GetPatchParamTextureBuffer() != 0u) {
 		glBindTextureUnit(0,
-						  mesh->GetPatchTable()->GetPatchParamTextureBuffer());
+						  _mesh->GetPatchTable()->GetPatchParamTextureBuffer());
+	}
 	//if (mesh->GetPatchTable()->GetPatchIndexTextureBuffer())
 	//	glBindTextureUnit(1, mesh->GetPatchTable()->GetPatchIndexTextureBuffer());
-	if (texcoord_fvar_texture)
-		glBindTextureUnit(1, texcoord_fvar_texture);
-	if (material_index_texture)
-		glBindTextureUnit(2, material_index_texture);
-	if (material->GetTexture())
-		glBindTextureUnit(3, material->GetTexture());
-	if (default_texture)
+	if (_texcoord_fvar_texture != 0u) {
+		glBindTextureUnit(1, _texcoord_fvar_texture);
+	}
+	if (_material_index_texture != 0u) {
+		glBindTextureUnit(2, _material_index_texture);
+	}
+	if (_material->GetTexture() != 0u) {
+		glBindTextureUnit(3, _material->GetTexture());
+	}
+	if (default_texture != 0u) {
 		glBindTextureUnit(4, default_texture);
-	glBindVertexArray(vao);
-	for (int i = 0; i < mesh->GetPatchTable()->GetPatchArrays().size(); ++i) {
-		Osd::PatchArray const& patch =
-			mesh->GetPatchTable()->GetPatchArrays()[i];
+	}
+	glBindVertexArray(_vao);
+	for (const auto& patch : _mesh->GetPatchTable()->GetPatchArrays()) {
 		Far::PatchDescriptor desc = patch.GetDescriptor();
 
-		int numVertsPerPatch =
+		int num_verts_per_patch =
 			desc.GetNumControlVertices(); // 16 for B-spline patches
-		osd_info info(shader_osd_info);
-		info.elem.Set_patch_type(desc.GetType());
-		const glslProgram& program =
+		OsdInfo info(_shader_osd_info);
+		info.elem.SetPatchType(desc.GetType());
+		const GlslProgram& program =
 			shader_manage->Get(default_glsl_info, info);
 		GLuint prog = program.GetProgram();
 		glUseProgram(prog);
@@ -357,10 +377,10 @@ void model::Draw() {
 		glProgramUniform1i(prog,
 						   program.GetUniform("PrimitiveIdBase")->GetIndex(),
 						   patch.GetPrimitiveIdBase());
-		glProgramUniformMatrix4fv(prog, program.GetUniform("model")->GetIndex(),
-								  1, GL_FALSE, &modelMatrix[0][0]);
-		glPatchParameteri(GL_PATCH_VERTICES, numVertsPerPatch);
-		glDrawElements(GL_PATCHES, patch.GetNumPatches() * numVertsPerPatch,
+		glProgramUniformMatrix4fv(prog, program.GetUniform("Model")->GetIndex(),
+								  1, GL_FALSE, &_model_matrix[0][0]);
+		glPatchParameteri(GL_PATCH_VERTICES, num_verts_per_patch);
+		glDrawElements(GL_PATCHES, patch.GetNumPatches() * num_verts_per_patch,
 					   GL_UNSIGNED_INT,
 					   (void*)(patch.GetIndexBase() * sizeof(unsigned int)));
 		++draw_call;
@@ -368,22 +388,24 @@ void model::Draw() {
 	glBindVertexArray(0);
 	glUseProgram(0);
 
-	if (shader_osd_info.elem.bits.patch_cull == 0)
+	if (_shader_osd_info.elem.bits.patch_cull == 0) {
 		glEnable(GL_CULL_FACE);
+	}
 }
-const glslProgram* model::GetProgram() const { return program.get(); }
-void               model::SetProgram(std::shared_ptr<glslProgram> prog) {
-    if (prog)
-        program = prog;
+const GlslProgram* Model::GetProgram() const { return _program.get(); }
+void               Model::SetProgram(std::shared_ptr<GlslProgram> prog) {
+    if (prog) {
+        _program = prog;
+    }
 }
 
-int                                    model::draw_call     = 0;
-int                                    model::max_patch     = 6;
-int                                    model::default_patch = 2;
-OpenSubdiv::Far::PatchDescriptor::Type model::default_patch_type;
-GLuint                                 model::default_texture = 0;
-glslProgram::glsl_info                 model::default_glsl_info;
-ShaderManager*                         model::shader_manage;
+int                                    Model::draw_call     = 0;
+int                                    Model::max_patch     = 6;
+int                                    Model::default_patch = 2;
+OpenSubdiv::Far::PatchDescriptor::Type Model::default_patch_type;
+GLuint                                 Model::default_texture = 0;
+GlslProgram::GlslInfo                  Model::default_glsl_info;
+ShaderManager*                         Model::shader_manage;
 OpenSubdiv::Osd::EvaluatorCacheT<OpenSubdiv::Osd::GLComputeEvaluator>
-	model::evaluator;
+	Model::evaluator;
 } // namespace tv

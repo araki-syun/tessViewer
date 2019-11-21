@@ -95,13 +95,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="app.cpp" />
+    <ClCompile Include="camera.cpp" />
     <ClCompile Include="glapp\base_window.cpp" />
     <ClCompile Include="glapp\config.cpp" />
     <ClCompile Include="glapp\glapp.cpp" />
-    <ClCompile Include="glapp\glslOSDprogram.cpp" />
-    <ClCompile Include="glapp\glShaderProgram.cpp" />
-    <ClCompile Include="glapp\glslshader.cpp" />
-    <ClCompile Include="glapp\glslshader_mamager.cpp" />
+    <ClCompile Include="glapp\osd_program.cpp" />
+    <ClCompile Include="glapp\shader_manager.cpp" />
+    <ClCompile Include="glapp\shader_object.cpp" />
+    <ClCompile Include="glapp\shader_program.cpp" />
     <ClCompile Include="glShaderVariable.cpp" />
     <ClCompile Include="glslProgram.cpp" />
     <ClCompile Include="glslStringDraw.cpp" />
@@ -117,14 +118,16 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="app.h" />
+    <ClInclude Include="camera.h" />
     <ClInclude Include="glapp\base_window.h" />
     <ClInclude Include="glapp\config.h" />
     <ClInclude Include="glapp\glapp.hpp" />
     <ClInclude Include="glapp\glapp_define.h" />
-    <ClInclude Include="glapp\glslOSDprogram.h" />
-    <ClInclude Include="glapp\glShaderProgram.h" />
-    <ClInclude Include="glapp\glslshader.h" />
-    <ClInclude Include="glapp\glslshader_manager.h" />
+    <ClInclude Include="glapp\glm_conversion.h" />
+    <ClInclude Include="glapp\osd_program.h" />
+    <ClInclude Include="glapp\shader_manager.h" />
+    <ClInclude Include="glapp\shader_object.h" />
+    <ClInclude Include="glapp\shader_program.h" />
     <ClInclude Include="glShaderVariable.h" />
     <ClInclude Include="glslProgram.h" />
     <ClInclude Include="glslStringDraw.h" />
