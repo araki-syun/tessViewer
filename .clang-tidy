@@ -1,11 +1,13 @@
 Checks: "-*,\
+cert-*,\
 cppcoreguidelines-*,\
 -cppcoreguidelines-pro-type-union-access,\
 -cppcoreguidelines-non-private-member-variables-in-classes,\
--cppcoreguidelines-avoid-magic-numbers,\
+llvm-*,\
 modernize-*,\
 -modernize-use-trailing-return-type,\
 -modernize-use-nodiscard,\
+performance-*,\
 readability-*,\
 -readability-convert-member-functions-to-static,\
 -readability-uppercase-literal-suffix,\
