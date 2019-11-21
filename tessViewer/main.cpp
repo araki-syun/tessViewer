@@ -15,7 +15,7 @@
 #include "glapp\config.h"
 #include "glapp\glapp_define.h"
 
-void import_options(const boost::program_options::variables_map& vm);
+void ImportOptions(const boost::program_options::variables_map& vm);
 
 int main(int argc, char* argv[]) {
 	using namespace std::literals::string_literals;
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
 	}
 }
 
-void import_options(const boost::program_options::variables_map& vm) {
+void ImportOptions(const boost::program_options::variables_map& vm) {
 	using nlohmann::json;
 	json options;
 	json window;
