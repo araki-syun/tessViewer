@@ -1,4 +1,5 @@
 #include "shader_program.h"
+#include "fmt/core.h"
 
 #include <boost\format.hpp>
 #include <type_traits>
@@ -99,7 +100,7 @@ void ShaderProgram::_Create() {
 		err.append(log.data(), log.size());
 
 		throw std::runtime_error(
-			(boost::format("Shader Program Link ERROR\n%1%") % err).str());
+			fmt::format("Shader Program Link ERROR\n{}", err));
 #else
 		err.append(log.data(), log.size());
 #endif
@@ -135,8 +136,7 @@ GLuint ShaderProgram::_ShaderCompile(const Shader* shader) {
 		std::string err;
 		err.append(log.data(), log.size());
 
-		throw std::runtime_error(
-			(boost::format("Shader Compile ERROR\n%1%") % err).str());
+		throw std::runtime_error(fmt::format("Shader Compile ERROR\n{}", err));
 #else
 		err.append(log.data(), log.size());
 #endif

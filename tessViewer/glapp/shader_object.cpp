@@ -5,8 +5,7 @@
 #include <regex>
 #include <filesystem>
 
-#include <boost\format.hpp>
-
+#include <fmt/format.h>
 //#include <opensubdiv\osd\glslPatchShaderSource.h>
 
 #include "glapp_define.h"
@@ -21,13 +20,13 @@ Shader::Shader(const std::string& filename) {
 
 	if (!std::filesystem::exists(file_path)) {
 		throw std::runtime_error(
-			(boost::format("NOT FOUND Shader File : %1%") % file_path).str());
+			fmt::format("NOT FOUND Shader File : {}", file_path));
 	}
 
 	std::ifstream ifs(filename);
 	if (ifs.fail()) {
 		throw std::runtime_error(
-			(boost::format("LOAD ERROR Shader File : %1%") % file_path).str());
+			fmt::format("LOAD ERROR Shader File : {}", file_path));
 	}
 
 	std::string ext = file_path.extension().string();
@@ -45,8 +44,7 @@ Shader::Shader(const std::string& filename) {
 	} else if (ext == ".glsl") {
 		_type = 0;
 	} else {
-		throw std::runtime_error(
-			(boost::format("") % file_path.string()).str());
+		throw std::runtime_error(fmt::format("{}", file_path));
 	}
 
 	std::string str((std::istreambuf_iterator<char>(ifs)),

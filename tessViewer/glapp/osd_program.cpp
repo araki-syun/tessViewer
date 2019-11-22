@@ -5,6 +5,7 @@
 
 #include <opensubdiv\osd\glslPatchShaderSource.h>
 
+#include "fmt/format.h"
 #include "glapp_define.h"
 
 namespace glapp {
@@ -72,30 +73,24 @@ GLuint OSDProgram::_ShaderCompile(const Shader* shader) {
 		std::vector<GLchar> log(max_length);
 		glGetShaderInfoLog(id, max_length, &length, log.data());
 
-#ifdef GLAPP_GL_COMPILE_ERROR_EXCEPTION
 		std::string err;
 		err.append(log.data(), log.size());
 
-		throw std::runtime_error(
-			(boost::format("Shader Compile ERROR\n%1%") % err).str());
-#else
-		err.append(log.data(), log.size());
-#endif
-		return id;
+		throw std::runtime_error(fmt::format("Shader Compile ERROR\n{}", err));
 	}
 	return 0;
 }
 
 std::string OSDProgram::_IncludeReplace(const Shader* shader) {
 	using namespace OpenSubdiv::Osd;
+	using namespace fmt::literals;
 
 	std::string src;
-	std::regex  common_include("#include <" GLAPP_OSD_COMMON_SOURCE_STRING ">");
-	std::regex  vertex_include("#include <" GLAPP_OSD_VERTEX_SOURCE_STRING ">");
-	std::regex  tesscont_include(
-        "#include <" GLAPP_OSD_TESS_CONTROL_SOURCE_STRING ">");
-	std::regex tesseval_include("#include <" GLAPP_OSD_TESS_EVAL_SOURCE_STRING
-								">");
+	auto        format = "#include <{}>"_format;
+	std::regex  common_include(format(GLAPP_OSD_COMMON_SOURCE_STRING));
+	std::regex  vertex_include(format(GLAPP_OSD_VERTEX_SOURCE_STRING));
+	std::regex  tesscont_include(format(GLAPP_OSD_TESS_CONTROL_SOURCE_STRING));
+	std::regex  tesseval_include(format(GLAPP_OSD_TESS_EVAL_SOURCE_STRING));
 
 	src = std::regex_replace(shader->GetSource(), common_include,
 							 GLSLPatchShaderSource::GetCommonShaderSource());

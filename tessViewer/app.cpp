@@ -8,6 +8,8 @@
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
 
+#include <fmt/format.h>
+
 #include <nlohmann/json.hpp>
 
 #include <glm/glm.hpp>
@@ -19,12 +21,13 @@
 #include <vector>
 
 #include "glapp\config.h"
-#include "glapp\glapp_define.h"
 
 #include "glm/fwd.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
 #include "version.h"
+
+using namespace fmt::literals;
 
 App::App() {
 	auto conf       = glapp::Config::Get();
@@ -105,9 +108,8 @@ App::App() {
 
 	_tess.Update(std::min(_max_tess_fact, _tess_fact));
 
-	_formater = boost::format("%1$-12s : %2%\n");
-
-	cv::Mat default_texture = cv::imread(TEXTURE "default_texture.png");
+	cv::Mat default_texture =
+		cv::imread("{}{}"_format(TEXTURE, "default_texture.png"));
 	cv::Mat flip_texture(
 		cv::Size(default_texture.size[0], default_texture.size[1]), CV_8UC3);
 	cv::flip(default_texture, flip_texture, 0);
@@ -162,18 +164,14 @@ void App::Run() {
 		_query->End();
 
 		//draw_string_query->Start();
-		_draw_string->Set(
-			5, 0,
-			(boost::format("FPS          %.1f") % (1.f / _frametime)).str());
-		_draw_string->Set(5, 18, (_formater % "Tess Level" % _tess_fact).str());
-		_draw_string->Set(5, 36,
-						  (_formater % "Primitive" % _query->Get()).str());
-		_draw_string->Set(5, 54, (_formater % "Patch Type" % patch_type).str());
-		_draw_string->Set(
-			5, 72,
-			(_formater % "Patch Level" % tv::Model::default_patch).str());
-		_draw_string->Set(
-			5, 90, (_formater % "Draw Call" % tv::Model::draw_call).str());
+		auto format = "{:-12s} : {:3.2f}\n"_format;
+		_draw_string->Set(5, 0, format("FPS", 1.f / _frametime));
+		_draw_string->Set(5, 18, format("Tess Level", _tess_fact));
+		_draw_string->Set(5, 36, format("Primitive", _query->Get()));
+		_draw_string->Set(5, 54, format("Patch Type", patch_type));
+		_draw_string->Set(5, 72,
+						  format("Patch Level", tv::Model::default_patch));
+		_draw_string->Set(5, 90, format("Draw Call", tv::Model::draw_call));
 		_draw_string->Draw();
 		//draw_string_query->End();
 
@@ -190,15 +188,15 @@ void App::Run() {
 
 void App::OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 						   const char*                message) {
-	std::runtime_error("OpenSubdiv Error Type : " + std::to_string(err) + '\n' +
-					   message);
+	throw std::runtime_error("{:12s} : {}\n{}\n"_format(
+		"OpenSubdiv Error Type", std::to_string(err), message));
 }
 void App::OsdWarningCallback(const char* message) {
 	std::cerr << message << std::endl;
 }
 void App::GlfwErrorCallback(int code, const char* message) {
-	std::runtime_error("GLFW ERROR Code : " + std::to_string(code) + '\n' +
-					   message + '\n');
+	throw std::runtime_error("{:12s} : {}\n{}\n"_format(
+		"GLFW ERROR Code", std::to_string(code), message));
 }
 void App::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -226,22 +224,15 @@ void App::KeyDefaultCallback(
 			//std::cout << a->format % "TessLevel" % a->tess_fact;
 			break;
 		case GLFW_KEY_SPACE: {
-			auto q = a->_camera.Quaternion();
-			std::cout << (a->_formater % "Pos" %
-						  glm::to_string(a->_camera.Position()))
-							 .str()
-					  << (a->_formater % "Angle" %
-						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
-							 .str()
-					  << (a->_formater % "LookPoint" %
-						  glm::to_string(q * tv::Camera::front))
-							 .str()
-					  << (a->_formater % "Right" %
-						  glm::to_string(q * tv::Camera::right))
-							 .str()
-					  << (a->_formater % "Up" %
-						  glm::to_string(q * tv::Camera::up))
-							 .str();
+			auto q      = a->_camera.Quaternion();
+			auto format = "{:-12s} : {:3.2f}\n"_format;
+			std::cout << format(
+				"Pos", glm::to_string(a->_camera.Position()),
+				format("Angle",
+					   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
+				format("LookPoint", glm::to_string(q * tv::Camera::front)),
+				format("Right", glm::to_string(q * tv::Camera::right)),
+				format("Up", glm::to_string(q * tv::Camera::up)));
 		} break;
 		default: break;
 		}
@@ -283,22 +274,15 @@ void App::KeyFlyModeCallback(
 		case GLFW_KEY_D: a->_camera.FpsMove(tv::Camera::right); break;
 		case GLFW_KEY_A: a->_camera.FpsMove(-tv::Camera::right); break;
 		case GLFW_KEY_SPACE: {
-			auto q = a->_camera.Quaternion();
-			std::cout << (a->_formater % "Pos" %
-						  glm::to_string(a->_camera.Position()))
-							 .str()
-					  << (a->_formater % "Angle" %
-						  glm::to_string(glm::degrees(glm::eulerAngles(q))))
-							 .str()
-					  << (a->_formater % "LookPoint" %
-						  glm::to_string(q * tv::Camera::front))
-							 .str()
-					  << (a->_formater % "Right" %
-						  glm::to_string(q * tv::Camera::right))
-							 .str()
-					  << (a->_formater % "Up" %
-						  glm::to_string(q * tv::Camera::up))
-							 .str();
+			auto q      = a->_camera.Quaternion();
+			auto format = "{:-12s} : {:3.2f}\n"_format;
+			std::cout << format(
+				"Pos", glm::to_string(a->_camera.Position()),
+				format("Angle",
+					   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
+				format("LookPoint", glm::to_string(q * tv::Camera::front)),
+				format("Right", glm::to_string(q * tv::Camera::right)),
+				format("Up", glm::to_string(q * tv::Camera::up)));
 		} break;
 		default: break;
 		}
@@ -413,7 +397,8 @@ void App::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 	auto fov = a->_camera.Fov() + (float)(up - down);
 	a->_camera.Fov(glm::clamp(fov, Camera::MinFov(), Camera::MaxFov()));
 	a->_update_projection();
-	std::cout << "fov : " << a->_camera.Fov() << std::endl;
+	std::cout << "{:-12s} : {:3.2f}\n"_format("fov : ", a->_camera.Fov())
+			  << std::endl;
 }
 void App::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,

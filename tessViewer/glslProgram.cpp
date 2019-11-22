@@ -7,7 +7,7 @@
 #include <utility>
 #include <vector>
 
-#include <boost\format.hpp>
+#include <fmt\format.h>
 
 GLuint CompileShader(GLenum type, std::string& src) {
 	GLuint      shader(glCreateShader(type));
@@ -38,10 +38,8 @@ GLuint CompileShader(GLenum type, std::string& src) {
 		case GL_TESS_CONTROL_SHADER: shader_type = "Tess_Control"; break;
 		default: break;
 		}
-		throw std::runtime_error(
-			(boost::format("GLSL %1% Shader Compile ERROR\n%2%\n") %
-			 shader_type % log.data())
-				.str());
+		throw std::runtime_error(fmt::format(
+			"GLSL {} Shader Compile ERROR\n{}\n", shader_type, log.data()));
 	}
 	return shader;
 }
@@ -178,9 +176,9 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 					  ? "#define OSD_PATCH_ENABLE_SINGLE_CREASE\n"
 					  : ""))
 	   << (osd.elem.bits.fvar_width != 0u
-			   ? (boost::format("#define OSD_FVAR_WIDTH %1%\n") %
-				  osd.elem.bits.fvar_width)
-					 .str()
+			   ? fmt::format("#define OSD_FVAR_WIDTH {}\n",
+							 osd.elem.bits.fvar_width)
+
 			   : "");
 
 	ss << Osd::GLSLPatchShaderSource::GetCommonShaderSource();
@@ -306,9 +304,7 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	{
 		if (ifsv.fail()) {
 			throw std::runtime_error(
-				(boost::format("Font Vertex Shader failed to open : %1%") %
-				 vert)
-					.str());
+				fmt::format("Font Vertex Shader failed to open : {}", vert));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsv)),
 						std::istreambuf_iterator<char>());
@@ -320,9 +316,7 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	{
 		if (ifsf.fail()) {
 			throw std::runtime_error(
-				(boost::format("Font Fragment Shader failed to open : %1%") %
-				 frag)
-					.str());
+				fmt::format("Font Fragment Shader failed to open : {}", frag));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsf)),
 						std::istreambuf_iterator<char>());
