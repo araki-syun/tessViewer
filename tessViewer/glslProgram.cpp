@@ -7,7 +7,12 @@
 #include <utility>
 #include <vector>
 
-#include <boost\format.hpp>
+#include <fmt\format.h>
+
+#include "define.h"
+
+using namespace fmt::literals;
+using namespace tv;
 
 GLuint CompileShader(GLenum type, std::string& src) {
 	GLuint      shader(glCreateShader(type));
@@ -38,10 +43,8 @@ GLuint CompileShader(GLenum type, std::string& src) {
 		case GL_TESS_CONTROL_SHADER: shader_type = "Tess_Control"; break;
 		default: break;
 		}
-		throw std::runtime_error(
-			(boost::format("GLSL %1% Shader Compile ERROR\n%2%\n") %
-			 shader_type % log.data())
-				.str());
+		throw std::runtime_error(fmt::format(
+			"GLSL {} Shader Compile ERROR\n{}\n", shader_type, log.data()));
 	}
 	return shader;
 }
@@ -65,7 +68,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl) {
 	}
 	_program = glCreateProgram();
 
-	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
+	std::ifstream ifsc(COMMON_SHADER, std::ios::in);
 	std::ifstream ifsv(glsl.vert, std::ios::in);
 	std::ifstream ifsf(glsl.frag, std::ios::in);
 	std::ifstream ifsg(glsl.geom, std::ios::in);
@@ -153,7 +156,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 	}
 	_program = glCreateProgram();
 
-	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
+	std::ifstream ifsc(COMMON_SHADER, std::ios::in);
 	std::ifstream ifsv(glsl.vert, std::ios::in);
 	std::ifstream ifsf(glsl.frag, std::ios::in);
 	std::ifstream ifsg(glsl.geom, std::ios::in);
@@ -178,9 +181,9 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 					  ? "#define OSD_PATCH_ENABLE_SINGLE_CREASE\n"
 					  : ""))
 	   << (osd.elem.bits.fvar_width != 0u
-			   ? (boost::format("#define OSD_FVAR_WIDTH %1%\n") %
-				  osd.elem.bits.fvar_width)
-					 .str()
+			   ? fmt::format("#define OSD_FVAR_WIDTH {}\n",
+							 osd.elem.bits.fvar_width)
+
 			   : "");
 
 	ss << Osd::GLSLPatchShaderSource::GetCommonShaderSource();
@@ -202,7 +205,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		   << Osd::GLSLPatchShaderSource::GetVertexShaderSource(
 				  osd.elem.GetPatchType());
 		shader_src[0] = ss.str();
-		std::ofstream ofs(SHADER "gen.vert", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.vert", std::ios::trunc);
 		ofs << shader_src[0] << std::endl;
 		GLuint shader = CompileShader(GL_VERTEX_SHADER, shader_src[0]);
 		glAttachShader(_program, shader);
@@ -219,7 +222,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 						std::istreambuf_iterator<char>());
 		ss << common << osd_def << "#define FRAGMENT_SHADER\n" << str;
 		shader_src[1] = ss.str();
-		std::ofstream ofs(SHADER "gen.frag", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.frag", std::ios::trunc);
 		ofs << shader_src[1] << std::endl;
 		GLuint shader = CompileShader(GL_FRAGMENT_SHADER, shader_src[1]);
 		glAttachShader(_program, shader);
@@ -232,7 +235,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 						std::istreambuf_iterator<char>());
 		ss << common << osd_def << "#define GEOMETRY_SHADER\n" << str;
 		shader_src[2] = ss.str();
-		std::ofstream ofs(SHADER "gen.geom", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.geom", std::ios::trunc);
 		ofs << shader_src[2] << std::endl;
 		GLuint shader = CompileShader(GL_GEOMETRY_SHADER, shader_src[2]);
 		glAttachShader(_program, shader);
@@ -250,7 +253,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		ss << Osd::GLSLPatchShaderSource::GetTessEvalShaderSource(
 			osd.elem.GetPatchType());
 		shader_src[3] = ss.str();
-		std::ofstream ofs(SHADER "gen.tese", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.tese", std::ios::trunc);
 		ofs << shader_src[3] << std::endl;
 		GLuint shader = CompileShader(GL_TESS_EVALUATION_SHADER, shader_src[3]);
 		glAttachShader(_program, shader);
@@ -267,7 +270,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		ss << Osd::GLSLPatchShaderSource::GetTessControlShaderSource(
 			osd.elem.GetPatchType());
 		shader_src[4] = ss.str();
-		std::ofstream ofs(SHADER "gen.tesc", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.tesc", std::ios::trunc);
 		ofs << shader_src[4] << std::endl;
 		GLuint shader = CompileShader(GL_TESS_CONTROL_SHADER, shader_src[4]);
 		glAttachShader(_program, shader);
@@ -306,9 +309,7 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	{
 		if (ifsv.fail()) {
 			throw std::runtime_error(
-				(boost::format("Font Vertex Shader failed to open : %1%") %
-				 vert)
-					.str());
+				fmt::format("Font Vertex Shader failed to open : {}", vert));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsv)),
 						std::istreambuf_iterator<char>());
@@ -320,9 +321,7 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	{
 		if (ifsf.fail()) {
 			throw std::runtime_error(
-				(boost::format("Font Fragment Shader failed to open : %1%") %
-				 frag)
-					.str());
+				fmt::format("Font Fragment Shader failed to open : {}", frag));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsf)),
 						std::istreambuf_iterator<char>());

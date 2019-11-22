@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <boost\format.hpp>
 #include <cstdint>
 
 #include <GL\glew.h>
@@ -102,6 +101,4 @@ private:
 		float TessLevel;
 		void  Update(int t) { TessLevel = static_cast<float>(1 << t); }
 	} _tess{};
-
-	boost::format _formater;
 };

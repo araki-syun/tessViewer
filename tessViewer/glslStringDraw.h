@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <vector>
 
 #include <boost\noncopyable.hpp>
@@ -11,11 +12,10 @@
 #include <glm\glm.hpp>
 #include <glm\ext.hpp>
 
-#include "location_define.h"
-#include "glslProgram.h"
+#include <fmt/format.h>
 
-#define FONT_VERTEX_SHADER SHADER R"(default_font.vert)"
-#define FONT_FRAGMENT_SHADER SHADER R"(default_font.frag)"
+#include "glslProgram.h"
+#include "define.h"
 
 namespace tv {
 class GlslStringDraw : public boost::noncopyable {
@@ -24,8 +24,9 @@ public:
 
 	static GlslStringDraw* GetInstance();
 
-	void Initialize(int                fontsize = 12,
-					const std::string& fontname = FONT "ipaexg.ttf");
+	void Initialize(int                          fontsize = 12,
+					const std::filesystem::path& filepath = std::string(FONT) +
+															"ipaexg.ttf");
 	void Set(int x, int y, const std::string& str);
 	void Draw();
 	void SetWindowSize(int w, int h);

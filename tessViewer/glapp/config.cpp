@@ -15,16 +15,11 @@
 namespace glapp {
 using namespace nlohmann;
 Config::Config(const std::filesystem::path& config_file) {
-	try {
-		std::ifstream ifs(config_file);
-		ifs.exceptions(std::ios_base::failbit);
-		auto j = std::shared_ptr<json>();
-		ifs >> *j;
-		_jconfig = std::move(j);
-	}
-	catch (std::exception& e) {
-		std::cerr << e.what();
-	}
+	std::ifstream ifs(config_file);
+	ifs.exceptions(std::ios_base::failbit);
+	auto j = std::shared_ptr<json>();
+	ifs >> *j;
+	_jconfig = std::move(j);
 }
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
@@ -35,11 +30,11 @@ Config::Config(Config&& config) noexcept : _base(config._base.to_string()) {
 		std::swap(_jconfig, config._jconfig);
 	}
 }
-Config::~Config()       = default;
-Config& Config::operator=(const Config& config) {
-	_jconfig = config._jconfig;
-	return *this;
-}
+Config::~Config() = default;
+// Config& Config::operator=(const Config& config) {
+// 	_jconfig = config._jconfig;
+// 	return *this;
+// }
 Config& Config::operator=(Config&& config) noexcept {
 	if (this != &config) {
 		_jconfig = std::move(config._jconfig);
@@ -71,15 +66,23 @@ void   Config::CommandLineOptions(const nlohmann::json& j) {
         _command_line_argument = j;
     }
 }
-const Config Config::_config = Config(std::filesystem::path("setting.json"));
+const Config Config::_config                = _initialize("setting.json");
 json         Config::_command_line_argument = json();
 const json   Config::_jschema               = Config::_load_schema();
-const json&  Config::_argument() { return _command_line_argument; }
-json         Config::_load_schema() {
+Config       Config::_initialize(const std::filesystem::path& file) noexcept {
+    try {
+        return Config(file);
+    }
+    catch (std::exception& e) {
+        return Config(json::object());
+    }
+}
+const json& Config::_argument() { return _command_line_argument; }
+json        Config::_load_schema() {
 #include "../doc/schemas/setting_schema.json.gen.h"
 	return json::parse(setting_json);
 }
-const json& Config::_get_schema(Config::_json_pointer p, std::string_view key) {
+const json& Config::_get_schema(const _json_pointer& p, std::string_view key) {
 	auto path = [](std::string_view str) -> std::string {
 		std::istringstream iss((std::string(str)));
 		std::ostringstream oss;

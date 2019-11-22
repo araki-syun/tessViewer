@@ -10,15 +10,9 @@
 #include "opensubdiv\far\patchDescriptor.h"
 
 #include "glShaderVariable.h"
-#include "location_define.h"
 #include "osd_info.h"
 
 #define GLSL_VERSION "#version 450\n"
-#define DEFAULT_VERTEX_SHADER SHADER "default.vert"
-#define DEFAULT_FRAGMENT_SHADER SHADER "default.frag"
-#define DEFAULT_GEOMETRY_SHADER SHADER "default.geom"
-#define DEFAULT_TESS_CTRL_SHADER SHADER "default.tcs"
-#define DEFAULT_TESS_EVAL_SHADER SHADER "default.tes"
 
 class GlslProgram {
 public:

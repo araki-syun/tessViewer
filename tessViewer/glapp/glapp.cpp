@@ -3,7 +3,6 @@
 #include <iostream>
 
 #include "GLFW/glfw3.h"
-#include "glapp_define.h"
 #include "config.h"
 
 namespace glapp {
@@ -53,7 +52,7 @@ Window::Window(std::string_view                title,
 
 	glDebugMessageCallback(_open_gl_debug_message_callback, nullptr);
 
-	for (auto ext : required_ext) {
+	for (const auto& ext : required_ext) {
 		if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
 			throw std::runtime_error("OpenGL Unsupported : " + ext);
 		}
