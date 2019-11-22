@@ -14,7 +14,7 @@
 
 namespace glapp {
 template <class, class = void>
-struct is_less_then_comparable : std::false_type {};// NOLINT
+struct is_less_then_comparable : std::false_type {}; // NOLINT
 
 template <class T>
 struct is_less_then_comparable< // NOLINT
@@ -31,8 +31,8 @@ public:
 	Config(const Config& config, std::string_view str);
 	Config(Config&& config) noexcept;
 	~Config();
-	Config& operator=(const Config& config);
-	Config& operator=(Config&& config) noexcept;
+	Config& operator=(const Config& config) = delete;
+	Config& operator                        =(Config&& config) noexcept;
 
 	const nlohmann::json& Json() const;
 	template <class T>
@@ -61,13 +61,14 @@ public:
 	static void   CommandLineOptions(const nlohmann::json& j);
 
 private:
-	static const Config          _config;
-	static nlohmann::json        _command_line_argument;
-	static const nlohmann::json  _jschema;
+	static const Config         _config;
+	static nlohmann::json       _command_line_argument;
+	static const nlohmann::json _jschema;
+	static Config _initialize(const std::filesystem::path& file) noexcept;
 	static const nlohmann::json& _argument();
 	static nlohmann::json        _load_schema();
-	static const nlohmann::json& _get_schema(_json_pointer    p,
-											 std::string_view key);
+	static const nlohmann::json& _get_schema(const _json_pointer& p,
+											 std::string_view     key);
 	static bool _check_schema_value(const nlohmann::json& schema,
 									const nlohmann::json& value);
 	template <class T>
