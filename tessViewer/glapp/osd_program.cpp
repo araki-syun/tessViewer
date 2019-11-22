@@ -6,7 +6,7 @@
 #include <opensubdiv\osd\glslPatchShaderSource.h>
 
 #include "fmt/format.h"
-#include "glapp_define.h"
+#include "../define.h"
 
 namespace glapp {
 OSDProgram::OSDProgram()
@@ -84,6 +84,7 @@ GLuint OSDProgram::_ShaderCompile(const Shader* shader) {
 std::string OSDProgram::_IncludeReplace(const Shader* shader) {
 	using namespace OpenSubdiv::Osd;
 	using namespace fmt::literals;
+	using namespace tv;
 
 	std::string src;
 	auto        format = "#include <{}>"_format;

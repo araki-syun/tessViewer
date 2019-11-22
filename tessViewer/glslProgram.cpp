@@ -9,6 +9,11 @@
 
 #include <fmt\format.h>
 
+#include "define.h"
+
+using namespace fmt::literals;
+using namespace tv;
+
 GLuint CompileShader(GLenum type, std::string& src) {
 	GLuint      shader(glCreateShader(type));
 	const char* c_src = src.c_str();
@@ -63,7 +68,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl) {
 	}
 	_program = glCreateProgram();
 
-	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
+	std::ifstream ifsc(COMMON_SHADER, std::ios::in);
 	std::ifstream ifsv(glsl.vert, std::ios::in);
 	std::ifstream ifsf(glsl.frag, std::ios::in);
 	std::ifstream ifsg(glsl.geom, std::ios::in);
@@ -151,7 +156,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 	}
 	_program = glCreateProgram();
 
-	std::ifstream ifsc(SHADER "common.glsl", std::ios::in);
+	std::ifstream ifsc(COMMON_SHADER, std::ios::in);
 	std::ifstream ifsv(glsl.vert, std::ios::in);
 	std::ifstream ifsf(glsl.frag, std::ios::in);
 	std::ifstream ifsg(glsl.geom, std::ios::in);
@@ -200,7 +205,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		   << Osd::GLSLPatchShaderSource::GetVertexShaderSource(
 				  osd.elem.GetPatchType());
 		shader_src[0] = ss.str();
-		std::ofstream ofs(SHADER "gen.vert", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.vert", std::ios::trunc);
 		ofs << shader_src[0] << std::endl;
 		GLuint shader = CompileShader(GL_VERTEX_SHADER, shader_src[0]);
 		glAttachShader(_program, shader);
@@ -217,7 +222,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 						std::istreambuf_iterator<char>());
 		ss << common << osd_def << "#define FRAGMENT_SHADER\n" << str;
 		shader_src[1] = ss.str();
-		std::ofstream ofs(SHADER "gen.frag", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.frag", std::ios::trunc);
 		ofs << shader_src[1] << std::endl;
 		GLuint shader = CompileShader(GL_FRAGMENT_SHADER, shader_src[1]);
 		glAttachShader(_program, shader);
@@ -230,7 +235,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 						std::istreambuf_iterator<char>());
 		ss << common << osd_def << "#define GEOMETRY_SHADER\n" << str;
 		shader_src[2] = ss.str();
-		std::ofstream ofs(SHADER "gen.geom", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.geom", std::ios::trunc);
 		ofs << shader_src[2] << std::endl;
 		GLuint shader = CompileShader(GL_GEOMETRY_SHADER, shader_src[2]);
 		glAttachShader(_program, shader);
@@ -248,7 +253,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		ss << Osd::GLSLPatchShaderSource::GetTessEvalShaderSource(
 			osd.elem.GetPatchType());
 		shader_src[3] = ss.str();
-		std::ofstream ofs(SHADER "gen.tese", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.tese", std::ios::trunc);
 		ofs << shader_src[3] << std::endl;
 		GLuint shader = CompileShader(GL_TESS_EVALUATION_SHADER, shader_src[3]);
 		glAttachShader(_program, shader);
@@ -265,7 +270,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		ss << Osd::GLSLPatchShaderSource::GetTessControlShaderSource(
 			osd.elem.GetPatchType());
 		shader_src[4] = ss.str();
-		std::ofstream ofs(SHADER "gen.tesc", std::ios::trunc);
+		std::ofstream ofs(std::string(SHADER) + "gen.tesc", std::ios::trunc);
 		ofs << shader_src[4] << std::endl;
 		GLuint shader = CompileShader(GL_TESS_CONTROL_SHADER, shader_src[4]);
 		glAttachShader(_program, shader);

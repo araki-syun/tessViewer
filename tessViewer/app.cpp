@@ -26,8 +26,10 @@
 #include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
 #include "version.h"
+#include "define.h"
 
 using namespace fmt::literals;
+using namespace tv;
 
 App::App() {
 	auto conf       = glapp::Config::Get();

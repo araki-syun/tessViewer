@@ -2,7 +2,6 @@
 
 #include <vector>
 #include <memory>
-#include <boost\format.hpp>
 #include <cstdint>
 
 #include <GL\glew.h>

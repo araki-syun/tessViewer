@@ -10,7 +10,6 @@
 
 #include "shader_manager.h"
 #include "shader_program.h"
-#include "glapp_define.h"
 
 namespace glapp {
 class OSDProgram : ShaderProgram {

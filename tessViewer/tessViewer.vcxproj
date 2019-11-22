@@ -119,10 +119,10 @@
   <ItemGroup>
     <ClInclude Include="app.h" />
     <ClInclude Include="camera.h" />
+    <ClInclude Include="define.h" />
     <ClInclude Include="glapp\base_window.h" />
     <ClInclude Include="glapp\config.h" />
     <ClInclude Include="glapp\glapp.hpp" />
-    <ClInclude Include="glapp\glapp_define.h" />
     <ClInclude Include="glapp\glm_conversion.h" />
     <ClInclude Include="glapp\osd_program.h" />
     <ClInclude Include="glapp\shader_manager.h" />
@@ -131,7 +131,6 @@
     <ClInclude Include="glShaderVariable.h" />
     <ClInclude Include="glslProgram.h" />
     <ClInclude Include="glslStringDraw.h" />
-    <ClInclude Include="location_define.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="glQuery.h" />

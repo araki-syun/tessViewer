@@ -1,10 +1,12 @@
 #include "glslStringDraw.h"
 
-#include <boost\format.hpp>
-
+#include <filesystem>
 #include <opencv2\core.hpp>
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
+#include <stdexcept>
+
+#include "define.h"
 
 #define NUM_CBLOCK 16
 
@@ -27,13 +29,19 @@ GlslStringDraw::~GlslStringDraw() {
 
 GlslStringDraw* GlslStringDraw::GetInstance() { return &stringDraw; }
 
-void GlslStringDraw::Initialize(int fontsize, const std::string& fontname) {
+void GlslStringDraw::Initialize(int                          fontsize,
+								const std::filesystem::path& filepath) {
 	fontsize = fontsize;
 	if (FT_Init_FreeType(&_ftlib) != 0) {
 		throw std::exception("ERROR : freetype Initialize");
 	}
-	if (FT_New_Face(_ftlib, fontname.c_str(), 0, &_ftface) != 0) {
-		throw std::exception("ERROR : font file Load\n");
+	if (std::filesystem::exists(filepath)) {
+		if (FT_New_Face(_ftlib, filepath.generic_string().c_str(), 0,
+						&_ftface) != 0) {
+			throw std::runtime_error("ERROR : font file Load\n");
+		}
+	} else {
+		throw std::runtime_error("ERROR : font file Not Found\n");
 	}
 	if (FT_Set_Char_Size(_ftface, 0, _font_size * 64, 80, 80) != 0) {
 		throw std::exception("ERROR : set font char size\n");
@@ -56,8 +64,7 @@ void GlslStringDraw::Initialize(int fontsize, const std::string& fontname) {
 	for (int i = ' '; i < '~'; ++i) {
 		FT_UInt index = FT_Get_Char_Index(_ftface, i);
 		if (FT_Load_Char(_ftface, i, FT_LOAD_DEFAULT) != 0) {
-			throw std::runtime_error(
-				(boost::format("Load Char : %1%") % (char)i).str());
+			throw std::runtime_error(fmt::format("Load Char : {}", (char)i));
 		}
 		if (FT_Render_Glyph(_ftface->glyph,
 							FT_Render_Mode::FT_RENDER_MODE_NORMAL) != 0) {
@@ -114,20 +121,19 @@ void GlslStringDraw::Set(int x, int y, const std::string& str) {
 	glm::vec2 screen_coord((float)x * screen_trans.x - 1.f,
 						   float(_window_size.y - y) * screen_trans.y - 1.f);
 	float     offset(0);
+	auto      size = float(_font_size);
 	for (char i : str) {
 		int               code = i - ' ';
 		const CharctorUV& uv   = _list[(code < 0 ? 0 : code)];
 		_buffer.emplace_back(screen_coord.x + offset, screen_coord.y);
 		_buffer.emplace_back(uv.xy);
 		_buffer.emplace_back(screen_coord.x + offset,
-							 screen_coord.y - _font_size * screen_trans.y);
+							 screen_coord.y - size * screen_trans.y);
 		_buffer.emplace_back(uv.xy.x, uv.wh.y);
-		_buffer.emplace_back(screen_coord.x + offset +
-								 _font_size * screen_trans.x,
-							 screen_coord.y - _font_size * screen_trans.y);
+		_buffer.emplace_back(screen_coord.x + offset + size * screen_trans.x,
+							 screen_coord.y - size * screen_trans.y);
 		_buffer.emplace_back(uv.wh);
-		_buffer.emplace_back(screen_coord.x + offset +
-								 _font_size * screen_trans.x,
+		_buffer.emplace_back(screen_coord.x + offset + size * screen_trans.x,
 							 screen_coord.y);
 		_buffer.emplace_back(uv.wh.x, uv.xy.y);
 		_element.emplace_back(0 + _element_offset);
@@ -136,7 +142,7 @@ void GlslStringDraw::Set(int x, int y, const std::string& str) {
 		_element.emplace_back(0 + _element_offset);
 		_element.emplace_back(2 + _element_offset);
 		_element.emplace_back(3 + _element_offset);
-		offset += (_font_size + 4) / (float)_window_size.x;
+		offset += (size + 4) / (float)_window_size.x;
 		_element_offset += 4;
 	}
 }

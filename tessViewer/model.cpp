@@ -15,7 +15,7 @@
 #include <opensubdiv\osd\glVertexBuffer.h>
 
 #include "glapp\glapp.hpp"
-#include "glapp\glapp_define.h"
+#include "define.h"
 #include "glapp\config.h"
 
 //OpenSubdiv::Far::TopologyRefiner* createRefiner(const picojson::object& obj);

@@ -9,16 +9,16 @@
 #include <fmt/format.h>
 
 #include "boost/program_options/variables_map.hpp"
-#include "location_define.h"
 #include "nlohmann/json_fwd.hpp"
 #include "version.h"
 
 #include "glapp\config.h"
-#include "glapp\glapp_define.h"
+#include "define.h"
 
 using namespace std::literals::string_literals;
 using namespace boost::program_options;
 using namespace fmt::literals;
+using namespace tv;
 
 void ImportOptions(const variables_map& vm);
 
@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 	if (vm.count("help") != 0u) {
-		std::cout << "tessViewer {}\n{}"_format(TV_VERSION, options)
+		std::cout << "tessViewer {}\n"_format(TV_VERSION) << options
 				  << std::endl;
 		return 0;
 	}
