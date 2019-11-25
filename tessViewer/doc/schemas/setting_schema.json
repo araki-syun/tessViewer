@@ -3,6 +3,28 @@
 	"title": "TessViewer Setting Schema",
 	"type": "object",
 	"properties": {
+		"application": {
+			"properties": {
+				"log": {
+					"properties": {
+						"level": {
+							"type": "integer",
+							"maximum": 6,
+							"minimum": 0,
+							"default": 0
+						},
+						"output": {
+							"enum": [
+								"quiet",
+								"file",
+								"stdout"
+							],
+							"default": "quiet"
+						}
+					}
+				}
+			}
+		},
 		"window": {
 			"description": "ウィンドウに関連する設定",
 			"type": "object",
