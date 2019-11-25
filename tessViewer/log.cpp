@@ -13,6 +13,7 @@
 namespace tv {
 std::string ToString(LogLevel lv) {
 	switch (lv) {
+	default:
 	case LogLevel::None: return "None";
 	case LogLevel::Fatal: return "Fatal";
 	case LogLevel::Error: return "Error";
@@ -24,6 +25,7 @@ std::string ToString(LogLevel lv) {
 }
 std::string ToString(InfoType type) {
 	switch (type) {
+	default:
 	case InfoType::Unknown: return "Unknown";
 	case InfoType::Application: return "Application";
 	case InfoType::Graphics: return "Graphics";
@@ -42,6 +44,7 @@ void Logger::Log(LogLevel lv, InfoType type, std::string_view str) {
 		_logger->_log(lv, type, str);
 	}
 }
+void Logger::Log(const AppError& e) { Log(e.Level(), e.Info(), e.what()); }
 Logger::Logger(LogLevel lv, std::streambuf* output)
 #ifdef _DEBUG //リリースでは詳細なログを取得できないように
 	: _level(lv)

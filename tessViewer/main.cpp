@@ -125,6 +125,9 @@ int main(int argc, char* argv[]) {
 	catch (boost::bad_any_cast& e) {
 		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
 	}
+	catch (tv::AppError& e) {
+		Logger::Log(e);
+	}
 	catch (std::exception& e) {
 		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
 	}

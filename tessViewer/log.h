@@ -10,6 +10,8 @@
 #include <nlohmann/json.hpp>
 #include <nlohmann/detail/macro_scope.hpp>
 
+#include "exception.h"
+
 namespace tv {
 enum class LogLevel { None = 0, Fatal, Error, Warning, Notice, Debug, Trace };
 enum class InfoType { Unknown, Application, Graphics, UserInterface, Control };
@@ -46,6 +48,7 @@ public:
 	 * @param str メッセージ
 	 */
 	static void Log(LogLevel lv, InfoType type, std::string_view str);
+	static void Log(const AppError& e);
 
 private:
 	Logger(LogLevel lv, std::streambuf* output);
