@@ -31,32 +31,25 @@ public:
 	 * 
 	 * @param output メッセージの出力先
 	 * std::ostream派生のオブジェクトのストリームバッファを指定する
-
-* @example Initialize(Loglevel::Debug, std::cout.rdbuf());
+	 * 
+	 * @example Initialize(Loglevel::Debug, std::cout.rdbuf());
 	 */
 	static void Initialize(LogLevel lv, std::streambuf* output);
 
 	/**
 	 * @brief コンストラクタで指定した出力に対してログを出力する
 	 * 
-	 * @tparam LEVEL メッセージのレベル
-
+	 * @param lv メッセージのレベル
+	 * 
+	 * @param type メッセージの種類
+	 * 
 	 * @param str メッセージ
 	 */
-	template <LogLevel LEVEL>
-	static void Log(std::string_view str) {
-		_logger->_log(str);
-	}
+	static void Log(LogLevel lv, InfoType type, std::string_view str);
 
 private:
 	Logger(LogLevel lv, std::streambuf* output);
-	template <LogLevel LEVEL>
-	void _log(std::string_view str) {
-		if (_level < LEVEL) {
-			return;
-		}
-		_output << std::string(str) << std::flush;
-	}
+	void           _log(LogLevel lv, InfoType type, std::string_view str);
 	const LogLevel _level = LogLevel::None;
 	std::ostream   _output;
 

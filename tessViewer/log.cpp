@@ -31,7 +31,9 @@ std::string ToString(InfoType type) {
 
 void Logger::Initialize(LogLevel lv, std::streambuf* output) {
 	if (!_logger) {
-		_logger = std::make_unique<Logger>(lv, output);
+void Logger::Log(LogLevel lv, InfoType type, std::string_view str) {
+	if (_logger) {
+		_logger->_log(lv, type, str);
 	}
 }
 Logger::Logger(LogLevel lv, std::streambuf* output)
@@ -46,4 +48,5 @@ Logger::Logger(LogLevel lv, std::streambuf* output)
 		out->open("tessViewer.log", std::ios_base::out | std::ios_base::app);
 	}
 }
+void Logger::_log(LogLevel lv, InfoType type, std::string_view str) {
 } // namespace tv
