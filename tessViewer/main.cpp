@@ -1,5 +1,6 @@
 #include "app.h"
 
+#include <exception>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -14,6 +15,7 @@
 
 #include "glapp\config.h"
 #include "define.h"
+#include "log.h"
 
 using namespace std::literals::string_literals;
 using namespace boost::program_options;
@@ -103,8 +105,18 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
+	ImportOptions(vm);
+	auto ofs = std::ofstream();
+	auto lv =
+		glapp::Config::Get().Value<tv::LogLevel>("/application/log/level");
+	switch (
+		glapp::Config::Get().Value<tv::OutputType>("/application/log/output")) {
+	case tv::OutputType::Quiet: break;
+	case tv::OutputType::File: Logger::Initialize(lv, ofs.rdbuf()); break;
+	case tv::OutputType::Stdout: Logger::Initialize(lv, std::cout.rdbuf());
+	}
+
 	try {
-		ImportOptions(vm);
 		App a;
 		a.Run();
 	}

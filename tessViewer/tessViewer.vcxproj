@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -106,6 +106,7 @@
     <ClCompile Include="glShaderVariable.cpp" />
     <ClCompile Include="glslProgram.cpp" />
     <ClCompile Include="glslStringDraw.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="model.cpp" />
@@ -131,6 +132,7 @@
     <ClInclude Include="glShaderVariable.h" />
     <ClInclude Include="glslProgram.h" />
     <ClInclude Include="glslStringDraw.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="glQuery.h" />
