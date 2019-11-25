@@ -1,5 +1,8 @@
 #include "log.h"
+#include <fmt/core.h>
+#include <fmt/chrono.h>
 
+#include <ctime>
 #include <fstream>
 #include <iostream>
 #include <memory>
@@ -31,6 +34,9 @@ std::string ToString(InfoType type) {
 
 void Logger::Initialize(LogLevel lv, std::streambuf* output) {
 	if (!_logger) {
+		_logger.reset(new Logger(lv, output)); //NOLINT
+	}
+}
 void Logger::Log(LogLevel lv, InfoType type, std::string_view str) {
 	if (_logger) {
 		_logger->_log(lv, type, str);
@@ -49,4 +55,15 @@ Logger::Logger(LogLevel lv, std::streambuf* output)
 	}
 }
 void Logger::_log(LogLevel lv, InfoType type, std::string_view str) {
+	if (_level < lv || lv == LogLevel::None) {
+		return;
+	}
+	auto    now = std::time(nullptr);
+	std::tm tm{};
+	localtime_s(&tm, &now);
+	_output << fmt::format("[ {:s} ] {:%F %T} {:s}\n",
+						   ToString(type), //NOLINTNEXTLINE
+						   tm, std::string(str))
+			<< std::endl;
+}
 } // namespace tv
