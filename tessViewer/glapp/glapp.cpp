@@ -4,6 +4,7 @@
 
 #include "GLFW/glfw3.h"
 #include "config.h"
+#include "../log.h"
 
 namespace glapp {
 
@@ -47,14 +48,21 @@ Window::Window(std::string_view                title,
 	glewExperimental = GL_TRUE;
 	GLenum err       = glewInit();
 	if (err != GLEW_OK) {
-		throw std::runtime_error("GLEW Initialize ERROR");
+		throw tv::GraphicsError(tv::LogLevel::Fatal, "GLEW Initialize ERROR");
 	}
 
 	glDebugMessageCallback(_open_gl_debug_message_callback, nullptr);
 
+	{
+		std::stringstream ss;
 	for (const auto& ext : required_ext) {
 		if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
-			throw std::runtime_error("OpenGL Unsupported : " + ext);
+				ss << "UnSupported OpenGL Extension : " << ext << std::endl;
+		}
+	}
+		if (const auto& str = ss.str(); !str.empty()) {
+			throw tv::GraphicsError(tv::LogLevel::Error,
+									"OpenGL Error\n" + str);
 		}
 	}
 

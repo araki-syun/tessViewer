@@ -7,6 +7,7 @@
 
 #include <fmt/format.h>
 //#include <opensubdiv\osd\glslPatchShaderSource.h>
+#include "../log.h"
 
 namespace glapp {
 
@@ -17,14 +18,16 @@ Shader::Shader(const std::string& filename) {
 	std::filesystem::path file_path(filename);
 
 	if (!std::filesystem::exists(file_path)) {
-		throw std::runtime_error(fmt::format("NOT FOUND Shader File : {}",
-											 file_path.generic_string()));
+		throw tv::AppError(tv::LogLevel::Error,
+						   fmt::format("NOT FOUND Shader File : {}",
+									   file_path.generic_string()));
 	}
 
 	std::ifstream ifs(filename);
 	if (ifs.fail()) {
-		throw std::runtime_error(fmt::format("LOAD ERROR Shader File : {}",
-											 file_path.generic_string()));
+		throw tv::AppError(tv::LogLevel::Error,
+						   fmt::format("LOAD ERROR Shader File : {}",
+									   file_path.generic_string()));
 	}
 
 	std::string ext = file_path.extension().string();

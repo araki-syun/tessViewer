@@ -25,8 +25,10 @@
 #include "glm/fwd.hpp"
 #include "glm/gtc/quaternion.hpp"
 #include "glm/trigonometric.hpp"
+
 #include "version.h"
 #include "define.h"
+#include "log.h"
 
 using namespace fmt::literals;
 using namespace tv;
@@ -75,9 +77,11 @@ App::App() {
 								conf.Value<int>("/window/resolution/height"));
 
 	// コマンドライン引数または設定で指定されたsdmjファイルから読み込む
-	std::ifstream sdmj(conf_graph.Value<std::string>("Model"));
+	auto          sdmjname = conf_graph.Value<std::string>("Model");
+	std::ifstream sdmj(sdmjname);
 	if (!sdmj) {
-		throw std::runtime_error("File Open Error\n");
+		throw AppError(LogLevel::Error,
+					   "File Open Error : {}"_format(sdmjname));
 	}
 
 	nlohmann::json j;
@@ -190,14 +194,16 @@ void App::Run() {
 
 void App::OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 						   const char*                message) {
-	throw std::runtime_error("{:12s} : {}\n{}\n"_format(
-		"OpenSubdiv Error Type", std::to_string(err), message));
+	throw GraphicsError(LogLevel::Error,
+						"{} : {} {}"_format("OpenSubdiv Error Type",
+											std::to_string(err), message));
 }
 void App::OsdWarningCallback(const char* message) {
 	std::cerr << message << std::endl;
 }
 void App::GlfwErrorCallback(int code, const char* message) {
-	throw std::runtime_error("{:12s} : {}\n{}\n"_format(
+	throw GraphicsError(LogLevel::Error,
+						"{:12s} : {}\n{}\n"_format(
 		"GLFW ERROR Code", std::to_string(code), message));
 }
 void App::KeyDefaultCallback(

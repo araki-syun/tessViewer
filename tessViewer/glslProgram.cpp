@@ -10,6 +10,7 @@
 #include <fmt\format.h>
 
 #include "define.h"
+#include "log.h"
 
 using namespace fmt::literals;
 using namespace tv;
@@ -43,8 +44,9 @@ GLuint CompileShader(GLenum type, std::string& src) {
 		case GL_TESS_CONTROL_SHADER: shader_type = "Tess_Control"; break;
 		default: break;
 		}
-		throw std::runtime_error(fmt::format(
-			"GLSL {} Shader Compile ERROR\n{}\n", shader_type, log.data()));
+		throw GraphicsError(LogLevel::Error,
+							fmt::format("GLSL {} Shader Compile ERROR\n{}\n",
+										shader_type, log.data()));
 	}
 	return shader;
 }
@@ -143,7 +145,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl) {
 		glDeleteProgram(_program);
 		_program        = 0;
 		std::string err = "GLSL Program Link ERROR\n";
-		throw std::runtime_error(err.append(log.data()));
+		throw GraphicsError(LogLevel::Error, err.append(log.data()));
 	}
 	_set_location();
 }
@@ -291,7 +293,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		glDeleteProgram(_program);
 		_program        = 0;
 		std::string err = "GLSL Program Link ERROR\n";
-		throw std::runtime_error(err.append(log.data()));
+		throw GraphicsError(LogLevel::Error, err.append(log.data()));
 	}
 	_set_location();
 }
@@ -308,7 +310,8 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	// vertex shader
 	{
 		if (ifsv.fail()) {
-			throw std::runtime_error(
+			throw GraphicsError(
+				LogLevel::Error,
 				fmt::format("Font Vertex Shader failed to open : {}", vert));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsv)),
@@ -320,7 +323,8 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 	// fragment shader
 	{
 		if (ifsf.fail()) {
-			throw std::runtime_error(
+			throw GraphicsError(
+				LogLevel::Error,
 				fmt::format("Font Fragment Shader failed to open : {}", frag));
 		}
 		std::string str((std::istreambuf_iterator<char>(ifsf)),
@@ -343,7 +347,7 @@ void GlslProgram::SetProgram(const std::string& vert, const std::string& frag) {
 		glDeleteProgram(_program);
 		_program        = 0;
 		std::string err = "GLSL Program Link ERROR\n";
-		throw std::runtime_error(err.append(log.data()));
+		throw GraphicsError(LogLevel::Error, err.append(log.data()));
 	}
 	_set_location();
 }
@@ -554,9 +558,8 @@ GlslProgram::GlslInfo::GetUniformBuffer(const std::string& name) {
 	try {
 		return buffers.at(name).get();
 	}
-	catch (std::out_of_range& e) {
-		std::cout << name << " は存在しません" << std::endl;
-		throw;
+	catch (std::out_of_range&) {
+		throw GraphicsError(LogLevel::Error, "'{}'は存在しません"_format(name));
 	}
 }
 

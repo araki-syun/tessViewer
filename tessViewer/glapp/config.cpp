@@ -1,4 +1,5 @@
 #include "config.h"
+#include "fmt/core.h"
 #include "nlohmann/json_fwd.hpp"
 
 #include <exception>
@@ -11,6 +12,8 @@
 #include <stdexcept>
 #include <string_view>
 #include <array>
+
+#include "../log.h"
 
 namespace glapp {
 using namespace nlohmann;
@@ -73,7 +76,7 @@ Config       Config::_initialize(const std::filesystem::path& file) noexcept {
     try {
         return Config(file);
     }
-    catch (std::exception& e) {
+    catch (std::exception&) {
         return Config(json::object());
     }
 }

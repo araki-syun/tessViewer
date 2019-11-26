@@ -4,9 +4,9 @@
 #include <opencv2\core.hpp>
 #include <opencv2\imgcodecs.hpp>
 #include <opencv2\highgui.hpp>
-#include <stdexcept>
 
 #include "define.h"
+#include "log.h"
 
 #define NUM_CBLOCK 16
 
@@ -33,18 +33,18 @@ void GlslStringDraw::Initialize(int                          fontsize,
 								const std::filesystem::path& filepath) {
 	fontsize = fontsize;
 	if (FT_Init_FreeType(&_ftlib) != 0) {
-		throw std::exception("ERROR : freetype Initialize");
+		throw GraphicsError(LogLevel::Error, "ERROR : freetype Initialize");
 	}
 	if (std::filesystem::exists(filepath)) {
 		if (FT_New_Face(_ftlib, filepath.generic_string().c_str(), 0,
 						&_ftface) != 0) {
-			throw std::runtime_error("ERROR : font file Load\n");
+			throw AppError(LogLevel::Error, "ERROR : font file Load\n");
 		}
 	} else {
-		throw std::runtime_error("ERROR : font file Not Found\n");
+		throw AppError(LogLevel::Error, "ERROR : font file Not Found\n");
 	}
 	if (FT_Set_Char_Size(_ftface, 0, _font_size * 64, 80, 80) != 0) {
-		throw std::exception("ERROR : set font char size\n");
+		throw GraphicsError(LogLevel::Error, "ERROR : set font char size\n");
 	}
 	//if(FT_Set_Pixel_Sizes(this->_face, w, h))
 	//	throw std::exception("ERROR : font set pixel\n");
@@ -64,11 +64,12 @@ void GlslStringDraw::Initialize(int                          fontsize,
 	for (int i = ' '; i < '~'; ++i) {
 		FT_UInt index = FT_Get_Char_Index(_ftface, i);
 		if (FT_Load_Char(_ftface, i, FT_LOAD_DEFAULT) != 0) {
-			throw std::runtime_error(fmt::format("Load Char : {}", (char)i));
+			throw InterfaceError(LogLevel::Error,
+								 fmt::format("Load Char : {}", (char)i));
 		}
 		if (FT_Render_Glyph(_ftface->glyph,
 							FT_Render_Mode::FT_RENDER_MODE_NORMAL) != 0) {
-			throw std::runtime_error("Render Gliph");
+			throw InterfaceError(LogLevel::Error, "Render Gliph");
 		}
 		FT_Bitmap& bm = _ftface->glyph->bitmap;
 

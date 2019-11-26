@@ -1,5 +1,7 @@
 #include "ShaderManager.h"
 
+#include "log.h"
+
 //glShaderUniformBuffer::glShaderUniformBuffer(/*GLuint program,*/ int buf_size, const char * name) :
 //	_binding(_bindindex++),_buffer(0), _bufSize(buf_size)
 //{
@@ -49,7 +51,7 @@ ShaderManager::_add(const GlslProgram::GlslInfo& glsl) {
 	if (it.second) {
 		return it.first;
 	}
-	{ throw std::runtime_error("Shader Insert ERROR"); }
+	{ throw GraphicsError(LogLevel::Error, "Shader Insert ERROR"); }
 }
 
 ShaderManager::shader_iterator
@@ -60,7 +62,7 @@ ShaderManager::_add(const GlslProgram::GlslInfo& glsl, const OsdInfo& osd) {
 	if (it.second) {
 		return it.first;
 	}
-	{ throw std::runtime_error("Shader Insert ERROR"); }
+	{ throw GraphicsError(LogLevel::Error, "Shader Insert ERROR"); }
 }
 
 const GlslProgram& ShaderManager::Get(const GlslProgram::GlslInfo& glsl) {
