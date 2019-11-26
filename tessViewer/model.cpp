@@ -213,7 +213,7 @@ void Model::Reload(const nlohmann::json& obj) {
 
 	Osd::MeshBitset bits;
 	bits.set(Osd::MeshAdaptive,
-			 _shader_osd_info.elem.bits.is_adaptive == 1); // set adaptive
+			 _shader_osd_info.elem.bits.is_adaptive == 1u); // set adaptive
 	bits.set(Osd::MeshEndCapBSplineBasis,
 			 _shader_osd_info.elem.GetPatchType() ==
 				 Far::PatchDescriptor::Type::
@@ -222,8 +222,8 @@ void Model::Reload(const nlohmann::json& obj) {
 			 _shader_osd_info.elem.GetPatchType() ==
 				 Far::PatchDescriptor::Type::GREGORY_BASIS);
 	bits.set(Osd::MeshUseSingleCreasePatch,
-			 _shader_osd_info.elem.bits.single_crease_patch == 1);
-	bits.set(Osd::MeshFVarData, _shader_osd_info.elem.bits.fvar_width != 0);
+			 _shader_osd_info.elem.bits.single_crease_patch == 1u);
+	bits.set(Osd::MeshFVarData, _shader_osd_info.elem.bits.fvar_width != 0u);
 
 	_mesh =
 		std::make_unique<Osd::Mesh<Osd::GLVertexBuffer, Osd::GLStencilTableSSBO,
@@ -330,7 +330,7 @@ void Model::Update(const float* v1,
 void Model::Draw() {
 	using namespace OpenSubdiv;
 
-	if (_shader_osd_info.elem.bits.patch_cull == 0) {
+	if (_shader_osd_info.elem.bits.patch_cull == 0u) {
 		glDisable(GL_CULL_FACE);
 	}
 	_mesh->BindVertexBuffer();
@@ -354,7 +354,7 @@ void Model::Draw() {
 	}
 	glBindVertexArray(_vao);
 	for (const auto& patch : _mesh->GetPatchTable()->GetPatchArrays()) {
-		Far::PatchDescriptor desc = patch.GetDescriptor();
+		const auto& desc = patch.GetDescriptor();
 
 		int num_verts_per_patch =
 			desc.GetNumControlVertices(); // 16 for B-spline patches
@@ -388,7 +388,7 @@ void Model::Draw() {
 	glBindVertexArray(0);
 	glUseProgram(0);
 
-	if (_shader_osd_info.elem.bits.patch_cull == 0) {
+	if (_shader_osd_info.elem.bits.patch_cull == 0u) {
 		glEnable(GL_CULL_FACE);
 	}
 }
