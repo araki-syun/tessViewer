@@ -23,6 +23,8 @@ Config::Config(const std::filesystem::path& config_file) {
 	auto j = std::shared_ptr<json>();
 	ifs >> *j;
 	_jconfig = std::move(j);
+	tv::Logger::Log(tv::LogLevel::Notice, tv::InfoType::Application,
+					fmt::format("Load : {}", config_file.generic_string()));
 }
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;

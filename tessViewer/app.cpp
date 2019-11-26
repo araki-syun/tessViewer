@@ -199,12 +199,12 @@ void App::OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 											std::to_string(err), message));
 }
 void App::OsdWarningCallback(const char* message) {
-	std::cerr << message << std::endl;
+	Logger::Log(LogLevel::Warning, InfoType::Graphics, message);
 }
 void App::GlfwErrorCallback(int code, const char* message) {
 	throw GraphicsError(LogLevel::Error,
 						"{:12s} : {}\n{}\n"_format(
-		"GLFW ERROR Code", std::to_string(code), message));
+							"GLFW ERROR Code", std::to_string(code), message));
 }
 void App::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -234,13 +234,15 @@ void App::KeyDefaultCallback(
 		case GLFW_KEY_SPACE: {
 			auto q      = a->_camera.Quaternion();
 			auto format = "{:-12s} : {:3.2f}\n"_format;
-			std::cout << format(
-				"Pos", glm::to_string(a->_camera.Position()),
-				format("Angle",
-					   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
-				format("LookPoint", glm::to_string(q * tv::Camera::front)),
-				format("Right", glm::to_string(q * tv::Camera::right)),
-				format("Up", glm::to_string(q * tv::Camera::up)));
+			Logger::Log(
+				LogLevel::Debug, InfoType::Control,
+				format(
+					"Pos", glm::to_string(a->_camera.Position()),
+					format("Angle",
+						   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
+					format("LookPoint", glm::to_string(q * tv::Camera::front)),
+					format("Right", glm::to_string(q * tv::Camera::right)),
+					format("Up", glm::to_string(q * tv::Camera::up))));
 		} break;
 		default: break;
 		}
@@ -267,7 +269,7 @@ void App::KeyFlyModeCallback(
 									   MouseButtonDfaultCallback);
 			a->_fly_mode = false;
 			DragCameraRotate(window, 0.0, 0.0);
-			std::cout << "Normal Mode" << std::endl;
+			Logger::Log(LogLevel::Debug, InfoType::Control, "Normal Mode");
 			break;
 		case GLFW_KEY_UP:
 			a->_tess_fact = glm::min(a->_tess_fact + 1, a->_max_tess_fact);
@@ -284,13 +286,15 @@ void App::KeyFlyModeCallback(
 		case GLFW_KEY_SPACE: {
 			auto q      = a->_camera.Quaternion();
 			auto format = "{:-12s} : {:3.2f}\n"_format;
-			std::cout << format(
-				"Pos", glm::to_string(a->_camera.Position()),
-				format("Angle",
-					   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
-				format("LookPoint", glm::to_string(q * tv::Camera::front)),
-				format("Right", glm::to_string(q * tv::Camera::right)),
-				format("Up", glm::to_string(q * tv::Camera::up)));
+			Logger::Log(
+				LogLevel::Debug, InfoType::Control,
+				format(
+					"Pos", glm::to_string(a->_camera.Position()),
+					format("Angle",
+						   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
+					format("LookPoint", glm::to_string(q * tv::Camera::front)),
+					format("Right", glm::to_string(q * tv::Camera::right)),
+					format("Up", glm::to_string(q * tv::Camera::up))));
 		} break;
 		default: break;
 		}
@@ -352,10 +356,12 @@ void App::MouseButtonDfaultCallback(GLFWwindow* window,
 			if (mods == GLFW_MOD_SHIFT) {
 				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
-				std::cout << "Camera Translation" << std::endl;
+				Logger::Log(LogLevel::Debug, InfoType::Control,
+							"Camera Translation");
 			} else {
 				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraRotate);
-				std::cout << "Camera Rotate" << std::endl;
+				Logger::Log(LogLevel::Debug, InfoType::Control,
+							"Camera Rotate");
 			}
 			break;
 		default: break;
@@ -381,10 +387,12 @@ void App::MouseButtonFlayModeCallback(GLFWwindow* window,
 			if (mods == GLFW_MOD_SHIFT) {
 				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
-				std::cout << "Camera Translation" << std::endl;
+				Logger::Log(LogLevel::Debug, InfoType::Control,
+							"Camera Translation");
 			} else {
 				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraFlyMode);
-				std::cout << "Camera Rotate" << std::endl;
+				Logger::Log(LogLevel::Debug, InfoType::Control,
+							"Camera Rotate");
 			}
 			break;
 		default: break;
@@ -405,8 +413,8 @@ void App::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 	auto fov = a->_camera.Fov() + (float)(up - down);
 	a->_camera.Fov(glm::clamp(fov, Camera::MinFov(), Camera::MaxFov()));
 	a->_update_projection();
-	std::cout << "{:-12s} : {:3.2f}\n"_format("fov : ", a->_camera.Fov())
-			  << std::endl;
+	Logger::Log(LogLevel::Debug, InfoType::Control,
+				"{:-12s} : {:3.2f}\n"_format("fov : ", a->_camera.Fov()));
 }
 void App::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,
