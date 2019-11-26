@@ -6,6 +6,7 @@ cppcoreguidelines-*,\
 -cppcoreguidelines-non-private-member-variables-in-classes,\
 -cppcoreguidelines-avoid-c-arrays,\
 -cppcoreguidelines-pro-bounds-array-to-pointer-decay,\
+-cppcoreguidelines-avoid-magic-numbers,\
 llvm-*,\
 modernize-*,\
 -modernize-use-trailing-return-type,\
