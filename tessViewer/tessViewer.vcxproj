@@ -47,7 +47,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\lib\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;$(LIB_PATH)\json\include;$(LIB_PATH)\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
@@ -74,7 +75,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\lib\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;$(LIB_PATH)\json\include;$(LIB_PATH)\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
