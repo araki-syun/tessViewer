@@ -1,8 +1,9 @@
 #include "shader_program.h"
 #include "fmt/core.h"
 
-#include <boost\format.hpp>
 #include <type_traits>
+
+#include "../log.h"
 
 namespace glapp {
 ShaderProgram::ShaderProgram() = default;
@@ -99,7 +100,8 @@ void ShaderProgram::_Create() {
 		std::string err;
 		err.append(log.data(), log.size());
 
-		throw std::runtime_error(
+		throw tv::GraphicsError(
+			tv::LogLevel::Error,
 			fmt::format("Shader Program Link ERROR\n{}", err));
 #else
 		err.append(log.data(), log.size());
@@ -136,7 +138,8 @@ GLuint ShaderProgram::_ShaderCompile(const Shader* shader) {
 		std::string err;
 		err.append(log.data(), log.size());
 
-		throw std::runtime_error(fmt::format("Shader Compile ERROR\n{}", err));
+		throw tv::GraphicsError(tv::LogLevel::Error,
+								fmt::format("Shader Compile ERROR\n{}", err));
 #else
 		err.append(log.data(), log.size());
 #endif

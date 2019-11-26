@@ -1,12 +1,12 @@
 #include "osd_program.h"
 
 #include <regex>
-#include <boost\format.hpp>
 
 #include <opensubdiv\osd\glslPatchShaderSource.h>
 
 #include "fmt/format.h"
 #include "../define.h"
+#include "../log.h"
 
 namespace glapp {
 OSDProgram::OSDProgram()
@@ -76,7 +76,8 @@ GLuint OSDProgram::_ShaderCompile(const Shader* shader) {
 		std::string err;
 		err.append(log.data(), log.size());
 
-		throw std::runtime_error(fmt::format("Shader Compile ERROR\n{}", err));
+		throw tv::GraphicsError(tv::LogLevel::Error,
+								fmt::format("Shader Compile ERROR\n{}", err));
 	}
 	return 0;
 }

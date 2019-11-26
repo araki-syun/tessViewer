@@ -1,9 +1,12 @@
 #include "glapp.hpp"
 
 #include <iostream>
+#include <sstream>
+#include <vector>
 
 #include "GLFW/glfw3.h"
 #include "config.h"
+#include "../log.h"
 
 namespace glapp {
 
@@ -47,14 +50,21 @@ Window::Window(std::string_view                title,
 	glewExperimental = GL_TRUE;
 	GLenum err       = glewInit();
 	if (err != GLEW_OK) {
-		throw std::runtime_error("GLEW Initialize ERROR");
+		throw tv::GraphicsError(tv::LogLevel::Fatal, "GLEW Initialize ERROR");
 	}
 
 	glDebugMessageCallback(_open_gl_debug_message_callback, nullptr);
 
-	for (const auto& ext : required_ext) {
-		if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
-			throw std::runtime_error("OpenGL Unsupported : " + ext);
+	{
+		std::stringstream ss;
+		for (const auto& ext : required_ext) {
+			if (GL_TRUE != glfwExtensionSupported(ext.c_str())) {
+				ss << "UnSupported OpenGL Extension : " << ext << std::endl;
+			}
+		}
+		if (const auto& str = ss.str(); !str.empty()) {
+			throw tv::GraphicsError(tv::LogLevel::Error,
+									"OpenGL Error\n" + str);
 		}
 	}
 
@@ -114,8 +124,9 @@ Window::_open_gl_debug_message_callback(GLenum        source,
 										GLsizei       length,
 										const GLchar* message,
 										const void*   user_param) {
-	int         level = 0;
-	std::string severity_string;
+	int               level = 0;
+	std::stringstream ss;
+	std::string       severity_string;
 	switch (severity) {
 	case GL_DEBUG_SEVERITY_NOTIFICATION:
 		severity_string = "NOTIFICATION";
@@ -138,59 +149,59 @@ Window::_open_gl_debug_message_callback(GLenum        source,
 		return;
 	}
 
-	std::cout << "---------------------opengl-callback-start------------"
-			  << std::endl;
+	ss << "------------opengl-callback-start------------" << std::endl;
 
-	std::cout << "No." << _debug_message_number << '\n';
-	std::cout << "type: ";
+	ss << "No." << _debug_message_number << '\n';
+	ss << "type: ";
 	switch (type) {
-	case GL_DEBUG_TYPE_ERROR: std::cout << "ERROR"; break;
-	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR:
-		std::cout << "DEPRECATED_BEHAVIOR";
-		break;
-	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR:
-		std::cout << "UNDEFINED_BEHAVIOR";
-		break;
-	case GL_DEBUG_TYPE_PORTABILITY: std::cout << "PORTABILITY"; break;
-	case GL_DEBUG_TYPE_PERFORMANCE: std::cout << "PERFORMANCE"; break;
-	case GL_DEBUG_TYPE_OTHER: std::cout << "OTHER"; break;
+	case GL_DEBUG_TYPE_ERROR: ss << "ERROR"; break;
+	case GL_DEBUG_TYPE_DEPRECATED_BEHAVIOR: ss << "DEPRECATED_BEHAVIOR"; break;
+	case GL_DEBUG_TYPE_UNDEFINED_BEHAVIOR: ss << "UNDEFINED_BEHAVIOR"; break;
+	case GL_DEBUG_TYPE_PORTABILITY: ss << "PORTABILITY"; break;
+	case GL_DEBUG_TYPE_PERFORMANCE: ss << "PERFORMANCE"; break;
+	case GL_DEBUG_TYPE_OTHER: ss << "OTHER"; break;
 	}
-	std::cout << std::endl;
+	ss << std::endl;
 
 	auto errstr = reinterpret_cast<const char*>(gluErrorString(id));
 	if (errstr != nullptr) {
-		std::cout << "id: " << id << ' ' << errstr << std::endl;
+		ss << "id: " << id << ' ' << errstr << std::endl;
 	}
-	std::cout << "severity: " << severity_string << std::endl;
+	ss << "severity: " << severity_string << std::endl;
 	//switch (severity) {
 	//case GL_DEBUG_SEVERITY_LOW:
-	//	std::cout << "LOW";
+	//	ss << "LOW";
 	//	break;
 	//case GL_DEBUG_SEVERITY_MEDIUM:
-	//	std::cout << "MEDIUM";
+	//	ss << "MEDIUM";
 	//	break;
 	//case GL_DEBUG_SEVERITY_HIGH:
-	//	std::cout << severity_string;
+	//	ss << severity_string;
 	//	break;
 	//}
-	//std::cout << std::endl;
+	//ss << std::endl;
 
-	std::cout << "source: ";
+	ss << "source: ";
 	switch (source) {
-	case GL_DEBUG_SOURCE_API_ARB: std::cout << "API"; break;
-	case GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB: std::cout << "WINDOW_SYSTEM"; break;
-	case GL_DEBUG_SOURCE_SHADER_COMPILER_ARB:
-		std::cout << "SHADER_COMPILER";
-		break;
-	case GL_DEBUG_SOURCE_THIRD_PARTY_ARB: std::cout << "THIRD_PARTY"; break;
-	case GL_DEBUG_SOURCE_APPLICATION_ARB: std::cout << "APPLICATION"; break;
-	case GL_DEBUG_SOURCE_OTHER_ARB: std::cout << "OTHER"; break;
+	case GL_DEBUG_SOURCE_API_ARB: ss << "API"; break;
+	case GL_DEBUG_SOURCE_WINDOW_SYSTEM_ARB: ss << "WINDOW_SYSTEM"; break;
+	case GL_DEBUG_SOURCE_SHADER_COMPILER_ARB: ss << "SHADER_COMPILER"; break;
+	case GL_DEBUG_SOURCE_THIRD_PARTY_ARB: ss << "THIRD_PARTY"; break;
+	case GL_DEBUG_SOURCE_APPLICATION_ARB: ss << "APPLICATION"; break;
+	case GL_DEBUG_SOURCE_OTHER_ARB: ss << "OTHER"; break;
 	}
-	std::cout << std::endl;
+	ss << std::endl;
 
-	std::cout << "message: " << message << std::endl;
-	std::cout << "---------------------opengl-callback-end--------------"
-			  << std::endl;
+	ss << "message: " << message << std::endl;
+	ss << "------------opengl-callback-end------------" << std::endl;
+	tv::LogLevel lv;
+	switch (severity) {
+	case GL_DEBUG_SEVERITY_NOTIFICATION: lv = tv::LogLevel::Notice; break;
+	case GL_DEBUG_SEVERITY_LOW: lv = tv::LogLevel::Warning; break;
+	case GL_DEBUG_SEVERITY_MEDIUM: lv = tv::LogLevel::Error; break;
+	case GL_DEBUG_SEVERITY_HIGH: lv = tv::LogLevel::Error; break;
+	}
+	tv::Logger::Log(lv, tv::InfoType::Graphics, ss.str());
 	++_debug_message_number;
 }
 

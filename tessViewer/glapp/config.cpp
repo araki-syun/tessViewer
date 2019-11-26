@@ -1,4 +1,5 @@
 #include "config.h"
+#include "fmt/core.h"
 #include "nlohmann/json_fwd.hpp"
 
 #include <exception>
@@ -12,6 +13,8 @@
 #include <string_view>
 #include <array>
 
+#include "../log.h"
+
 namespace glapp {
 using namespace nlohmann;
 Config::Config(const std::filesystem::path& config_file) {
@@ -20,6 +23,8 @@ Config::Config(const std::filesystem::path& config_file) {
 	auto j = std::shared_ptr<json>();
 	ifs >> *j;
 	_jconfig = std::move(j);
+	tv::Logger::Log(tv::LogLevel::Notice, tv::InfoType::Application,
+					fmt::format("Load : {}", config_file.generic_string()));
 }
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
@@ -73,7 +78,7 @@ Config       Config::_initialize(const std::filesystem::path& file) noexcept {
     try {
         return Config(file);
     }
-    catch (std::exception& e) {
+    catch (std::exception&) {
         return Config(json::object());
     }
 }

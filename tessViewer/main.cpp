@@ -1,5 +1,6 @@
 #include "app.h"
 
+#include <exception>
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -14,6 +15,7 @@
 
 #include "glapp\config.h"
 #include "define.h"
+#include "log.h"
 
 using namespace std::literals::string_literals;
 using namespace boost::program_options;
@@ -103,24 +105,37 @@ int main(int argc, char* argv[]) {
 		return 0;
 	}
 
+	auto ofs = std::ofstream();
 	try {
 		ImportOptions(vm);
+
+		auto conf_log = glapp::Config::Get("/application/log");
+		switch (auto lv = conf_log.Value<tv::LogLevel>("level");
+				conf_log.Value<tv::OutputType>("output")) {
+		case tv::OutputType::Quiet: break;
+		case tv::OutputType::File: Logger::Initialize(lv, ofs.rdbuf()); break;
+		case tv::OutputType::Stdout:
+			Logger::Initialize(lv, std::cout.rdbuf());
+			break;
+		}
+
 		App a;
 		a.Run();
 	}
 	catch (boost::bad_any_cast& e) {
-		std::cerr << e.what() << std::endl;
+		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
+	}
+	catch (tv::AppError& e) {
+		Logger::Log(e);
 	}
 	catch (std::exception& e) {
-		std::cerr << "error log output : tessviewer.log" << std::endl;
-		std::ofstream ost(".//tessviewer.log", std::ios::trunc);
-		ost << e.what() << std::endl;
+		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
 	}
 	catch (const char* message) {
-		std::cerr << message << std::endl;
+		Logger::Log(LogLevel::Fatal, InfoType::Application, message);
 	}
 	catch (...) {
-		std::cerr << "Unknown Exception\n" << std::endl;
+		Logger::Log(LogLevel::Fatal, InfoType::Unknown, "Unknown Error");
 	}
 }
 

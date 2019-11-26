@@ -47,7 +47,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\lib\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;$(LIB_PATH)\json\include;$(LIB_PATH)\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
@@ -74,7 +75,8 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(BOOST_INCLUDE);$(LIB_PATH)\include;$(LIB_PATH)\lib\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;$(LIB_PATH)\json\include;$(LIB_PATH)\glm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>ciso646</ForcedIncludeFiles>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -96,6 +98,7 @@
   <ItemGroup>
     <ClCompile Include="app.cpp" />
     <ClCompile Include="camera.cpp" />
+    <ClCompile Include="exception.cpp" />
     <ClCompile Include="glapp\base_window.cpp" />
     <ClCompile Include="glapp\config.cpp" />
     <ClCompile Include="glapp\glapp.cpp" />
@@ -106,6 +109,7 @@
     <ClCompile Include="glShaderVariable.cpp" />
     <ClCompile Include="glslProgram.cpp" />
     <ClCompile Include="glslStringDraw.cpp" />
+    <ClCompile Include="log.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="model.cpp" />
@@ -120,6 +124,7 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="exception.h" />
     <ClInclude Include="glapp\base_window.h" />
     <ClInclude Include="glapp\config.h" />
     <ClInclude Include="glapp\glapp.hpp" />
@@ -131,6 +136,7 @@
     <ClInclude Include="glShaderVariable.h" />
     <ClInclude Include="glslProgram.h" />
     <ClInclude Include="glslStringDraw.h" />
+    <ClInclude Include="log.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="model.h" />
     <ClInclude Include="glQuery.h" />

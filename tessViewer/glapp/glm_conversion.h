@@ -9,7 +9,7 @@
 
 namespace nlohmann {
 template <size_t L, class T>
-struct adl_serializer<glm::vec<L, T>> {
+struct adl_serializer<glm::vec<L, T>> { //NOLINT
 	using vec = glm::vec<L, T>;
 	template <typename BASIC_JSON_TYPE>
 	static void to_json(BASIC_JSON_TYPE& j, const vec& v) { //NOLINT
@@ -26,7 +26,7 @@ struct adl_serializer<glm::vec<L, T>> {
 	}
 };
 template <>
-struct adl_serializer<glm::vec<4, float>> {
+struct adl_serializer<glm::vec<4, float>> { //NOLINT
 	using vec = glm::vec<4, float>;
 	template <typename BASIC_JSON_TYPE>
 	static void from_json(const BASIC_JSON_TYPE& j, vec& v) { //NOLINT
