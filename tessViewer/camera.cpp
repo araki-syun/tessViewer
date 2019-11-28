@@ -29,7 +29,7 @@ Camera::Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far)
 	, _fov(fov)
 	, _near(near)
 	, _far(far) {
-	assert(_max_fov > fov > _min_fov);
+	assert(fov < _max_fov && _min_fov < fov);
 	assert(near < far);
 }
 void Camera::Move(glm::vec3 pos) { _pos = pos; }
@@ -57,7 +57,7 @@ void Camera::RotateMove(glm::vec2 vh) {
 	Move(look - dir); //注視点 - 方向 = 移動位置
 }
 float Camera::Fov(float fov) {
-	assert(_max_fov > fov > _min_fov);
+	assert(fov < _max_fov && _min_fov < fov);
 	return _fov = fov;
 }
 float     Camera::Near(float near) { return _near = near; }
