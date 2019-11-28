@@ -62,6 +62,16 @@ private:
 NLOHMANN_JSON_SERIALIZE_ENUM(
 	tv::OutputType, {{Quiet, "quiet"}, {File, "file"}, {Stdout, "stdout"}});
 
+template <class T,
+		  std::enable_if_t<std::is_enum_v<T>, std::nullptr_t> = nullptr>
+constexpr bool operator<(const T& l, const T& r) {
+	if constexpr (!std::is_enum_v<T>) {
+		static_assert("T != enum");
+	}
+	using type = std::underlying_type_t<T>;
+	return static_cast<type>(l) < static_cast<type>(r);
+}
+
 // LogLevelをフォーマット出来るようにする
 namespace fmt {
 template <>
