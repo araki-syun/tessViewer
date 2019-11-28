@@ -124,6 +124,7 @@
     <ClInclude Include="app.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="define.h" />
+    <ClInclude Include="doc\schemas\setting_schema.json.gen.h" />
     <ClInclude Include="exception.h" />
     <ClInclude Include="glapp\base_window.h" />
     <ClInclude Include="glapp\config.h" />
@@ -150,6 +151,8 @@
   <ItemGroup>
     <None Include="doc\ClassDiagram.cd" />
     <None Include="doc\ClassDiagram1.cd" />
+    <None Include="doc\schemas\cpp_header_gen.py" />
+    <None Include="doc\schemas\setting_schema.json" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\計画.txt" />

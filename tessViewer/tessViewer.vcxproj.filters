@@ -149,10 +149,15 @@
     <ClInclude Include="exception.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="doc\schemas\setting_schema.json.gen.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="doc\ClassDiagram.cd" />
     <None Include="doc\ClassDiagram1.cd" />
+    <None Include="doc\schemas\setting_schema.json" />
+    <None Include="doc\schemas\cpp_header_gen.py" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\計画.txt" />
