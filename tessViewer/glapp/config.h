@@ -7,9 +7,9 @@
 #include <string_view>
 #include <type_traits>
 
-#include "nlohmann/detail/json_pointer.hpp"
 #include "nlohmann/json_fwd.hpp"
 #include "nlohmann/json.hpp"
+#include "nlohmann/detail/json_pointer.hpp"
 #include "glm_conversion.h"
 
 namespace glapp {
@@ -32,12 +32,12 @@ public:
 	Config(Config&& config) noexcept;
 	~Config();
 	Config& operator=(const Config& config) = delete;
-	Config& operator                        =(Config&& config) noexcept;
+	Config& operator=(Config&& config) noexcept; //NOLINT
 
 	const nlohmann::json& Json() const;
 	template <class T>
 	T Value(std::string_view key) const {
-		auto path   = (key[0] == '/' ? "" : "/") + std::string(key);
+		auto path   = Config::_jptr_from_str(key);
 		auto schema = Config::_get_schema(_base, path);
 		auto value  = _key_value(schema, path);
 		if (!_check_schema_value(schema, value)) {
@@ -54,7 +54,7 @@ private:
 	const _json_pointer             _base;
 
 	const nlohmann::json& _key_value(const nlohmann::json& schema,
-									 std::string_view      key) const;
+									 const nlohmann::json& key) const;
 
 public:
 	static Config Get(std::string_view key = "");
@@ -68,18 +68,17 @@ private:
 	static const nlohmann::json& _argument();
 	static nlohmann::json        _load_schema();
 	static const nlohmann::json& _get_schema(const _json_pointer& p,
-											 std::string_view     key);
-	static bool _check_schema_value(const nlohmann::json& schema,
-									const nlohmann::json& value);
+											 const _json_pointer& key);
+	static bool          _check_schema_value(const nlohmann::json& schema,
+											 const nlohmann::json& value);
+	static _json_pointer _jptr_from_str(std::string_view str);
 	template <class T>
 	static T _round_value(const nlohmann::json& schema, const T& value) {
 		if constexpr (is_less_then_comparable<T>::value) {
 			auto maximum = schema.find("maximum");
 			auto minimum = schema.find("minimum");
 			auto end     = schema.cend();
-			if (maximum != end && minimum != end) {
-				return std::clamp(value, maximum->get<T>(), minimum->get<T>());
-			}
+
 			auto v = value;
 			if (maximum != schema.cend()) {
 				v = std::min(value, maximum->get<T>());

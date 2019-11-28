@@ -1,6 +1,7 @@
 #include "config.h"
 #include "fmt/core.h"
 #include "nlohmann/json_fwd.hpp"
+#include <nlohmann/detail/json_pointer.hpp>
 
 #include <exception>
 #include <filesystem>
@@ -10,6 +11,7 @@
 #include <memory>
 #include <algorithm>
 #include <stdexcept>
+#include <string>
 #include <string_view>
 #include <array>
 
@@ -29,7 +31,7 @@ Config::Config(const std::filesystem::path& config_file) {
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
 Config::Config(const Config& config, std::string_view str)
-	: _jconfig(config._jconfig), _base(std::string(str)) {}
+	: _jconfig(config._jconfig), _base(Config::_jptr_from_str(str)) {}
 Config::Config(Config&& config) noexcept : _base(config._base.to_string()) {
 	if (this != &config) {
 		std::swap(_jconfig, config._jconfig);
@@ -51,10 +53,10 @@ Config      Config::Relative(std::string_view key) const {
     return Config(*this, key);
 }
 const json& Config::Schema(std::string_view key) const {
-	return _get_schema(_base, (key[0] == '/' ? "" : "/") + std::string(key));
+	return _get_schema(_base, Config::_jptr_from_str(key));
 }
 const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
-										 std::string_view      key) const {
+										 const nlohmann::json& key) const {
 	std::string path(key);
 	if (Config::_argument().contains(path)) {
 		return Config::_argument()[path];
@@ -87,16 +89,19 @@ json        Config::_load_schema() {
 #include "../doc/schemas/setting_schema.json.gen.h"
 	return json::parse(setting_json);
 }
-const json& Config::_get_schema(const _json_pointer& p, std::string_view key) {
-	auto path = [](std::string_view str) -> std::string {
-		std::istringstream iss((std::string(str)));
-		std::ostringstream oss;
-		for (std::string obj; std::getline(iss, obj, '/');) {
-			oss << "/properties" << obj;
+const json& Config::_get_schema(const _json_pointer& p,
+								const _json_pointer& key) {
+	auto path = [](_json_pointer ptr) -> _json_pointer {
+		_json_pointer j;
+		_json_pointer prop("/properties");
+		while (!ptr.empty()) {
+			j = prop / ptr.back() / j;
+			ptr.pop_back();
 		}
-		return oss.str();
+		return j;
 	};
-	return Config::_jschema.at(path(p.to_string()) + path(key));
+	auto key_path = _json_pointer(std::string(key));
+	return Config::_jschema.at(path(p) / path(key_path));
 }
 bool Config::_check_schema_value(const nlohmann::json& schema,
 								 const nlohmann::json& value) {
@@ -107,5 +112,8 @@ bool Config::_check_schema_value(const nlohmann::json& schema,
 	auto result = std::find(std::cbegin(types), std::cend(types),
 							schema.at("type").get<std::string>());
 	return result != std::cend(types) && *result == value.type_name();
+}
+Config::_json_pointer Config::_jptr_from_str(std::string_view str) {
+	return _json_pointer((str[0] == '/' ? "" : "/") + std::string(str));
 }
 } // namespace glapp
