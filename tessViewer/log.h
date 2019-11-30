@@ -8,7 +8,6 @@
 
 #include <fmt/format.h>
 #include <nlohmann/json.hpp>
-#include <nlohmann/detail/macro_scope.hpp>
 
 #include "exception.h"
 
@@ -59,8 +58,6 @@ private:
 	inline static std::unique_ptr<Logger> _logger;
 };
 } // namespace tv
-NLOHMANN_JSON_SERIALIZE_ENUM(
-	tv::OutputType, {{Quiet, "quiet"}, {File, "file"}, {Stdout, "stdout"}});
 
 template <class T,
 		  std::enable_if_t<std::is_enum_v<T>, std::nullptr_t> = nullptr>
@@ -104,23 +101,62 @@ namespace nlohmann {
 template <>
 struct adl_serializer<tv::LogLevel> { //NOLINT
 	template <typename BASIC_JSON_TYPE>
-	static void to_json(BASIC_JSON_TYPE& j, const tv::LogLevel& v) { //NOLINT
+	//NOLINTNEXTLINE
+	static void to_json(BASIC_JSON_TYPE& j, const tv::LogLevel& v) {
 		j = static_cast<int>(v);
 	}
 	template <typename BASIC_JSON_TYPE>
-	static void from_json(const BASIC_JSON_TYPE& j, tv::LogLevel& v) { //NOLINT
+	//NOLINTNEXTLINE
+	static void from_json(const BASIC_JSON_TYPE& j, tv::LogLevel& v) {
 		v = static_cast<tv::LogLevel>(j.get<int>());
 	}
 };
 template <>
 struct adl_serializer<tv::InfoType> { //NOLINT
 	template <typename BASIC_JSON_TYPE>
-	static void to_json(BASIC_JSON_TYPE& j, const tv::InfoType& v) { //NOLINT
+	//NOLINTNEXTLINE
+	static void to_json(BASIC_JSON_TYPE& j, const tv::InfoType& v) {
 		j = static_cast<int>(v);
 	}
 	template <typename BASIC_JSON_TYPE>
-	static void from_json(const BASIC_JSON_TYPE& j, tv::InfoType& v) { //NOLINT
+	//NOLINTNEXTLINE
+	static void from_json(const BASIC_JSON_TYPE& j, tv::InfoType& v) {
 		v = static_cast<tv::InfoType>(j.get<int>());
+	}
+};
+template <>
+struct adl_serializer<tv::OutputType> { //NOLINT
+	template <typename BASIC_JSON_TYPE>
+	//NOLINTNEXTLINE
+	static void to_json(BASIC_JSON_TYPE& j, const tv ::OutputType& e) {
+		static_assert(std ::is_enum<tv ::OutputType>::value,
+					  "tv::OutputType"
+					  " must be an enum!");
+		static const std ::pair<tv ::OutputType, BASIC_JSON_TYPE> m[] = {
+			{tv ::OutputType ::Quiet, "quiet"},
+			{tv ::OutputType ::File, "file"},
+			{tv ::OutputType ::Stdout, "stdout"}};
+		auto it = std ::find_if(
+			std ::begin(m), std ::end(m),
+			[e](const std ::pair<tv ::OutputType, BASIC_JSON_TYPE>& ej_pair)
+				-> bool { return ej_pair.first == e; });
+		j = ((it != std ::end(m)) ? it : std ::begin(m))->second;
+	}
+	template <typename BASIC_JSON_TYPE>
+	//NOLINTNEXTLINE
+	static void from_json(const BASIC_JSON_TYPE& j, tv ::OutputType& e) {
+		static_assert(std ::is_enum<tv ::OutputType>::value,
+					  "tv::OutputType"
+					  " must be an enum!");
+		static const std ::pair<tv ::OutputType, BASIC_JSON_TYPE> m[] = {
+			{tv ::OutputType ::Quiet, "quiet"},
+			{tv ::OutputType ::File, "file"},
+			{tv ::OutputType ::Stdout, "stdout"}};
+		auto it = std ::find_if(
+			std ::begin(m), std ::end(m),
+			[j](const std ::pair<tv ::OutputType, BASIC_JSON_TYPE>& ej_pair)
+				-> bool { return ej_pair.second == j; });
+		e = ((it != std ::end(m)) ? it : std ::begin(m))->first;
 	}
 };
 } // namespace nlohmann
