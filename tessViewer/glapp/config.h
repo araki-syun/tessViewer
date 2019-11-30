@@ -39,7 +39,12 @@ public:
 		auto schema = Config::_get_schema(_base, path);
 		auto value  = _key_value(schema, path);
 		if (!_check_schema_value(schema, value)) {
-			throw std::domain_error("key : '" + path + "'\n想定外のタイプ");
+			throw tv::AppError(
+				tv::LogLevel::Error,
+				fmt::format(
+					"key : '{}{}'\n想定外のタイプ\nschema\t: {}\nkey\t\t: {}",
+					_base.to_string(), path.to_string(),
+					schema.at("type").get<std::string>(), value.type_name()));
 		}
 		return _round_value(schema, value.get<T>());
 	}
