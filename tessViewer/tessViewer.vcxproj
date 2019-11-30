@@ -47,13 +47,14 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -74,12 +75,13 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
+      <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/source-charset:utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>No</GenerateDebugInformation>
@@ -113,6 +115,10 @@
     <ClCompile Include="model.cpp" />
     <ClCompile Include="glQuery.cpp" />
     <ClCompile Include="osd_info.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Setting.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -140,6 +146,7 @@
     <ClInclude Include="model.h" />
     <ClInclude Include="glQuery.h" />
     <ClInclude Include="osd_info.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="Setting.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClInclude>
