@@ -4,8 +4,7 @@
 #include <string>
 #include <glm/glm.hpp>
 #include <glm/detail/qualifier.hpp>
-#include "nlohmann/adl_serializer.hpp"
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 namespace nlohmann {
 template <size_t L, class T>

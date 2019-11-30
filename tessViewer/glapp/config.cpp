@@ -1,7 +1,6 @@
 #include "config.h"
 #include "fmt/core.h"
-#include "nlohmann/json_fwd.hpp"
-#include <nlohmann/detail/json_pointer.hpp>
+#include <nlohmann/json.hpp>
 
 #include <exception>
 #include <filesystem>

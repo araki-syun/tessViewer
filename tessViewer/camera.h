@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm/fwd.hpp"
-#include "nlohmann/json_fwd.hpp"
+#include <nlohmann/json.hpp>
 #include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>

@@ -7,9 +7,7 @@
 #include <string_view>
 #include <type_traits>
 
-#include "nlohmann/json_fwd.hpp"
-#include "nlohmann/json.hpp"
-#include "nlohmann/detail/json_pointer.hpp"
+#include <nlohmann/json.hpp>
 #include "glm_conversion.h"
 
 namespace glapp {

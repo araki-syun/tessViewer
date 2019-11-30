@@ -1,7 +1,7 @@
 #include "camera.h"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/ext/quaternion_trigonometric.hpp"
-#include "glm/fwd.hpp"
+//#include "glm/fwd.hpp"
 #include "glm/geometric.hpp"
 #include "glm/gtx/quaternion.hpp"
 

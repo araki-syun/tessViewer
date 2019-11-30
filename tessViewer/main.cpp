@@ -10,12 +10,12 @@
 #include <fmt/format.h>
 
 #include "boost/program_options/variables_map.hpp"
-#include "nlohmann/json_fwd.hpp"
+#include <nlohmann/json.hpp>
 #include "version.h"
 
 #include "glapp\config.h"
-#include "define.h"
 #include "log.h"
+#include "define.h"
 
 using namespace std::literals::string_literals;
 using namespace boost::program_options;
