@@ -31,7 +31,7 @@ Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
 Config::Config(const Config& config, std::string_view str)
 	: _jconfig(config._jconfig), _base(Config::_jptr_from_str(str)) {}
-Config::Config(Config&& config) noexcept : _base(config._base.to_string()) {
+Config::Config(Config&& config) noexcept : _base(config._base) {
 	if (this != &config) {
 		std::swap(_jconfig, config._jconfig);
 	}
@@ -105,14 +105,18 @@ const json& Config::_get_schema(const _json_pointer& p,
 bool Config::_check_schema_value(const nlohmann::json& schema,
 								 const nlohmann::json& value) {
 	auto                             def = schema.find("default");
-	const std::array<std::string, 6> types{"boolean", "integer", "number",
-										   "string",  "array",   "object"};
+	const std::array<std::string, 7> types{
+		"null", "boolean", "number", "string", "array", "object", "discarded"};
 	//schemaとvalueが同じタイプ
 	auto result = std::find(std::cbegin(types), std::cend(types),
 							schema.at("type").get<std::string>());
-	return result != std::cend(types) && *result == value.type_name();
+	return result != std::cend(types) ? *result == value.type_name() : true;
 }
 Config::_json_pointer Config::_jptr_from_str(std::string_view str) {
-	return _json_pointer((str[0] == '/' ? "" : "/") + std::string(str));
+	if (str.empty()) {
+		return _json_pointer();
+	}
+	return _json_pointer((!str.empty() && str[0] == '/' ? "" : "/") +
+						 std::string(str));
 }
 } // namespace glapp

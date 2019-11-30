@@ -185,6 +185,7 @@
 							"properties": {
 								"type": {
 									"description": "パッチタイプ",
+									"type":"string",
 									"enum": [
 										"REGULAR",
 										"GREGORY_BASIS"
