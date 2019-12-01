@@ -136,13 +136,16 @@ void ImportOptions(const boost::program_options::variables_map& vm) {
 	};
 
 	if (contain(GLAPP_CONFIG_FULLSCREEN)) {
-		window["fullscreen"] = vm[GLAPP_CONFIG_FULLSCREEN].as<bool>();
+		window["/fullscreen"_json_pointer] =
+			vm[GLAPP_CONFIG_FULLSCREEN].as<bool>();
 	}
 	if (contain(GLAPP_CONFIG_RESOLUTION_X)) {
-		window["/resolution/width"] = vm[GLAPP_CONFIG_RESOLUTION_X].as<int>();
+		window["/resolution/width"_json_pointer] =
+			vm[GLAPP_CONFIG_RESOLUTION_X].as<int>();
 	}
 	if (contain(GLAPP_CONFIG_RESOLUTION_Y)) {
-		window["/resolution/height"] = vm[GLAPP_CONFIG_RESOLUTION_Y].as<int>();
+		window["/resolution/height"_json_pointer] =
+			vm[GLAPP_CONFIG_RESOLUTION_Y].as<int>();
 	}
 	if (contain(GLAPP_CONFIG_FOV)) {
 		window["fov"] = vm[GLAPP_CONFIG_FOV].as<float>();
@@ -151,21 +154,23 @@ void ImportOptions(const boost::program_options::variables_map& vm) {
 		window["vsync"] = vm[GLAPP_CONFIG_VSYNC].as<bool>();
 	}
 	if (contain("object")) {
-		graphics["/graphics/model"] = vm["object"].as<std::string>();
+		graphics["/graphics/model"_json_pointer] =
+			vm["object"].as<std::string>();
 	}
 	if (contain(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT)) {
-		graphics["/graphics/osd/patch/level"] =
+		graphics["/graphics/osd/patch/level"_json_pointer] =
 			vm[GLAPP_CONFIG_PATCH_LEVEL_DEFAULT].as<int>();
 	}
 	if (contain(GLAPP_CONFIG_TESS_LEVEL_DEFAULT)) {
-		graphics["/graphics/osd/tessellation/level"] =
+		graphics["/graphics/osd/tessellation/level"_json_pointer] =
 			vm[GLAPP_CONFIG_TESS_LEVEL_DEFAULT].as<int>();
 	}
 	if (contain(GLAPP_CONFIG_FONT_SIZE)) {
-		ui["/ui/font/size"] = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
+		ui["/ui/font/size"_json_pointer] = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
 	}
 	if (contain(GLAPP_CONFIG_FONT_COLOR)) {
-		ui["/ui/font/color"] = vm[GLAPP_CONFIG_FONT_COLOR].as<std::string>();
+		ui["/ui/font/color"_json_pointer] =
+			vm[GLAPP_CONFIG_FONT_COLOR].as<std::string>();
 	}
 	options["window"]   = window;
 	options["graphics"] = graphics;

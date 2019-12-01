@@ -66,9 +66,8 @@ const json& Config::Schema(std::string_view key) const {
 	}
 }
 const json& Config::_key_value(const json&         schema,
-const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
-										 const nlohmann::json& key) const {
-	std::string path(key);
+							   const json_pointer& key) const {
+	auto path = _base / key;
 	if (Config::_argument().contains(path)) {
 		return Config::_argument()[path];
 	}
@@ -128,6 +127,6 @@ Config::json_pointer Config::_jptr_from_str(std::string_view str) {
 		return json_pointer();
 	}
 	return json_pointer((!str.empty() && str[0] == '/' ? "" : "/") +
-						 std::string(str));
+						std::string(str));
 }
 } // namespace glapp

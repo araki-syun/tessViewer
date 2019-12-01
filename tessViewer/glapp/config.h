@@ -58,8 +58,7 @@ private:
 	std::shared_ptr<json> _jconfig;
 	const json_pointer    _base;
 
-	const nlohmann::json& _key_value(const nlohmann::json& schema,
-									 const nlohmann::json& key) const;
+	const json& _key_value(const json& schema, const json_pointer& key) const;
 
 public:
 	static Config Get(std::string_view key = "");
