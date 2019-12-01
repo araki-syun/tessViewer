@@ -33,7 +33,8 @@
 			"type": "object",
 			"properties": {
 				"fullscreen": {
-					"type": "boolean"
+					"type": "boolean",
+					"default": true
 				},
 				"resolution": {
 					"description": "画面解像度",
@@ -185,7 +186,7 @@
 							"properties": {
 								"type": {
 									"description": "パッチタイプ",
-									"type":"string",
+									"type": "string",
 									"enum": [
 										"REGULAR",
 										"GREGORY_BASIS"

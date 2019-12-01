@@ -36,7 +36,7 @@ public:
 	template <class T>
 	T Value(std::string_view key) const {
 		auto path   = Config::_jptr_from_str(key);
-		auto schema = Config::_get_schema(_base, path);
+		auto schema = Schema(key);
 		auto value  = _key_value(schema, path);
 		if (!_check_schema_value(schema, value)) {
 			throw tv::AppError(

@@ -32,7 +32,8 @@ Window::Window(std::string_view                title,
 	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, _debug_level > 0 ? 1 : 0);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, glversion_major);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, glversion_minor);
-	glfwWindowHint(GLFW_SAMPLES, conf_win.Value<int>("/graphics/aa/samples"));
+	glfwWindowHint(GLFW_SAMPLES,
+				   Config::Get().Value<int>("/graphics/aa/samples"));
 	glfwWindowHint(GLFW_RED_BITS, conf_bit.Value<int>("red"));
 	glfwWindowHint(GLFW_GREEN_BITS, conf_bit.Value<int>("green"));
 	glfwWindowHint(GLFW_BLUE_BITS, conf_bit.Value<int>("blue"));

@@ -30,7 +30,8 @@ Config::Config(const std::filesystem::path& config_file) {
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
 Config::Config(const Config& config, std::string_view str)
-	: _jconfig(config._jconfig), _base(Config::_jptr_from_str(str)) {}
+	: _jconfig(config._jconfig)
+	, _base(config._base / Config::_jptr_from_str(str)) {}
 Config::Config(Config&& config) noexcept : _base(config._base) {
 	if (this != &config) {
 		std::swap(_jconfig, config._jconfig);
@@ -52,7 +53,17 @@ Config      Config::Relative(std::string_view key) const {
     return Config(*this, key);
 }
 const json& Config::Schema(std::string_view key) const {
-	return _get_schema(_base, Config::_jptr_from_str(key));
+	try {
+		return _get_schema(_base, Config::_jptr_from_str(key));
+	}
+	catch (detail::out_of_range& e) {
+		throw tv::AppError(
+			tv::LogLevel::Error,
+			fmt::format(
+				"スキーマが存在しません。\n{}\njson error code : {}\n{}",
+				(_base / Config::_jptr_from_str(key)).to_string(), e.id,
+				e.what()));
+	}
 }
 const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
 										 const nlohmann::json& key) const {
