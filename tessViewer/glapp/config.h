@@ -41,6 +41,9 @@ public:
 		auto path   = Config::_jptr_from_str(key);
 		auto schema = Schema(key);
 		auto value  = _key_value(schema, path);
+		Logger::Log<LogLevel::Trace>(
+			InfoType::Application,
+			fmt::format("Read Value to {}", (_base / path).to_string()));
 		if (!_check_schema_value(schema, value)) {
 			throw tv::AppError(
 				tv::LogLevel::Error,

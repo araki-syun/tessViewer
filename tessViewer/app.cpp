@@ -34,6 +34,7 @@ using namespace fmt::literals;
 using namespace tv;
 
 App::App() {
+	Logger::Log<LogLevel::Debug>(InfoType::Application, "Start App Initialize");
 	auto conf       = glapp::Config::Get();
 	auto conf_graph = conf.Relative("/graphics");
 	auto conf_osd   = conf_graph.Relative("/osd");

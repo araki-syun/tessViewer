@@ -16,6 +16,9 @@
 
 #include "../log.h"
 
+using tv::InfoType;
+using tv::Logger;
+using tv::LogLevel;
 namespace glapp {
 using namespace nlohmann;
 Config::Config(const std::filesystem::path& config_file) {
@@ -24,14 +27,19 @@ Config::Config(const std::filesystem::path& config_file) {
 	auto j = std::shared_ptr<json>();
 	ifs >> *j;
 	_jconfig = std::move(j);
-	tv::Logger::Log(tv::LogLevel::Notice, tv::InfoType::Application,
-					fmt::format("Load : {}", config_file.generic_string()));
+	Logger::Log<LogLevel::Notice>(
+		InfoType::Application,
+		fmt::format("Load : {}", config_file.generic_string()));
 }
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
 Config::Config(const Config& config, std::string_view str)
 	: _jconfig(config._jconfig)
-	, _base(config._base / Config::_jptr_from_str(str)) {}
+	, _base(config._base / Config::_jptr_from_str(str)) {
+	Logger::Log<LogLevel::Trace>(
+		InfoType::Application,
+		fmt::format("Create Relative Config : {}", _base.to_string()));
+}
 Config::Config(Config&& config) noexcept : _base(config._base) {
 	if (this != &config) {
 		std::swap(_jconfig, config._jconfig);

@@ -64,7 +64,7 @@ void Logger::_log(LogLevel lv, InfoType type, std::string_view str) {
 	auto    now = std::time(nullptr);
 	std::tm tm{};
 	localtime_s(&tm, &now);
-	_output << fmt::format("[ {:s} ] {:%F %T} {:s}\n",
+	_output << fmt::format("[{:s}] {:%F %T} {:s}\n",
 						   ToString(type), //NOLINTNEXTLINE
 						   tm, std::string(str))
 			<< std::endl;

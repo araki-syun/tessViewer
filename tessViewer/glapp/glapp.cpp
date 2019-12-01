@@ -8,12 +8,16 @@
 #include "config.h"
 #include "../log.h"
 
+using tv::InfoType;
+using tv::Logger;
+using tv::LogLevel;
 namespace glapp {
 
 void Initialize() {
 	if (glfwInit() != GL_TRUE) {
-		throw std::runtime_error("GLFW Initialize ERROR");
+		throw tv::GraphicsError(LogLevel::Fatal, "GLFW Initialize ERROR");
 	}
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "GLFW Initialize");
 }
 
 //window::window(){
@@ -24,6 +28,7 @@ Window::Window(std::string_view                title,
 			   int                             glversion_minor,
 			   const std::vector<std::string>& required_ext)
 	: inner::BaseWindow(title) {
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Start Window Initialize");
 	auto conf_win        = Config::Get("/window");
 	auto conf_bit        = conf_win.Relative("/bit");
 	Window::_debug_level = conf_win.Value<int>("debug_level");
@@ -47,12 +52,14 @@ Window::Window(std::string_view                title,
 		conf_win.Value<bool>("fullscreen") ? glfwGetPrimaryMonitor() : nullptr,
 		nullptr);
 	glfwMakeContextCurrent(this->_win);
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Create GLFW Window");
 
 	glewExperimental = GL_TRUE;
 	GLenum err       = glewInit();
 	if (err != GLEW_OK) {
 		throw tv::GraphicsError(tv::LogLevel::Fatal, "GLEW Initialize ERROR");
 	}
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "GLEW Initialize");
 
 	glDebugMessageCallback(_open_gl_debug_message_callback, nullptr);
 
@@ -79,14 +86,18 @@ Window::Window(std::string_view                title,
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_MULTISAMPLE);
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics,
+								 "Finish Window Initialize");
 }
 Window::Window(Window&& win) noexcept
 	: inner::BaseWindow(win.GetTitle()), _win(win._win) {
 	win._win = nullptr;
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Window Move Construct");
 }
 Window::~Window() {
 	glfwDestroyWindow(this->_win);
 	glfwTerminate();
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Window Destruct");
 }
 Window& Window::operator=(Window&& win) noexcept {
 	if (this != &win) {
@@ -94,11 +105,13 @@ Window& Window::operator=(Window&& win) noexcept {
 		win._win = nullptr;
 		_title   = std::move(win._title);
 	}
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Window Move Operator");
 	return *this;
 }
 
 void Window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Set Window Back Color");
 }
 
 glm::ivec2 Window::GetWindowSize() const {

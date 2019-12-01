@@ -110,22 +110,24 @@ int main(int argc, char* argv[]) {
 
 		App a;
 		a.Run();
+		return 0;
 	}
 	catch (boost::bad_any_cast& e) {
-		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, e.what());
 	}
 	catch (tv::AppError& e) {
 		Logger::Log(e);
 	}
 	catch (std::exception& e) {
-		Logger::Log(LogLevel::Fatal, InfoType::Application, e.what());
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, e.what());
 	}
 	catch (const char* message) {
-		Logger::Log(LogLevel::Fatal, InfoType::Application, message);
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, message);
 	}
 	catch (...) {
-		Logger::Log(LogLevel::Fatal, InfoType::Unknown, "Unknown Error");
+		Logger::Log<LogLevel::Fatal>(InfoType::Unknown, "Unknown Error");
 	}
+	return 1;
 }
 
 void ImportOptions(const boost::program_options::variables_map& vm) {
