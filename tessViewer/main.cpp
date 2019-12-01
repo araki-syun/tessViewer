@@ -32,53 +32,39 @@ int main(int argc, char* argv[]) {
 	options_description graphics_option("graphics_option");
 	options_description ui_option("ui_option");
 
+	// clang-format off
 	options.add_options()
-		.
-		operator()(format("help", 'h').c_str(), "ヘルプを表示")
-		.
-		operator()(format("version", "v").c_str(), "バージョン情報")
-		.
-		operator()(format("object", "o").c_str(), value<std::string>(),
-				   "表示モデル");
+		(format("help", 'h').c_str(), "ヘルプを表示")
+		(format("version", "v").c_str(), "バージョン情報")
+		(format("object", "o").c_str(), value<std::string>(), "表示モデル")
 
 	window_option.add_options()
-		.
-		operator()(format(GLAPP_CONFIG_FULLSCREEN, "f").c_str(), value<bool>(),
+		(format(GLAPP_CONFIG_FULLSCREEN, "f").c_str(), value<bool>(),
 				   "全画面表示")
-		.
-		operator()(GLAPP_CONFIG_RESOLUTION_X, value<int>(), "横解像度")
-		.
-		operator()(GLAPP_CONFIG_RESOLUTION_Y, value<int>(), "縦解像度")
-		.
-		operator()(GLAPP_CONFIG_FOV, value<float>(),
+		(GLAPP_CONFIG_RESOLUTION_X, value<int>(), "横解像度")
+		(GLAPP_CONFIG_RESOLUTION_Y, value<int>(), "縦解像度")
+		(GLAPP_CONFIG_FOV, value<float>(),
 				   "Fov")(GLAPP_CONFIG_VSYNC, value<bool>(), "VSync");
 
 	graphics_option.add_options()
-		.
-		operator()(format(GLAPP_CONFIG_PATCH_TYPE_GREGORY, "g").c_str(),
+		(format(GLAPP_CONFIG_PATCH_TYPE_GREGORY, "g").c_str(),
 				   "Patch Type に GREGORY_BASIS を使用")
-		.
-		operator()(format(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT, "p").c_str(),
+		(format(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT, "p").c_str(),
 				   value<int>(), "デフォルトパッチレベル")
-		.
-		operator()(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>(),
+		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>(),
 				   "最大パッチレベル")
-		.
-		operator()(format(GLAPP_CONFIG_TESS_LEVEL_DEFAULT, "t").c_str(),
+		(format(GLAPP_CONFIG_TESS_LEVEL_DEFAULT, "t").c_str(),
 				   value<int>(), "デフォルトテッセレーション係数")
-		.
-		operator()(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>(),
+		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>(),
 				   "最大テッセレーション係数");
 
 	ui_option.add_options()
-		.
-		operator()(GLAPP_CONFIG_USER_INTERFACE, value<bool>(),
+		(GLAPP_CONFIG_USER_INTERFACE, value<bool>(),
 				   "ユーザーインターフェイス")
-		.
-		operator()(GLAPP_CONFIG_FONT_SIZE, value<int>(), "フォントサイズ")
-		.
-		operator()(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>(),
+		(GLAPP_CONFIG_FONT_SIZE, value<int>(), "フォントサイズ")
+		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>(),
 				   "フォント色");
+	// clang-format on
 
 	options.add(window_option).add(graphics_option).add(ui_option);
 
