@@ -45,7 +45,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
@@ -74,7 +74,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\freetype-2.5.5;$(LIB_PATH)\freetype-2.5.5\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCPKG_ROOT)\installed\x64-windows-static\include;$(LIB_PATH)\lib\opensubdiv\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>GLEW_STATIC;OSD_USES_GLEW;NOMINMAX;_USE_MATH_DEFINES;BOOST_ALL_NO_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <DebugInformationFormat>None</DebugInformationFormat>
