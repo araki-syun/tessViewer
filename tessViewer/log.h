@@ -11,6 +11,10 @@
 
 #include "exception.h"
 
+#ifndef COMPILE_TIME_LOG_LEVEL
+#define COMPILE_TIME_LOG_LEVEL Notice
+#endif
+
 namespace tv {
 enum class LogLevel { None = 0, Fatal, Error, Warning, Notice, Debug, Trace };
 enum class InfoType { Unknown, Application, Graphics, UserInterface, Control };
@@ -47,6 +51,14 @@ public:
 	 * @param str メッセージ
 	 */
 	static void Log(LogLevel lv, InfoType type, std::string_view str);
+	template <LogLevel LV = LogLevel::Trace>
+	static void Log(InfoType type, std::string_view str) {
+		if constexpr (LV <= _compile_time_level) {
+			if (_logger) {
+				_logger->_log(LV, type, str);
+			}
+		}
+	}
 	static void Log(const AppError& e);
 
 private:
@@ -56,6 +68,8 @@ private:
 	std::ostream   _output;
 
 	inline static std::unique_ptr<Logger> _logger;
+	static constexpr LogLevel             _compile_time_level =
+		LogLevel::COMPILE_TIME_LOG_LEVEL;
 };
 } // namespace tv
 
