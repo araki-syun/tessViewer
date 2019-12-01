@@ -9,6 +9,7 @@
 #include <string_view>
 #include <fmt/format.h>
 
+#include "boost/program_options/value_semantic.hpp"
 #include "boost/program_options/variables_map.hpp"
 #include <nlohmann/json.hpp>
 #include "version.h"
@@ -37,10 +38,12 @@ int main(int argc, char* argv[]) {
 		(format("help", 'h').c_str(), "ヘルプを表示")
 		(format("version", "v").c_str(), "バージョン情報")
 		(format("object", "o").c_str(), value<std::string>(), "表示モデル")
+		("log_output", value<std::string>()->default_value("quiet"), "ログの出力先")
+		("log_level", value<int>()->default_value(0), "ログの詳細度");
 
 	window_option.add_options()
 		(format(GLAPP_CONFIG_FULLSCREEN, "f").c_str(), value<bool>(),
-				   "全画面表示")
+		 "全画面表示")
 		(GLAPP_CONFIG_RESOLUTION_X, value<int>(), "横解像度")
 		(GLAPP_CONFIG_RESOLUTION_Y, value<int>(), "縦解像度")
 		(GLAPP_CONFIG_FOV, value<float>(),
@@ -48,19 +51,19 @@ int main(int argc, char* argv[]) {
 
 	graphics_option.add_options()
 		(format(GLAPP_CONFIG_PATCH_TYPE_GREGORY, "g").c_str(),
-				   "Patch Type に GREGORY_BASIS を使用")
+		 "Patch Type に GREGORY_BASIS を使用")
 		(format(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT, "p").c_str(),
-				   value<int>(), "デフォルトパッチレベル")
+		 value<int>(), "デフォルトパッチレベル")
 		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>(),
-				   "最大パッチレベル")
+		 "最大パッチレベル")
 		(format(GLAPP_CONFIG_TESS_LEVEL_DEFAULT, "t").c_str(),
-				   value<int>(), "デフォルトテッセレーション係数")
+		 value<int>(), "デフォルトテッセレーション係数")
 		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>(),
 				   "最大テッセレーション係数");
 
 	ui_option.add_options()
 		(GLAPP_CONFIG_USER_INTERFACE, value<bool>(),
-				   "ユーザーインターフェイス")
+		 "ユーザーインターフェイス")
 		(GLAPP_CONFIG_FONT_SIZE, value<int>(), "フォントサイズ")
 		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>(),
 				   "フォント色");
@@ -96,8 +99,8 @@ int main(int argc, char* argv[]) {
 		ImportOptions(vm);
 
 		auto conf_log = glapp::Config::Get("/application/log");
-		switch (auto lv = conf_log.Value<tv::LogLevel>("level");
-				conf_log.Value<tv::OutputType>("output")) {
+		auto lv       = conf_log.Value<tv::LogLevel>("level");
+		switch (conf_log.Value<tv::OutputType>("output")) {
 		case tv::OutputType::Quiet: break;
 		case tv::OutputType::File: Logger::Initialize(lv, ofs.rdbuf()); break;
 		case tv::OutputType::Stdout:
@@ -127,6 +130,7 @@ int main(int argc, char* argv[]) {
 
 void ImportOptions(const boost::program_options::variables_map& vm) {
 	using nlohmann::json;
+	json app;
 	json options;
 	json window;
 	json graphics;
@@ -135,6 +139,12 @@ void ImportOptions(const boost::program_options::variables_map& vm) {
 		return vm.count(std::string(name)) > 0;
 	};
 
+	if (contain("log_output")) {
+		app["/log/output"_json_pointer] = vm["log_output"].as<std::string>();
+	}
+	if (contain("log_level")) {
+		app["/log/level"_json_pointer] = vm["log_level"].as<int>();
+	}
 	if (contain(GLAPP_CONFIG_FULLSCREEN)) {
 		window["/fullscreen"_json_pointer] =
 			vm[GLAPP_CONFIG_FULLSCREEN].as<bool>();
@@ -172,9 +182,10 @@ void ImportOptions(const boost::program_options::variables_map& vm) {
 		ui["/ui/font/color"_json_pointer] =
 			vm[GLAPP_CONFIG_FONT_COLOR].as<std::string>();
 	}
-	options["window"]   = window;
-	options["graphics"] = graphics;
-	options["ui"]       = ui;
+	options["application"] = app;
+	options["window"]      = window;
+	options["graphics"]    = graphics;
+	options["ui"]          = ui;
 
 	glapp::Config::CommandLineOptions(options);
 }
