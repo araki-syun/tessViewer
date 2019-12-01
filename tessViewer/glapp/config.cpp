@@ -65,6 +65,7 @@ const json& Config::Schema(std::string_view key) const {
 				e.what()));
 	}
 }
+const json& Config::_key_value(const json&         schema,
 const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
 										 const nlohmann::json& key) const {
 	std::string path(key);
@@ -78,7 +79,7 @@ const nlohmann::json& Config::_key_value(const nlohmann::json& schema,
 }
 
 Config Config::Get(std::string_view key) { return _config.Relative(key); }
-void   Config::CommandLineOptions(const nlohmann::json& j) {
+void   Config::CommandLineOptions(const json& j) {
     if (_command_line_argument.empty()) {
         _command_line_argument = j;
     }
@@ -99,22 +100,21 @@ json        Config::_load_schema() {
 #include "../doc/schemas/setting_schema.json.gen.h"
 	return json::parse(setting_json);
 }
-const json& Config::_get_schema(const _json_pointer& p,
-								const _json_pointer& key) {
-	auto path = [](_json_pointer ptr) -> _json_pointer {
-		_json_pointer j;
-		_json_pointer prop("/properties");
+const json& Config::_get_schema(const json_pointer& p,
+								const json_pointer& key) {
+	auto path = [](json_pointer ptr) -> json_pointer {
+		json_pointer j;
+		json_pointer prop("/properties");
 		while (!ptr.empty()) {
 			j = prop / ptr.back() / j;
 			ptr.pop_back();
 		}
 		return j;
 	};
-	auto key_path = _json_pointer(std::string(key));
+	auto key_path = json_pointer(std::string(key));
 	return Config::_jschema.at(path(p) / path(key_path));
 }
-bool Config::_check_schema_value(const nlohmann::json& schema,
-								 const nlohmann::json& value) {
+bool Config::_check_schema_value(const json& schema, const json& value) {
 	auto                             def = schema.find("default");
 	const std::array<std::string, 7> types{
 		"null", "boolean", "number", "string", "array", "object", "discarded"};
@@ -123,11 +123,11 @@ bool Config::_check_schema_value(const nlohmann::json& schema,
 							schema.at("type").get<std::string>());
 	return result != std::cend(types) ? *result == value.type_name() : true;
 }
-Config::_json_pointer Config::_jptr_from_str(std::string_view str) {
+Config::json_pointer Config::_jptr_from_str(std::string_view str) {
 	if (str.empty()) {
-		return _json_pointer();
+		return json_pointer();
 	}
-	return _json_pointer((!str.empty() && str[0] == '/' ? "" : "/") +
+	return json_pointer((!str.empty() && str[0] == '/' ? "" : "/") +
 						 std::string(str));
 }
 } // namespace glapp

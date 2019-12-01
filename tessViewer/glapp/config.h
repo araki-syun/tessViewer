@@ -22,9 +22,12 @@ struct is_less_then_comparable< // NOLINT
 
 class Config {
 public:
+	using json         = nlohmann::json;
+	using json_pointer = nlohmann::json_pointer<json>;
+
 	Config() = delete;
 	Config(const std::filesystem::path& config_file);
-	explicit Config(const nlohmann::json& j);
+	explicit Config(const json& j);
 	Config(const Config& config);
 	Config(const Config& config, std::string_view str);
 	Config(Config&& config) noexcept;
@@ -32,7 +35,7 @@ public:
 	Config& operator=(const Config& config) = delete;
 	Config& operator=(Config&& config) noexcept; //NOLINT
 
-	const nlohmann::json& Json() const;
+	const json& Json() const;
 	template <class T>
 	T Value(std::string_view key) const {
 		auto path   = Config::_jptr_from_str(key);
@@ -48,35 +51,33 @@ public:
 		}
 		return _round_value(schema, value.get<T>());
 	}
-	Config                Relative(std::string_view key) const;
-	const nlohmann::json& Schema(std::string_view key) const;
+	Config      Relative(std::string_view key) const;
+	const json& Schema(std::string_view key) const;
 
 private:
-	using _json_pointer = nlohmann::json_pointer<nlohmann::json>;
-	std::shared_ptr<nlohmann::json> _jconfig;
-	const _json_pointer             _base;
+	std::shared_ptr<json> _jconfig;
+	const json_pointer    _base;
 
 	const nlohmann::json& _key_value(const nlohmann::json& schema,
 									 const nlohmann::json& key) const;
 
 public:
 	static Config Get(std::string_view key = "");
-	static void   CommandLineOptions(const nlohmann::json& j);
+	static void   CommandLineOptions(const json& j);
 
 private:
-	static const Config         _config;
-	static nlohmann::json       _command_line_argument;
-	static const nlohmann::json _jschema;
-	static Config _initialize(const std::filesystem::path& file) noexcept;
-	static const nlohmann::json& _argument();
-	static nlohmann::json        _load_schema();
-	static const nlohmann::json& _get_schema(const _json_pointer& p,
-											 const _json_pointer& key);
-	static bool          _check_schema_value(const nlohmann::json& schema,
-											 const nlohmann::json& value);
-	static _json_pointer _jptr_from_str(std::string_view str);
+	static const Config _config;
+	static json         _command_line_argument;
+	static const json   _jschema;
+	static Config       _initialize(const std::filesystem::path& file) noexcept;
+	static const json&  _argument();
+	static json         _load_schema();
+	static const json&  _get_schema(const json_pointer& p,
+									const json_pointer& key);
+	static bool _check_schema_value(const json& schema, const json& value);
+	static json_pointer _jptr_from_str(std::string_view str);
 	template <class T>
-	static T _round_value(const nlohmann::json& schema, const T& value) {
+	static T _round_value(const json& schema, const T& value) {
 		if constexpr (is_less_then_comparable<T>::value) {
 			auto maximum = schema.find("maximum");
 			auto minimum = schema.find("minimum");
