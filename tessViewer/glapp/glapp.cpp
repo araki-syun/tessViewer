@@ -113,6 +113,8 @@ void Window::SetBackColor(const glm::vec4& color) {
 	glClearColor(color.r, color.g, color.b, color.a);
 	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Set Window Back Color");
 }
+void Window::SetWindowSize(int w, int h) { glfwSetWindowSize(_win, w, h); }
+void Window::SetWindowSize(glm::ivec2 size) { SetWindowSize(size.x, size.y); }
 
 glm::ivec2 Window::GetWindowSize() const {
 	glm::ivec2 size(0);

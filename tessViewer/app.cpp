@@ -99,8 +99,6 @@ App::App() {
 	Logger::Log<LogLevel::Notice>(InfoType::Application,
 								  "Model Loaded : " + sdmjname);
 
-	_window_size = _win->GetWindowSize();
-
 	_camera.MaxFov(conf_graph.Schema("/camera/fov/maximum").get<float>());
 	_camera.MinFov(conf_graph.Schema("/camera/fov/minimum").get<float>());
 	_camera = conf_graph.Value<tv::Camera>("camera");
@@ -451,16 +449,16 @@ void App::WindowResizeCallback(GLFWwindow* window, int x, int y) {
 	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	glViewport(0, 0, x, y);
-	a->_window_size = glm::ivec2(x, y);
+	a->_win->SetWindowSize(x, y);
 	a->_update_projection();
 	a->_draw_string->SetWindowSize(x, y);
 }
 
 void App::_update_view() { _transform.view = _camera.ViewMatrix(); }
 void App::_update_projection() {
+	auto size = glm::vec2(_win->GetWindowSize());
 	_transform.projection =
-		glm::perspective(glm::radians(_camera.Fov()),
-						 (float)_window_size.x / (float)_window_size.y,
+		glm::perspective(glm::radians(_camera.Fov()), size.x / size.y,
 						 _camera.Near(), _camera.Far());
 }
 void App::_update_ubo() {

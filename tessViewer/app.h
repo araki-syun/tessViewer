@@ -74,7 +74,6 @@ private:
 	GLuint              _default_diffuse_texture = 0;
 
 	bool       _mainloop{};
-	glm::ivec2 _window_size{};
 	float      _frametime{};
 	tv::Camera _camera;
 	bool       _fly_mode = false;

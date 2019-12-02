@@ -31,6 +31,8 @@ public:
 	Window& operator                 =(Window&& win) noexcept;
 
 	void        SetBackColor(const glm::vec4& color);
+	void        SetWindowSize(int w, int h);
+	void        SetWindowSize(glm::ivec2 size);
 	glm::ivec2  GetWindowSize() const;
 	void        GetWindowSize(int* x, int* y) const override;
 	void        GetWindowPosition(int* x, int* y) const override;
