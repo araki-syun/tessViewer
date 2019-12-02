@@ -5,6 +5,8 @@
 #include "glm/geometric.hpp"
 #include "glm/gtx/quaternion.hpp"
 
+#include "log.h"
+
 namespace tv {
 Camera::Camera() : Camera(glm::vec3(0), glm::quat(), 60.0f, 10.0f, 179.0f) {}
 Camera::Camera(glm::vec3 pos, glm::vec3 angle)
@@ -31,8 +33,15 @@ Camera::Camera(glm::vec3 pos, glm::quat quat, float fov, float near, float far)
 	, _far(far) {
 	assert(fov < _max_fov && _min_fov < fov);
 	assert(near < far);
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Camera Create");
 }
-void Camera::Move(glm::vec3 pos) { _pos = pos; }
+void Camera::Move(glm::vec3 pos) {
+	_pos = pos;
+	Logger::Log<LogLevel::Trace>(
+		InfoType::Graphics,
+		fmt::format("Camera Move : x:{:3.2f} y:{:3.2f} z:{:3.2f}", _pos.x,
+					_pos.y, _pos.z));
+}
 void Camera::FpsMove(glm::vec3 move) { _move += move; }
 void Camera::Rotate(float x, float y) {
 	auto h = glm::angleAxis(x, _up);
@@ -49,6 +58,10 @@ void Camera::Rotate(glm::quat quat) {
 	_front = _quat * front;
 	_up    = _quat * up;
 	_right = _quat * right;
+	Logger::Log<LogLevel::Trace>(
+		InfoType::Graphics,
+		fmt::format("Camera Rotate : w:{:1.3f} x:{:1.3f} y:{:1.3f} z:{:1.3f}",
+					_quat.w, _quat.x, _quat.y, _quat.z));
 }
 void Camera::RotateMove(glm::vec2 vh) {
 	auto look = ((_quat * front) * _length) + _pos; //注視点
@@ -58,12 +71,31 @@ void Camera::RotateMove(glm::vec2 vh) {
 }
 float Camera::Fov(float fov) {
 	assert(fov < _max_fov && _min_fov < fov);
-	return _fov = fov;
+	_fov = fov;
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics,
+								 fmt::format("Camera Set Fov : {:1.3f}", _fov));
+	return _fov;
 }
-float     Camera::Near(float near) { return _near = near; }
-float     Camera::Far(float far) { return _far = far; }
-float     Camera::Length(float length) { return _length = length; }
-void      Camera::Update(float factor) { _pos += _quat * _move * factor; }
+float Camera::Near(float near) {
+	_near = near;
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Graphics, fmt::format("Camera Set Near : {:1.3f}", _near));
+	return _near;
+}
+float Camera::Far(float far) {
+	_far = far;
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics,
+								 fmt::format("Camera Set Far : {:1.3f}", _far));
+	return _far;
+}
+float Camera::Length(float length) {
+	_length = length;
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Graphics,
+		fmt::format("Camera Set Length : {:1.3f}", _length));
+	return _length;
+}
+void Camera::Update(float factor) { Move(Position() + _quat * _move * factor); }
 glm::vec3 Camera::Position() const { return _pos; }
 glm::vec3 Camera::Move() const { return _move; }
 glm::quat Camera::Quaternion() const { return _quat; }
@@ -76,7 +108,19 @@ glm::mat4 Camera::ViewMatrix() const {
 }
 
 float Camera::MaxFov() { return _max_fov; }
-float Camera::MaxFov(float max) { return _max_fov = max; }
+float Camera::MaxFov(float max) {
+	_max_fov = max;
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Graphics,
+		fmt::format("Camera Set MaxFov : {:1.3f}", _max_fov));
+	return _max_fov;
+}
 float Camera::MinFov() { return _min_fov; }
-float Camera::MinFov(float min) { return _min_fov = min; }
+float Camera::MinFov(float min) {
+	_min_fov = min;
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Graphics,
+		fmt::format("Camera Set MinFov : {:1.3f}", _min_fov));
+	return _min_fov;
+}
 } // namespace tv

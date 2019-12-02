@@ -34,16 +34,19 @@ using namespace fmt::literals;
 using namespace tv;
 
 App::App() {
-	Logger::Log<LogLevel::Debug>(InfoType::Application, "Start App Initialize");
+	Logger::Log<LogLevel::Debug>(InfoType::Application, "App Start Initialize");
 	auto conf       = glapp::Config::Get();
 	auto conf_graph = conf.Relative("/graphics");
 	auto conf_osd   = conf_graph.Relative("/osd");
 	auto conf_font  = conf.Relative("/ui/font");
 
+	auto path_type = conf.Value<std::string>("/graphics/osd/patch/type");
 	tv::Model::default_patch_type =
-		conf.Value<std::string>("/graphics/osd/patch/type") == "GREGORY_BASIS"
+		path_type == "GREGORY_BASIS"
 			? OpenSubdiv::Far::PatchDescriptor::Type::GREGORY_BASIS
 			: OpenSubdiv::Far::PatchDescriptor::Type::REGULAR;
+	Logger::Log<LogLevel::Notice>(InfoType::Graphics,
+								  "OSD Set Patch Type : " + path_type);
 
 	OpenSubdiv::Far::SetErrorCallback(OsdErrorCallback);
 	OpenSubdiv::Far::SetWarningCallback(OsdWarningCallback);
@@ -74,8 +77,8 @@ App::App() {
 	_draw_string = tv::GlslStringDraw::GetInstance();
 	_draw_string->Initialize(conf_font.Value<int>("size"),
 							 conf_font.Value<std::string>("file"));
-	_draw_string->SetWindowSize(conf.Value<int>("/window/resolution/width"),
-								conf.Value<int>("/window/resolution/height"));
+	auto win_size = _win->GetWindowSize();
+	_draw_string->SetWindowSize(win_size.x, win_size.y);
 
 	// コマンドライン引数または設定で指定されたsdmjファイルから読み込む
 	auto          sdmjname = conf_graph.Value<std::string>("Model");
@@ -93,9 +96,10 @@ App::App() {
 	for (auto& o : objects) {
 		_models.emplace_back(o, _material);
 	}
+	Logger::Log<LogLevel::Notice>(InfoType::Application,
+								  "Model Loaded : " + sdmjname);
 
-	_window_size = glm::ivec2(conf.Value<int>("/window/resolution/width"),
-							  conf.Value<int>("/window/resolution/height"));
+	_window_size = _win->GetWindowSize();
 
 	_camera.MaxFov(conf_graph.Schema("/camera/fov/maximum").get<float>());
 	_camera.MinFov(conf_graph.Schema("/camera/fov/minimum").get<float>());
@@ -115,8 +119,8 @@ App::App() {
 
 	_tess.Update(std::min(_max_tess_fact, _tess_fact));
 
-	cv::Mat default_texture =
-		cv::imread("{}{}"_format(TEXTURE, "default_texture.png"));
+	auto default_texture_path = "{}{}"_format(TEXTURE, "default_texture.png");
+	cv::Mat default_texture   = cv::imread(default_texture_path);
 	cv::Mat flip_texture(
 		cv::Size(default_texture.size[0], default_texture.size[1]), CV_8UC3);
 	cv::flip(default_texture, flip_texture, 0);
@@ -130,11 +134,15 @@ App::App() {
 	glTextureParameteri(_default_diffuse_texture, GL_TEXTURE_MIN_FILTER,
 						GL_LINEAR);
 	tv::Model::default_texture = _default_diffuse_texture;
+	Logger::Log<LogLevel::Notice>(InfoType::Application,
+								  "Default Texture Loaded : " +
+									  default_texture_path);
 }
 App::~App() {
 	if (_default_diffuse_texture != 0u) {
 		glDeleteTextures(1, &_default_diffuse_texture);
 	}
+	Logger::Log<LogLevel::Notice>(InfoType::Application, "App Terminate");
 }
 
 void App::Run() {
@@ -154,6 +162,8 @@ void App::Run() {
 
 	_query = std::make_unique<GlQuery>(GL_PRIMITIVES_GENERATED);
 	//draw_string_query.reset(new glQuery(GL_PRIMITIVES_GENERATED));
+	Logger::Log<LogLevel::Debug>(InfoType::Application,
+								 "App Finish Initialize");
 	glfwSetTime(0.0);
 	_mainloop = true;
 	while (_mainloop && (glfwWindowShouldClose(w) == 0)) {
@@ -195,20 +205,23 @@ void App::Run() {
 
 void App::OsdErrorCallback(OpenSubdiv::Far::ErrorType err,
 						   const char*                message) {
-	throw GraphicsError(LogLevel::Error,
-						"{} : {} {}"_format("OpenSubdiv Error Type",
-											std::to_string(err), message));
+	throw GraphicsError(
+		LogLevel::Error,
+		"OpenSubdiv Error\nType : {}\n{}"_format(std::to_string(err), message));
 }
 void App::OsdWarningCallback(const char* message) {
-	Logger::Log(LogLevel::Warning, InfoType::Graphics, message);
+	Logger::Log<LogLevel::Warning>(InfoType::Graphics, message);
 }
 void App::GlfwErrorCallback(int code, const char* message) {
-	throw GraphicsError(LogLevel::Error,
-						"{:12s} : {}\n{}\n"_format(
-							"GLFW ERROR Code", std::to_string(code), message));
+	throw GraphicsError(LogLevel::Error, "GLFW ERROR\nCode : {}\n{}"_format(
+											 std::to_string(code), message));
 }
 void App::KeyDefaultCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Control,
+		fmt::format("Key {} {}", action == GLFW_PRESS ? "Press" : "Release",
+					key));
 	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
@@ -234,16 +247,15 @@ void App::KeyDefaultCallback(
 			break;
 		case GLFW_KEY_SPACE: {
 			auto q      = a->_camera.Quaternion();
-			auto format = "{:-12s} : {:3.2f}\n"_format;
-			Logger::Log(
-				LogLevel::Debug, InfoType::Control,
-				format(
-					"Pos", glm::to_string(a->_camera.Position()),
+			auto format = "\n{:-12s} : {:3.2f}"_format;
+			Logger::Log<LogLevel::Debug>(
+				InfoType::Control,
+				format("Pos", glm::to_string(a->_camera.Position())) +
 					format("Angle",
-						   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
-					format("LookPoint", glm::to_string(q * tv::Camera::front)),
-					format("Right", glm::to_string(q * tv::Camera::right)),
-					format("Up", glm::to_string(q * tv::Camera::up))));
+						   glm::to_string(glm::degrees(glm::eulerAngles(q)))) +
+					format("LookPoint", glm::to_string(q * tv::Camera::front)) +
+					format("Right", glm::to_string(q * tv::Camera::right)) +
+					format("Up", glm::to_string(q * tv::Camera::up)));
 		} break;
 		default: break;
 		}
@@ -258,6 +270,10 @@ void App::KeyDefaultCallback(
 }
 void App::KeyFlyModeCallback(
 	GLFWwindow* window, int key, int scancode, int action, int mods) {
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Control,
+		fmt::format("Key {} {}", action == GLFW_PRESS ? "Press" : "Release",
+					key));
 	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
@@ -270,7 +286,7 @@ void App::KeyFlyModeCallback(
 									   MouseButtonDfaultCallback);
 			a->_fly_mode = false;
 			DragCameraRotate(window, 0.0, 0.0);
-			Logger::Log(LogLevel::Debug, InfoType::Control, "Normal Mode");
+			Logger::Log<LogLevel::Debug>(InfoType::Control, "Normal Mode");
 			break;
 		case GLFW_KEY_UP:
 			a->_tess_fact = glm::min(a->_tess_fact + 1, a->_max_tess_fact);
@@ -286,16 +302,15 @@ void App::KeyFlyModeCallback(
 		case GLFW_KEY_A: a->_camera.FpsMove(-tv::Camera::right); break;
 		case GLFW_KEY_SPACE: {
 			auto q      = a->_camera.Quaternion();
-			auto format = "{:-12s} : {:3.2f}\n"_format;
-			Logger::Log(
-				LogLevel::Debug, InfoType::Control,
-				format(
-					"Pos", glm::to_string(a->_camera.Position()),
+			auto format = "\n{:-12s} : {:3.2f}"_format;
+			Logger::Log<LogLevel::Debug>(
+				InfoType::Control,
+				format("Pos", glm::to_string(a->_camera.Position())) +
 					format("Angle",
-						   glm::to_string(glm::degrees(glm::eulerAngles(q)))),
-					format("LookPoint", glm::to_string(q * tv::Camera::front)),
-					format("Right", glm::to_string(q * tv::Camera::right)),
-					format("Up", glm::to_string(q * tv::Camera::up))));
+						   glm::to_string(glm::degrees(glm::eulerAngles(q)))) +
+					format("LookPoint", glm::to_string(q * tv::Camera::front)) +
+					format("Right", glm::to_string(q * tv::Camera::right)) +
+					format("Up", glm::to_string(q * tv::Camera::up)));
 		} break;
 		default: break;
 		}
@@ -349,6 +364,10 @@ void App::MouseButtonDfaultCallback(GLFWwindow* window,
 									int         button,
 									int         action,
 									int         mods) {
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Control,
+		fmt::format("Button {} {}", action == GLFW_PRESS ? "Press" : "Release",
+					button));
 	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
@@ -357,12 +376,12 @@ void App::MouseButtonDfaultCallback(GLFWwindow* window,
 			if (mods == GLFW_MOD_SHIFT) {
 				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
-				Logger::Log(LogLevel::Debug, InfoType::Control,
-							"Camera Translation");
+				Logger::Log<LogLevel::Debug>(InfoType::Control,
+											 "Camera Translation");
 			} else {
 				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraRotate);
-				Logger::Log(LogLevel::Debug, InfoType::Control,
-							"Camera Rotate");
+				Logger::Log<LogLevel::Debug>(InfoType::Control,
+											 "Camera Rotate");
 			}
 			break;
 		default: break;
@@ -380,6 +399,10 @@ void App::MouseButtonFlayModeCallback(GLFWwindow* window,
 									  int         button,
 									  int         action,
 									  int         mods) {
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Control,
+		fmt::format("Button {} {}", action == GLFW_PRESS ? "Press" : "Release",
+					button));
 	App* a = static_cast<App*>(glfwGetWindowUserPointer(window));
 
 	if (action == GLFW_PRESS) {
@@ -388,12 +411,12 @@ void App::MouseButtonFlayModeCallback(GLFWwindow* window,
 			if (mods == GLFW_MOD_SHIFT) {
 				glfwSetCursorPosCallback(a->_win->GetWin(),
 										 DragCameraTranslation);
-				Logger::Log(LogLevel::Debug, InfoType::Control,
-							"Camera Translation");
+				Logger::Log<LogLevel::Debug>(InfoType::Control,
+											 "Camera Translation");
 			} else {
 				glfwSetCursorPosCallback(a->_win->GetWin(), DragCameraFlyMode);
-				Logger::Log(LogLevel::Debug, InfoType::Control,
-							"Camera Rotate");
+				Logger::Log<LogLevel::Debug>(InfoType::Control,
+											 "Camera Rotate");
 			}
 			break;
 		default: break;
@@ -414,8 +437,6 @@ void App::MouseScrollFovCallback(GLFWwindow* window, double up, double down) {
 	auto fov = a->_camera.Fov() + (float)(up - down);
 	a->_camera.Fov(glm::clamp(fov, Camera::MinFov(), Camera::MaxFov()));
 	a->_update_projection();
-	Logger::Log(LogLevel::Debug, InfoType::Control,
-				"{:-12s} : {:3.2f}\n"_format("fov : ", a->_camera.Fov()));
 }
 void App::MouseScrollLengthCallback(GLFWwindow* window,
 									double      up,
