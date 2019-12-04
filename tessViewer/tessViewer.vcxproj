@@ -156,12 +156,34 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\data\font\IPA_Font_License_Agreement_v1.0.txt"/>
+    <Font Include="..\data\font\ipaexg.ttf"/>
+    <None Include="..\data\model\box1.sdmj" />
+    <None Include="..\data\model\box2x.sdmj" />
+    <None Include="..\data\model\box2y.sdmj" />
+    <None Include="..\data\model\box2z.sdmj" />
+    <None Include="..\data\model\cube.sdmj" />
+    <None Include="..\data\model\cube_uv.sdmj" />
+    <None Include="..\data\model\logicool_sp.sdmj" />
+    <None Include="..\data\model\Suzanne.sdmj" />
+    <None Include="..\data\model\Suzanne2.sdmj" />
+    <None Include="..\data\model\Teapot1.sdmj" />
+    <None Include="..\data\model\test1.sdmj" />
+    <None Include="..\data\model\tile.sdmj" />
+    <None Include="..\data\model\transform.sdmj" />
+    <None Include="..\data\model\transform2.sdmj" />
+    <None Include="..\data\model\untitled.sdmj" />
+    <None Include="..\data\shader\common.glsl" />
+    <None Include="..\data\shader\default.frag" />
+    <None Include="..\data\shader\default.geom" />
+    <None Include="..\data\shader\default.vert" />
+    <None Include="..\data\shader\default_font.frag" />
+    <None Include="..\data\shader\default_font.vert" />
+    <Image Include="..\data\texture\default_texture.png" />
     <None Include="doc\ClassDiagram.cd" />
     <None Include="doc\ClassDiagram1.cd" />
     <None Include="doc\schemas\cpp_header_gen.py" />
     <None Include="doc\schemas\setting_schema.json" />
-  </ItemGroup>
-  <ItemGroup>
     <Text Include="doc\計画.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

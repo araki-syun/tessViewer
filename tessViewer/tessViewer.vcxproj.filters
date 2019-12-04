@@ -9,9 +9,20 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="リソース ファイル">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="data">
+      <UniqueIdentifier>{5c59e92d-4b55-4a81-b2fa-9aeb01eb92b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\font">
+      <UniqueIdentifier>{8ef41ba5-b770-432b-99de-ee32ec75fc53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\shader">
+      <UniqueIdentifier>{14446c3a-3c45-4757-9d2b-8a5a22d18c37}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\texture">
+      <UniqueIdentifier>{de9da24d-8654-4d02-80db-289a73325b7d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\model">
+      <UniqueIdentifier>{a433d44e-6fac-45be-94e6-dfb8560ecb83}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -164,8 +175,84 @@
     <None Include="doc\ClassDiagram1.cd" />
     <None Include="doc\schemas\setting_schema.json" />
     <None Include="doc\schemas\cpp_header_gen.py" />
+    <None Include="..\data\shader\common.glsl">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\shader\default.frag">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\shader\default.geom">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\shader\default.vert">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\shader\default_font.frag">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\shader\default_font.vert">
+      <Filter>data\shader</Filter>
+    </None>
+    <None Include="..\data\model\box1.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\box2x.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\box2y.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\box2z.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\cube.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\cube_uv.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\logicool_sp.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\Suzanne.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\Suzanne2.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\Teapot1.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\test1.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\tile.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\transform.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\transform2.sdmj">
+      <Filter>data\model</Filter>
+    </None>
+    <None Include="..\data\model\untitled.sdmj">
+      <Filter>data\model</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="doc\計画.txt" />
+    <Text Include="..\data\font\IPA_Font_License_Agreement_v1.0.txt">
+      <Filter>data\font</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="..\data\font\ipaexg.ttf">
+      <Filter>data\font</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\data\texture\default_texture.png">
+      <Filter>data\texture</Filter>
+    </Image>
   </ItemGroup>
 </Project>
