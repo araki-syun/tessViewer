@@ -4,10 +4,16 @@
 #include "opensubdiv\osd\glslPatchShaderSource.h"
 #include "opensubdiv\far\patchDescriptor.h"
 
-struct osd_info {
-	enum Elem_Type
-	{
-		FVAR_WIDTH, PATCH_TYPE, NUM_PRIM_PER_VERTEX, IS_ADAPTIVE, SCREEN_SPACE_TESS, FRACTIONAL, PATCH_CULL, SINGLE_CREASE_PATCH
+struct OsdInfo {
+	enum ElemType {
+		FVAR_WIDTH,
+		PATCH_TYPE,
+		NUM_PRIM_PER_VERTEX,
+		IS_ADAPTIVE,
+		SCREEN_SPACE_TESS,
+		FRACTIONAL,
+		PATCH_CULL,
+		SINGLE_CREASE_PATCH
 	};
 	union Element {
 		struct {
@@ -22,13 +28,13 @@ struct osd_info {
 		} bits;
 		unsigned int data;
 
-		bool operator==(const Element e) const;
-		OpenSubdiv::Far::PatchDescriptor::Type Get_patch_type() const;
-		void Set_patch_type(OpenSubdiv::Far::PatchDescriptor::Type type);
-	} elem;
+		bool                                   operator==(Element e) const;
+		OpenSubdiv::Far::PatchDescriptor::Type GetPatchType() const;
+		void SetPatchType(OpenSubdiv::Far::PatchDescriptor::Type type);
+	} elem{};
 
-	osd_info();
-	osd_info(const osd_info& info);
-	void set(Elem_Type e, unsigned int value);
-	const std::string str() const;
+	OsdInfo();
+	OsdInfo(const OsdInfo& info);
+	void        Set(ElemType e, unsigned int value);
+	std::string Str() const;
 };

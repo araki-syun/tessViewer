@@ -1,45 +1,73 @@
 #include "app.h"
 
+#include <exception>
 #include <iostream>
-#include <boost\program_options.hpp>
+#include <string>
+#include <fstream>
 
-#include "location_define.h"
+#include <boost\program_options.hpp>
+#include <string_view>
+#include <fmt/format.h>
+
+#include "boost/program_options/value_semantic.hpp"
+#include "boost/program_options/variables_map.hpp"
+#include <nlohmann/json.hpp>
 #include "version.h"
 
 #include "glapp\config.h"
-#include "glapp\glapp_define.h"
+#include "log.h"
+#include "define.h"
 
-void main(int argc, char* argv[]) {
-	using namespace boost::program_options;
+using namespace std::literals::string_literals;
+using namespace boost::program_options;
+using namespace fmt::literals;
+using namespace tv;
+
+void ImportOptions(const variables_map& vm);
+
+int main(int argc, char* argv[]) {
+	auto format = "{},{}"_format;
+
 	options_description options("option");
 	options_description window_option("display_option");
 	options_description graphics_option("graphics_option");
 	options_description ui_option("ui_option");
 
+	// clang-format off
 	options.add_options()
-		("help,h", "ƒwƒ‹ƒv‚ğ•\¦")
-		("version,v", "ƒo[ƒWƒ‡ƒ“î•ñ")
-		("object,o", value<std::string>()->default_value(MODEL "cube_uv.sdmj"), "•\¦ƒ‚ƒfƒ‹");
+		(format("help", 'h').c_str(), "ãƒ˜ãƒ«ãƒ—ã‚’è¡¨ç¤º")
+		(format("version", "v").c_str(), "ãƒãƒ¼ã‚¸ãƒ§ãƒ³æƒ…å ±")
+		(format("object", "o").c_str(), value<std::string>(), "è¡¨ç¤ºãƒ¢ãƒ‡ãƒ«")
+		("log_output", value<std::string>()->default_value("quiet"), "ãƒ­ã‚°ã®å‡ºåŠ›å…ˆ")
+		("log_level", value<int>()->default_value(0), "ãƒ­ã‚°ã®è©³ç´°åº¦");
 
 	window_option.add_options()
-		(GLAPP_CONFIG_FULLSCREEN ",f", "‘S‰æ–Ê•\¦")
-		(GLAPP_CONFIG_RESOLUTION_X, value<int>()->default_value(1280), "‰¡‰ğ‘œ“x")
-		(GLAPP_CONFIG_RESOLUTION_Y, value<int>()->default_value(720), "c‰ğ‘œ“x")
-		(GLAPP_CONFIG_FOV, value<float>()->default_value(60.f), "Fov")
-		(GLAPP_CONFIG_VSYNC, value<bool>()->default_value(true), "VSync");
+		(format(GLAPP_CONFIG_FULLSCREEN, "f").c_str(), value<bool>(),
+		 "å…¨ç”»é¢è¡¨ç¤º")
+		(GLAPP_CONFIG_RESOLUTION_X, value<int>(), "æ¨ªè§£åƒåº¦")
+		(GLAPP_CONFIG_RESOLUTION_Y, value<int>(), "ç¸¦è§£åƒåº¦")
+		(GLAPP_CONFIG_FOV, value<float>(),
+				   "Fov")(GLAPP_CONFIG_VSYNC, value<bool>(), "VSync");
 
 	graphics_option.add_options()
-		(GLAPP_CONFIG_PATCH_TYPE_GREGORY ",g", "Patch Type ‚É GREGORY_BASIS ‚ğg—p")
-		(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT ",p", value<int>()->default_value(2), "ƒfƒtƒHƒ‹ƒgƒpƒbƒ`ƒŒƒxƒ‹")
-		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>()->default_value(6), "Å‘åƒpƒbƒ`ƒŒƒxƒ‹")
-		(GLAPP_CONFIG_TESS_LEVEL_DEFAULT ",t", value<int>()->default_value(1), "ƒfƒtƒHƒ‹ƒgƒeƒbƒZƒŒ[ƒVƒ‡ƒ“ŒW”")
-		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>()->default_value(6), "Å‘åƒeƒbƒZƒŒ[ƒVƒ‡ƒ“ŒW”");
+		(format(GLAPP_CONFIG_PATCH_TYPE_GREGORY, "g").c_str(),
+		 "Patch Type ã« GREGORY_BASIS ã‚’ä½¿ç”¨")
+		(format(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT, "p").c_str(),
+		 value<int>(), "ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ‘ãƒƒãƒãƒ¬ãƒ™ãƒ«")
+		(GLAPP_CONFIG_PATCH_LEVEL_MAX, value<int>(),
+		 "æœ€å¤§ãƒ‘ãƒƒãƒãƒ¬ãƒ™ãƒ«")
+		(format(GLAPP_CONFIG_TESS_LEVEL_DEFAULT, "t").c_str(),
+		 value<int>(), "ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆãƒ†ãƒƒã‚»ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ä¿‚æ•°")
+		(GLAPP_CONFIG_TESS_LEVEL_MAX, value<int>(),
+				   "æœ€å¤§ãƒ†ãƒƒã‚»ãƒ¬ãƒ¼ã‚·ãƒ§ãƒ³ä¿‚æ•°");
 
 	ui_option.add_options()
-		(GLAPP_CONFIG_USER_INTERFACE, value<bool>()->default_value(true), "ƒ†[ƒU[ƒCƒ“ƒ^[ƒtƒFƒCƒX")
-		(GLAPP_CONFIG_FONT_FILE, value<std::string>()->default_value(FONT "ipaexg.ttf"), "g—p‚·‚éƒtƒHƒ“ƒg")
-		(GLAPP_CONFIG_FONT_SIZE, value<int>()->default_value(16), "ƒtƒHƒ“ƒgƒTƒCƒY")
-		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>()->default_value(0), "ƒtƒHƒ“ƒgF");
+		(GLAPP_CONFIG_USER_INTERFACE, value<bool>(),
+		 "ãƒ¦ãƒ¼ã‚¶ãƒ¼ã‚¤ãƒ³ã‚¿ãƒ¼ãƒ•ã‚§ã‚¤ã‚¹")
+		(GLAPP_CONFIG_FONT_SIZE, value<int>(), "ãƒ•ã‚©ãƒ³ãƒˆã‚µã‚¤ã‚º")
+		(GLAPP_CONFIG_FONT_COLOR, value<std::uint8_t>(),
+				   "ãƒ•ã‚©ãƒ³ãƒˆè‰²");
+	// clang-format on
 
 	options.add(window_option).add(graphics_option).add(ui_option);
 
@@ -54,39 +82,112 @@ void main(int argc, char* argv[]) {
 	}
 	catch (std::exception& e) {
 		std::cout << e.what() << std::endl;
-		return;
+		return -1;
 	}
-	if (vm.count("version")) {
-		std::cout << "tessViewer " TV_VERSION << std::endl;
-		return;
+	if (vm.count("version") != 0u) {
+		std::cout << "tessViewer {}"_format(TV_VERSION) << std::endl;
+		return 0;
 	}
-	if (vm.count("help")) {
-		std::cout << "tessViewer " TV_VERSION << std::endl;
-		std::cout << options << std::endl;
-		//std::cout << window_option << std::endl;
-		//std::cout << graphics_option << std::endl;
-		//std::cout << ui_option << std::endl;
-		return;
+	if (vm.count("help") != 0u) {
+		std::cout << "tessViewer {}\n"_format(TV_VERSION) << options
+				  << std::endl;
+		return 0;
 	}
 
+	auto ofs = std::ofstream();
 	try {
-		app a(vm);
+		ImportOptions(vm);
+
+		auto conf_log = glapp::Config::Get("/application/log");
+		auto lv       = conf_log.Value<tv::LogLevel>("level");
+		switch (conf_log.Value<tv::OutputType>("output")) {
+		case tv::OutputType::Quiet: break;
+		case tv::OutputType::File: Logger::Initialize(lv, ofs.rdbuf()); break;
+		case tv::OutputType::Stdout:
+			Logger::Initialize(lv, std::cout.rdbuf());
+			break;
+		}
+
+		App a;
 		a.Run();
+		return 0;
 	}
 	catch (boost::bad_any_cast& e) {
-		std::cerr << e.what() << std::endl;
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, e.what());
+	}
+	catch (tv::AppError& e) {
+		Logger::Log(e);
 	}
 	catch (std::exception& e) {
-		std::cerr << "error log output : tessviewer.log" << std::endl;
-		std::ofstream ost(".//tessviewer.log", std::ios::trunc);
-		ost << e.what() << std::endl;
-
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, e.what());
 	}
 	catch (const char* message) {
-		std::cerr << message << std::endl;
+		Logger::Log<LogLevel::Fatal>(InfoType::Application, message);
 	}
 	catch (...) {
-		std::cerr << "Unknown Exception\n" << std::endl;
+		Logger::Log<LogLevel::Fatal>(InfoType::Unknown, "Unknown Error");
 	}
+	return 1;
 }
 
+void ImportOptions(const boost::program_options::variables_map& vm) {
+	using nlohmann::json;
+	json app;
+	json options;
+	json window;
+	json graphics;
+	json ui;
+	auto contain = [&](std::string_view name) -> bool {
+		return vm.count(std::string(name)) > 0;
+	};
+
+	if (contain("log_output")) {
+		app["/log/output"_json_pointer] = vm["log_output"].as<std::string>();
+	}
+	if (contain("log_level")) {
+		app["/log/level"_json_pointer] = vm["log_level"].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_FULLSCREEN)) {
+		window["/fullscreen"_json_pointer] =
+			vm[GLAPP_CONFIG_FULLSCREEN].as<bool>();
+	}
+	if (contain(GLAPP_CONFIG_RESOLUTION_X)) {
+		window["/resolution/width"_json_pointer] =
+			vm[GLAPP_CONFIG_RESOLUTION_X].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_RESOLUTION_Y)) {
+		window["/resolution/height"_json_pointer] =
+			vm[GLAPP_CONFIG_RESOLUTION_Y].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_FOV)) {
+		window["fov"] = vm[GLAPP_CONFIG_FOV].as<float>();
+	}
+	if (contain(GLAPP_CONFIG_VSYNC)) {
+		window["vsync"] = vm[GLAPP_CONFIG_VSYNC].as<bool>();
+	}
+	if (contain("object")) {
+		graphics["/graphics/model"_json_pointer] =
+			vm["object"].as<std::string>();
+	}
+	if (contain(GLAPP_CONFIG_PATCH_LEVEL_DEFAULT)) {
+		graphics["/graphics/osd/patch/level"_json_pointer] =
+			vm[GLAPP_CONFIG_PATCH_LEVEL_DEFAULT].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_TESS_LEVEL_DEFAULT)) {
+		graphics["/graphics/osd/tessellation/level"_json_pointer] =
+			vm[GLAPP_CONFIG_TESS_LEVEL_DEFAULT].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_FONT_SIZE)) {
+		ui["/ui/font/size"_json_pointer] = vm[GLAPP_CONFIG_FONT_SIZE].as<int>();
+	}
+	if (contain(GLAPP_CONFIG_FONT_COLOR)) {
+		ui["/ui/font/color"_json_pointer] =
+			vm[GLAPP_CONFIG_FONT_COLOR].as<std::string>();
+	}
+	options["application"] = app;
+	options["window"]      = window;
+	options["graphics"]    = graphics;
+	options["ui"]          = ui;
+
+	glapp::Config::CommandLineOptions(options);
+}
