@@ -97,7 +97,9 @@ void GlslStringDraw::Initialize(int                          fontsize,
 	glGetTextureImage(temp_texture, 0, GL_RED, GL_UNSIGNED_BYTE,
 					  (int)buf.size(), buf.data());
 	cv::Mat img(cv::Size(tex_size, tex_size), CV_8UC1, buf.data());
+#ifdef EXPORT_FONT_TEXTURE
 	cv::imwrite("tv_font_texture.png", img);
+#endif
 	cv::Mat flip_img(cv::Size(tex_size, tex_size), CV_8UC1);
 	cv::flip(img, flip_img, 0);
 
