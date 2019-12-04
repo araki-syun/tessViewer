@@ -156,8 +156,8 @@
     <ClInclude Include="version.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\data\font\IPA_Font_License_Agreement_v1.0.txt"/>
-    <Font Include="..\data\font\ipaexg.ttf"/>
+    <Text Include="..\data\font\IPA_Font_License_Agreement_v1.0.txt" />
+    <Font Include="..\data\font\ipaexg.ttf" />
     <None Include="..\data\model\box1.sdmj" />
     <None Include="..\data\model\box2x.sdmj" />
     <None Include="..\data\model\box2y.sdmj" />
