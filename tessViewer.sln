@@ -20,6 +20,7 @@ Global
 		{06BCEAB6-F696-4BC4-B904-77D10EA0AAE5}.Debug|x64.ActiveCfg = Debug
 		{06BCEAB6-F696-4BC4-B904-77D10EA0AAE5}.Debug|x64.Build.0 = Debug
 		{06BCEAB6-F696-4BC4-B904-77D10EA0AAE5}.Release|x64.ActiveCfg = Release
+		{06BCEAB6-F696-4BC4-B904-77D10EA0AAE5}.Release|x64.Build.0 = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
