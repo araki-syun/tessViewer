@@ -10,59 +10,54 @@
 #include "opensubdiv\far\patchDescriptor.h"
 
 #include "glShaderVariable.h"
-#include "location_define.h"
 #include "osd_info.h"
 
 #define GLSL_VERSION "#version 450\n"
-#define DEFAULT_VERTEX_SHADER SHADER "default.vert"
-#define DEFAULT_FRAGMENT_SHADER SHADER "default.frag"
-#define DEFAULT_GEOMETRY_SHADER SHADER "default.geom"
-#define DEFAULT_TESS_CTRL_SHADER SHADER "default.tcs"
-#define DEFAULT_TESS_EVAL_SHADER SHADER "default.tes"
 
-class glslProgram
-{
+class GlslProgram {
 public:
-	struct glsl_info {
-		glsl_info();
-		glsl_info(const glsl_info& info);
-		glsl_info(
-			const std::string& vert,
-			const std::string& frag,
-			const std::string& geom,
-			const std::string& tcs,
-			const std::string& tes);
+	struct GlslInfo {
+		GlslInfo();
+		GlslInfo(std::string vert,
+				 std::string frag,
+				 std::string geom,
+				 std::string tcs,
+				 std::string tes);
 
-		const std::string str() const;
+		std::string Str() const;
 
 		std::string vert, frag, geom, tcs, tes;
 
 		static void CreateUniformBuffer(const std::string& name, int size);
-		static const tv::glShaderUniformBuffer* GetUniformBuffer(const std::string& name);
+		static const tv::GlShaderUniformBuffer*
+		GetUniformBuffer(const std::string& name);
 
 	private:
-		static std::map<std::string, std::unique_ptr<tv::glShaderUniformBuffer>> buffers;
+		static std::map<std::string, std::unique_ptr<tv::GlShaderUniformBuffer>>
+			buffers;
 	};
-	glslProgram();
-	glslProgram(const glsl_info& glsl);
-	glslProgram(const glsl_info& glsl, const osd_info& osd);
-	~glslProgram();
+	GlslProgram();
+	GlslProgram(const GlslInfo& glsl);
+	GlslProgram(const GlslInfo& glsl, const OsdInfo& osd);
+	~GlslProgram();
 
 	GLuint GetProgram() const;
-	void SetProgram(const glsl_info& glsl);
-	void SetProgram(const glsl_info& glsl, const osd_info& osd);
-	void SetProgram(const std::string & vert, const std::string & frag);
-	const tv::glShaderAttribute* GetAttrib(const std::string& name) const;
-	const tv::glShaderUniform* GetUniform(const std::string& name) const;
-	const tv::glShaderUniformBlock* GetUniformBlock(const std::string& name) const;
+	void   SetProgram(const GlslInfo& glsl);
+	void   SetProgram(const GlslInfo& glsl, const OsdInfo& osd);
+	void   SetProgram(const std::string& vert, const std::string& frag);
+	const tv::GlShaderAttribute* GetAttrib(const std::string& name) const;
+	const tv::GlShaderUniform*   GetUniform(const std::string& name) const;
+	const tv::GlShaderUniformBlock*
+	GetUniformBlock(const std::string& name) const;
 	//void BindUniformBlock();
 private:
-	void SetLocation();
+	void _set_location();
 
-	GLuint _program;
-	std::map<std::string, std::unique_ptr<tv::glShaderAttribute> > attrib_map;
-	std::map<std::string, std::unique_ptr<tv::glShaderUniform> > uniform_map;
-	std::map<std::string, std::unique_ptr<tv::glShaderUniformBlock> > uniformBlock_map;
-	GLint fragment;
+	GLuint _program{};
+
+	std::map<std::string, std::unique_ptr<tv::GlShaderAttribute>> _attrib_map;
+	std::map<std::string, std::unique_ptr<tv::GlShaderUniform>>   _uniform_map;
+	std::map<std::string, std::unique_ptr<tv::GlShaderUniformBlock>>
+		  _uniform_block_map;
+	GLint _fragment = -1;
 };
-

@@ -2,6 +2,7 @@
 
 #include <unordered_map>
 #include <memory>
+#include <stdexcept>
 
 #include "osd_info.h"
 #include "glslProgram.h"
@@ -23,23 +24,23 @@
 //	int _bufSize;
 //};
 namespace tv {
-	class ShaderManager
-	{
-	public:
-		ShaderManager();
-		~ShaderManager();
+class ShaderManager {
+public:
+	ShaderManager();
+	~ShaderManager();
 
-		const glslProgram& Get(const glslProgram::glsl_info& glsl);
-		const glslProgram& Get(const glslProgram::glsl_info& glsl, const osd_info& osd);
+	const GlslProgram& Get(const GlslProgram::GlslInfo& glsl);
+	const GlslProgram& Get(const GlslProgram::GlslInfo& glsl,
+						   const OsdInfo&               osd);
 
-		using shader_iterator = std::unordered_map<std::string, std::unique_ptr<glslProgram> >::const_iterator;
+	using shader_iterator =
+		std::unordered_map<std::string,
+						   std::unique_ptr<GlslProgram>>::const_iterator;
 
-	private:
-		shader_iterator add(const glslProgram::glsl_info& glsl);
-		shader_iterator add(const glslProgram::glsl_info& glsl, const osd_info& osd);
+private:
+	shader_iterator _add(const GlslProgram::GlslInfo& glsl);
+	shader_iterator _add(const GlslProgram::GlslInfo& glsl, const OsdInfo& osd);
 
-		std::unordered_map<std::string, std::unique_ptr<glslProgram> > shader_list;
-
-	};
-}
-
+	std::unordered_map<std::string, std::unique_ptr<GlslProgram>> _shader_list;
+};
+} // namespace tv

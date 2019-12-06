@@ -2,20 +2,18 @@
 
 #include <GL\glew.h>
 
-class glQuery
-{
+class GlQuery {
 public:
-	glQuery() = delete;
-	glQuery(GLenum target);
-	~glQuery();
+	GlQuery() = delete;
+	GlQuery(GLenum target);
+	~GlQuery();
 
-	void Start();
-	void End();
+	void   Start();
+	void   End();
 	GLuint Get();
 
 private:
-	GLenum target;
-	GLuint id;
-	GLuint value;
+	GLenum _target{};
+	GLuint _id{};
+	GLuint _value{};
 };
-

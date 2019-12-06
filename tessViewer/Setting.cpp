@@ -1,12 +1,5 @@
 #include "Setting.h"
 
+Setting::Setting() = default;
 
-
-Setting::Setting()
-{
-}
-
-
-Setting::~Setting()
-{
-}
+Setting::~Setting() = default;
