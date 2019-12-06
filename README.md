@@ -3,7 +3,7 @@
 **(c) Araki Syun 2015**
 
 tessViewerは**OpenGL**及び[**OpenSubdiv**](http://graphics.pixar.com/opensubdiv/docs/intro.html)の使用方法を検証するためのプログラムです。  
-読み込んだモデルに**OpenSubdiv**を使い、テッセレーションをかけて表示します。
+読み込んだモデルに**OpenSubdiv**を用いて、テッセレーションをかけて表示します。
 
 
 ## 動作環境  
@@ -28,31 +28,34 @@ tessViewerは**OpenGL**及び[**OpenSubdiv**](http://graphics.pixar.com/opensubd
 ## コマンドラインオプション
 ||||
 |---|---|---|
-| -h| [ --help ]						|ヘルプを表示						|
-| -v| [ --version ]						|バージョン情報						|
-| -o| [ --object ] arg					|表示モデル							|
-|   | --log_output arg (=quiet)			|ログの出力先						|
-|   | --log_level arg (=0)				|ログの詳細度						|
-||||
-| -f| [ --full_screen ] arg				|全画面表示							|
-|   | --resolution_x arg				|横解像度							|
-|   | --resolution_y arg				|縦解像度							|
-|   | --fov arg							|Fov								|
-|   | --vsync arg						|VSync								|
-||||
-| -g| [ --osd_patch_type_gregory ]		|Patch Type に GREGORY_BASIS を使用	|
-| -p| [ --osd_patch_level_default ] arg	|デフォルトパッチレベル					|
-|   | --osd_patch_level_max arg			|最大パッチレベル						|
-| -t| [ --osd_tess_level_default ] arg	|デフォルトテッセレーション係数			|
-|   | --osd_tess_level_max arg			|最大テッセレーション係数				|
-||||
-|   | --user_interface arg				|ユーザーインターフェイス				|
-|   | --font_size arg					|フォントサイズ						|
-|   | --font_color arg					|フォント色							|
+| -h | --help							|ヘルプを表示						|
+| -v | --version						|バージョン情報						|
+| -o | --object arg						|表示モデル							|
+|    | --log_output arg (=quiet)		|ログの出力先						|
+|    | --log_level arg (=0)				|ログの詳細度						|
+| -f | --full_screen arg				|全画面表示							|
+|    | --resolution_x arg				|横解像度							|
+|    | --resolution_y arg				|縦解像度							|
+|    | --fov arg						|Fov								|
+|    | --vsync arg						|VSync								|
+| -g | --osd_patch_type_gregory			|Patch Type に GREGORY_BASIS を使用	|
+| -p | --osd_patch_level_default arg	|デフォルトパッチレベル					|
+|    | --osd_patch_level_max arg		|最大パッチレベル						|
+| -t | --osd_tess_level_default arg		|デフォルトテッセレーション係数			|
+|    | --osd_tess_level_max arg			|最大テッセレーション係数				|
+|    | --user_interface arg				|ユーザーインターフェイス				|
+|    | --font_size arg					|フォントサイズ						|
+|    | --font_color arg					|フォント色							|
 
 ## setting.json
 コマンドライン引数の代わりに`setting.json`を使用できます。  
-設定項目がコマンドライン引数と重複した場合、コマンドライン引数の値が優先されます。
+設定項目がコマンドライン引数と重複した場合、コマンドライン引数の値が優先されます。  
+`setting.json`のスキーマは[こちら](data/doc/schema/setting_schema.json)
+
+## スクリーンショット
+![tess_level](data/doc/image/tess_level.gif)
+![screen_shot1](data/doc/image/screen_shot1.png)
+![screen_shot2](data/doc/image/screen_shot2.png)
 
 ## 使用ライブラリ
 |ライブラリ|バージョン|
