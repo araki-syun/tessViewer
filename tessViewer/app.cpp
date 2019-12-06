@@ -55,8 +55,8 @@ App::App() {
 
 	std::vector<std::string> extensions{"GL_ARB_direct_state_access",
 										"GL_ARB_tessellation_shader"};
-	_win = std::make_unique<glapp::Window>("tessViewer " TV_VERSION, 4, 5,
-										   extensions);
+	_win = std::make_unique<glapp::Window>(
+		fmt::format(FMT_STRING("tessViewer {}"), TV_VERSION), 4, 5, extensions);
 
 	int mat_offset           = _material->GetElementSize();
 	tv::Model::shader_manage = &(App::_shader_manage);

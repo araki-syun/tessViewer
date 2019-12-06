@@ -38,8 +38,8 @@ int main(int argc, char* argv[]) {
 		(format("help", 'h').c_str(), "ヘルプを表示")
 		(format("version", "v").c_str(), "バージョン情報")
 		(format("object", "o").c_str(), value<std::string>(), "表示モデル")
-		("log_output", value<std::string>()->default_value("quiet"), "ログの出力先")
-		("log_level", value<int>()->default_value(0), "ログの詳細度");
+		("log_output", value<std::string>()->default_value("stdout"), "ログの出力先")
+		("log_level", value<int>()->default_value(static_cast<int>(Logger::CompileTimeLogLevel())), "ログの詳細度");
 
 	window_option.add_options()
 		(format(GLAPP_CONFIG_FULLSCREEN, "f").c_str(), value<bool>(),
