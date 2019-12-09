@@ -23,6 +23,7 @@ tessViewerは**OpenGL**及び[**OpenSubdiv**](http://graphics.pixar.com/opensubd
 | 視点平行移動	|Shift+マウス中ボタン|
 | ズーム		|マウススクロール|
 | Fov変更		|Shift + マウススクロール|
+| Tess Level 増減 |UP/DOWN キー|
 | 終了			|Escape|
 
 ## コマンドラインオプション
