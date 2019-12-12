@@ -61,6 +61,10 @@ public:
 	}
 	static void Log(const AppError& e);
 
+	static constexpr LogLevel CompileTimeLogLevel() {
+		return _compile_time_level;
+	}
+
 private:
 	Logger(LogLevel lv, std::streambuf* output);
 	void           _log(LogLevel lv, InfoType type, std::string_view str);

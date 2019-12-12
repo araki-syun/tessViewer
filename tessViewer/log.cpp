@@ -46,12 +46,7 @@ void Logger::Log(LogLevel lv, InfoType type, std::string_view str) {
 }
 void Logger::Log(const AppError& e) { Log(e.Level(), e.Info(), e.what()); }
 Logger::Logger(LogLevel lv, std::streambuf* output)
-#ifdef _DEBUG //リリースでは詳細なログを取得できないように
-	: _level(lv)
-#else
-	: _level(std::min(lv, LogLevel::Notice))
-#endif
-	, _output(std::forward<std::streambuf*>(output)) {
+	: _level(lv), _output(std::forward<std::streambuf*>(output)) {
 	if (auto out = dynamic_cast<std::filebuf*>(_output.rdbuf());
 		out != nullptr && !out->is_open()) {
 		out->open("tessViewer.log", std::ios_base::out | std::ios_base::app);
@@ -64,9 +59,8 @@ void Logger::_log(LogLevel lv, InfoType type, std::string_view str) {
 	auto    now = std::time(nullptr);
 	std::tm tm{};
 	localtime_s(&tm, &now);
-	_output << fmt::format("[{:s}] {:%F %T} [{:s}] {:s}",
-						   ToString(type), 
-						   tm, ToString(lv), std::string(str))
+	_output << fmt::format("[{0:13s}] [{2:7s}] {1:%F %T} {3:s}", ToString(type), tm,
+						   ToString(lv), std::string(str))
 			<< std::endl;
 }
 } // namespace tv
