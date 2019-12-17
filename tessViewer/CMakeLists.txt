@@ -33,11 +33,21 @@ set(OpenSubdiv_CPU_LIB "${OpenSubdiv_LIBRARY_DIRS}/osdCPU.lib")
 set(OpenSubdiv_GPU_LIB "${OpenSubdiv_LIBRARY_DIRS}/osdGPU.lib")
 
 add_executable(${PROJECT_NAME})
+
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+
 if(MSVC)
 	set_target_properties(${PROJECT_NAME} PROPERTIES
 		MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+
+set(TESSVIEWER_LOG_LEVELS None Fatal Error Warning Notice Debug Trace)
+set(COMPILE_TIME_LOG_LEVEL Notice CACHE STRING "compile time Log Level")
+set_property(CACHE COMPILE_TIME_LOG_LEVEL PROPERTY STRINGS ${TESSVIEWER_LOG_LEVELS})
+if(NOT COMPILE_TIME_LOG_LEVEL IN_LIST TESSVIEWER_LOG_LEVELS)
+	message(FATAL_ERROR "COMPILE_TIME_LOG_LEVEL(${COMPILE_TIME_LOG_LEVEL}) is not included in the TESSVIEWER_LOG_LEVELS")
+endif()
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE
 	GLEW_STATIC
 	OSD_USES_GLEW
