@@ -4,10 +4,7 @@ message("CMAKE_TOOLCHAIN_FILE : ${CMAKE_TOOLCHAIN_FILE}")
 message("VCPKG_TARGET_TRIPLET : ${VCPKG_TARGET_TRIPLET}")
 message("COMPILE_TIME_LOG_LEVEL : ${COMPILE_TIME_LOG_LEVEL}")
 
-project(tessViewer VERSION 0.2.0)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(Python3 REQUIRED)
 
 find_path(GLM_INCLUDE_DIRS				"glm/glm.hpp")
 find_path(nlohmann_json_INCLUDE_DIRS	"nlohmann/json.hpp")
@@ -33,6 +30,12 @@ set(OpenSubdiv_CPU_LIB "${OpenSubdiv_LIBRARY_DIRS}/osdCPU.lib")
 set(OpenSubdiv_GPU_LIB "${OpenSubdiv_LIBRARY_DIRS}/osdGPU.lib")
 
 add_executable(${PROJECT_NAME})
+
+# setting_schema.json.gen.h 生成
+add_custom_command(
+	OUTPUT doc/schemas/setting_schema.json.ge.h
+	COMMAND ${Python3_EXECUTABLE} doc/schemas/cpp_header_gen.py
+)
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
@@ -93,7 +96,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	material.cpp
 	model.cpp
 	osd_info.cpp
-	pch.cpp
+#	pch.cpp
 	Setting.cpp
 	ShaderManager.cpp
 	glapp/base_window.cpp
