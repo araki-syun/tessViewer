@@ -4,7 +4,8 @@ message("CMAKE_TOOLCHAIN_FILE : ${CMAKE_TOOLCHAIN_FILE}")
 message("VCPKG_TARGET_TRIPLET : ${VCPKG_TARGET_TRIPLET}")
 message("COMPILE_TIME_LOG_LEVEL : ${COMPILE_TIME_LOG_LEVEL}")
 
-find_package(Python3 REQUIRED)
+find_package(Python3 3.4 REQUIRED)
+message("Python3 executable ${Python3_EXECUTABLE}")
 
 find_path(GLM_INCLUDE_DIRS				"glm/glm.hpp")
 find_path(nlohmann_json_INCLUDE_DIRS	"nlohmann/json.hpp")
