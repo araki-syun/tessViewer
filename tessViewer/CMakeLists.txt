@@ -34,8 +34,12 @@ add_executable(${PROJECT_NAME})
 
 # setting_schema.json.gen.h 生成
 add_custom_command(
-	OUTPUT doc/schemas/setting_schema.json.ge.h
+	OUTPUT doc/schemas/setting_schema.json.gen.h
 	COMMAND ${Python3_EXECUTABLE} doc/schemas/cpp_header_gen.py
+	MAIN_DEPENDENCY doc/schemas/setting_schema.json
+	DEPENDS doc/schemas/setting_schema.json
+	WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+	COMMENT "generated ${CMAKE_CURRENT_SOURCE_DIR}/doc/schemas/setting_schema.json.gen.h"
 )
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
@@ -92,6 +96,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	glShaderVariable.cpp
 	glslProgram.cpp
 	glslStringDraw.cpp
+	doc/schemas/setting_schema.json.gen.h
 	log.cpp
 	main.cpp
 	material.cpp
