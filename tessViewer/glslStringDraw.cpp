@@ -35,16 +35,21 @@ void GlslStringDraw::Initialize(int                          fontsize,
 	if (FT_Init_FreeType(&_ftlib) != 0) {
 		throw GraphicsError(LogLevel::Error, "ERROR : freetype Initialize");
 	}
+	Logger::Log<LogLevel::Trace>(InfoType::UserInterface,
+								 "FreeType Initialize");
 	if (std::filesystem::exists(filepath)) {
 		if (FT_New_Face(_ftlib, filepath.generic_string().c_str(), 0,
 						&_ftface) != 0) {
-			throw AppError(LogLevel::Error, "ERROR : font file Load\n");
+			throw AppError(LogLevel::Error, "ERROR : font file Load");
 		}
+		Logger::Log<LogLevel::Debug>(InfoType::UserInterface,
+									 "Load Font File : " +
+										 filepath.generic_string());
 	} else {
-		throw AppError(LogLevel::Error, "ERROR : font file Not Found\n");
+		throw AppError(LogLevel::Error, "ERROR : font file Not Found");
 	}
 	if (FT_Set_Char_Size(_ftface, 0, _font_size * 64, 80, 80) != 0) {
-		throw GraphicsError(LogLevel::Error, "ERROR : set font char size\n");
+		throw GraphicsError(LogLevel::Error, "ERROR : set font char size");
 	}
 	//if(FT_Set_Pixel_Sizes(this->_face, w, h))
 	//	throw std::exception("ERROR : font set pixel\n");
@@ -116,6 +121,8 @@ void GlslStringDraw::Initialize(int                          fontsize,
 	glFlush();
 
 	_program.SetProgram(FONT_VERTEX_SHADER, FONT_FRAGMENT_SHADER);
+	Logger::Log<LogLevel::Debug>(InfoType::UserInterface,
+								 "StringDraw Initialized");
 }
 
 void GlslStringDraw::Set(int x, int y, const std::string& str) {

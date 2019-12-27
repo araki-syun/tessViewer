@@ -17,11 +17,11 @@
 #include "glapp\glapp.hpp"
 #include "define.h"
 #include "glapp\config.h"
+#include "log.h"
 
 //OpenSubdiv::Far::TopologyRefiner* createRefiner(const picojson::object& obj);
 
 namespace tv {
-Model::Model() = default;
 Model::Model(const tv::Model& m)
 	: _name(m._name)
 	, _vertex(m._vertex)
@@ -47,11 +47,13 @@ Model::~Model() {
 	if (_material_index_texture != 0u) {
 		glDeleteTextures(1, &_material_index_texture);
 	}
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Model Destructed");
 }
 
 void Model::Reload(const nlohmann::json& obj) {
 	using namespace OpenSubdiv;
 
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "Model Loading Start");
 	Far::TopologyDescriptor desc;
 
 	auto& vertex_positions  = obj["vertex_positions"];
@@ -191,6 +193,9 @@ void Model::Reload(const nlohmann::json& obj) {
 	desc.numFVarChannels = 1;
 	desc.fvarChannels    = &fvar;
 
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "Model Loading Finish");
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "OSD Model Create Start");
+
 	// create refiner
 	Sdc::Options opt;
 	opt.SetVtxBoundaryInterpolation(Sdc::Options::VTX_BOUNDARY_EDGE_AND_CORNER);
@@ -231,7 +236,7 @@ void Model::Reload(const nlohmann::json& obj) {
 			refiner, num_vertex_elements, 0,
 			glm::clamp(default_patch, 0, max_patch), bits, &evaluator);
 
-	// Face Per Material
+	// 面ごとに変化するデータを設定する
 	GLuint matbuffer;
 	glCreateBuffers(1, &matbuffer);
 	glNamedBufferData(matbuffer, mpf.size() * sizeof(int), mpf.data(),
@@ -269,6 +274,8 @@ void Model::Reload(const nlohmann::json& obj) {
 
 	Update(v.data(), 0, (int)v.size() / 3);
 
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "OSD Model Create Finish");
+
 	if (_vao != 0u) {
 		glDeleteVertexArrays(1, &_vao);
 	}
@@ -297,6 +304,8 @@ void Model::Reload(const nlohmann::json& obj) {
 	//glBindTexture(GL_TEXTURE_BUFFER, mesh->GetPatchTable()->GetPatchParamTextureBuffer());
 	glBindTextureUnit(0, _mesh->GetPatchTable()->GetPatchParamTextureBuffer());
 	//glBindTextureUnit(1, mesh->GetPatchTable()->GetPatchIndexTextureBuffer());
+	
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "Model Data Upload to VRAM");
 
 	glm::mat4 trans = glm::translate(glm::vec3(location[0].get<double>(),
 											   location[1].get<double>(),
@@ -311,6 +320,8 @@ void Model::Reload(const nlohmann::json& obj) {
 							 scale[2].get<double>()));
 
 	_model_matrix = trans * rot * sc;
+
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Model Created");
 }
 
 void Model::Update(const float* v1,

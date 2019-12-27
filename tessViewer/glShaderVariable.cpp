@@ -32,10 +32,7 @@ void GlShaderUniform::Set(GLuint program, const char* name) {
 	_variable_name = name;
 }
 
-GlShaderUniformBlock::GlShaderUniformBlock(
-	GLuint program, /*int buf_size,*/ const char* name) /*:
-		_buf_size(buf_size)*/
-{
+GlShaderUniformBlock::GlShaderUniformBlock(GLuint program, const char* name) {
 	this->Set(program, name);
 }
 GlShaderUniformBlock::~GlShaderUniformBlock() = default;
@@ -47,10 +44,9 @@ void GlShaderUniformBlock::Set(GLuint program, const char* name) {
 	_variable_name = name;
 }
 
-GlShaderUniformBuffer::GlShaderUniformBuffer(
-	/*GLuint program,*/ int buf_size /*, const char* name*/)
+GlShaderUniformBuffer::GlShaderUniformBuffer(int buf_size)
 	: _binding(_bindindex++), _buffer(0), _buf_size(buf_size) {
-	this->Set(/*program, name*/);
+	this->Set();
 }
 GlShaderUniformBuffer::~GlShaderUniformBuffer() {
 	if (_buffer != 0u) {

@@ -109,6 +109,7 @@ void ShaderProgram::_Create() {
 	}
 	_SetIndexAttrib();
 	_SetIndexUniform();
+	tv::Logger::Log<tv::LogLevel::Debug>(tv::InfoType::Graphics, "Shader Program Created");
 }
 
 GLuint ShaderProgram::_ShaderCompile(const Shader* shader) {

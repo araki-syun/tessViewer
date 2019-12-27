@@ -49,9 +49,10 @@ ShaderManager::_add(const GlslProgram::GlslInfo& glsl) {
 		std::piecewise_construct, std::forward_as_tuple(glsl.Str()),
 		std::forward_as_tuple(new GlslProgram(glsl)));
 	if (it.second) {
+		Logger::Log<LogLevel::Trace>(InfoType::Graphics, "ShaderManager Add");
 		return it.first;
 	}
-	{ throw GraphicsError(LogLevel::Error, "Shader Insert ERROR"); }
+	throw GraphicsError(LogLevel::Error, "Shader Insert ERROR");
 }
 
 ShaderManager::shader_iterator
@@ -60,9 +61,10 @@ ShaderManager::_add(const GlslProgram::GlslInfo& glsl, const OsdInfo& osd) {
 		std::piecewise_construct, std::forward_as_tuple(glsl.Str() + osd.Str()),
 		std::forward_as_tuple(new GlslProgram(glsl, osd)));
 	if (it.second) {
+		Logger::Log<LogLevel::Trace>(InfoType::Graphics, "ShaderManager Add");
 		return it.first;
 	}
-	{ throw GraphicsError(LogLevel::Error, "Shader Insert ERROR"); }
+	throw GraphicsError(LogLevel::Error, "Shader Insert ERROR");
 }
 
 const GlslProgram& ShaderManager::Get(const GlslProgram::GlslInfo& glsl) {

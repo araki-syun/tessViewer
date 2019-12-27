@@ -29,7 +29,7 @@ Config::Config(const std::filesystem::path& config_file) {
 	_jconfig = std::move(j);
 	Logger::Log<LogLevel::Notice>(
 		InfoType::Application,
-		fmt::format("Load : {}", config_file.generic_string()));
+		fmt::format("Config Load : {}", config_file.generic_string()));
 }
 Config::Config(const json& j) : _jconfig(new json(j)) {}
 Config::Config(const Config& config) = default;
@@ -38,7 +38,7 @@ Config::Config(const Config& config, std::string_view str)
 	, _base(config._base / Config::_jptr_from_str(str)) {
 	Logger::Log<LogLevel::Trace>(
 		InfoType::Application,
-		fmt::format("Create Relative Config : {}", _base.to_string()));
+		fmt::format("Config Create Relative : {}", _base.to_string()));
 }
 Config::Config(Config&& config) noexcept : _base(config._base) {
 	if (this != &config) {
@@ -77,11 +77,14 @@ const json& Config::_key_value(const json&         schema,
 							   const json_pointer& key) const {
 	auto path = _base / key;
 	if (Config::_argument().contains(path)) {
+		Logger::Log<LogLevel::Trace>( InfoType::Application, "Config Value From Program Options");
 		return Config::_argument()[path];
 	}
 	if (_jconfig->contains(path)) {
+		Logger::Log<LogLevel::Trace>( InfoType::Application, "Config Value From setting.json");
 		return _jconfig->operator[](path);
 	}
+	Logger::Log<LogLevel::Trace>( InfoType::Application, "Config Value From Schema Default");
 	return schema.at("default");
 }
 

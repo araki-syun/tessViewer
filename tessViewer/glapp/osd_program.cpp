@@ -8,6 +8,7 @@
 #include "../define.h"
 #include "../log.h"
 
+using namespace tv;
 namespace glapp {
 OSDProgram::OSDProgram()
 	: _type(OpenSubdiv::Far::PatchDescriptor::Type::REGULAR) {}
@@ -79,6 +80,8 @@ GLuint OSDProgram::_ShaderCompile(const Shader* shader) {
 		throw tv::GraphicsError(tv::LogLevel::Error,
 								fmt::format("Shader Compile ERROR\n{}", err));
 	}
+	Logger::Log<LogLevel::Debug>(
+		InfoType::Graphics, "OSD Shader Compiled : " + shader->GetTypeString());
 	return 0;
 }
 
@@ -106,6 +109,8 @@ std::string OSDProgram::_IncludeReplace(const Shader* shader) {
 		src, tesseval_include,
 		GLSLPatchShaderSource::GetTessEvalShaderSource(_type));
 
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics,
+								 "OSD Shader Include Replace");
 	return src;
 }
 

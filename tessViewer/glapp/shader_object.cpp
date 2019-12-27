@@ -58,7 +58,17 @@ Shader::~Shader() { glDeleteShader(_id); }
 GLuint      Shader::GetShader() const { return _id; }
 std::string Shader::GetSource() const { return _src; }
 GLuint      Shader::GetType() const { return _type; }
-bool        Shader::Empty() const { return _id == 0; }
+std::string Shader::GetTypeString() const {
+	switch (_type) {
+	case GL_VERTEX_SHADER: return "Vertex Shader";
+	case GL_FRAGMENT_SHADER: return "Fragment Shader";
+	case GL_GEOMETRY_SHADER: return "Geometry Shader";
+	case GL_TESS_CONTROL_SHADER: return "Tess Control Shader";
+	case GL_TESS_EVALUATION_SHADER: return "Tess Evaluation Shader";
+	default: return "Unknown Shader";
+	}
+}
+bool Shader::Empty() const { return _id == 0; }
 
 //	void Shader::Compile(void)
 //	{

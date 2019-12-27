@@ -177,7 +177,9 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 	   << (osd.elem.bits.fractional ? "#define OSD_FRACTIONAL_EVEN_SPACING\n"
 									: "")
 	   << (osd.elem.bits.patch_cull ? "#define OSD_ENABLE_PATCH_CULL\n" : "")
-	   << (osd.elem.bits.patch_type == Far::PatchDescriptor::Type::GREGORY_BASIS
+	   << (osd.elem.bits.patch_type ==
+				   static_cast<unsigned int>(
+					   Far::PatchDescriptor::Type::GREGORY_BASIS)
 			   ? ""
 			   : (osd.elem.bits.single_crease_patch
 					  ? "#define OSD_PATCH_ENABLE_SINGLE_CREASE\n"
@@ -295,6 +297,7 @@ void GlslProgram::SetProgram(const GlslProgram::GlslInfo& glsl,
 		std::string err = "GLSL Program Link ERROR\n";
 		throw GraphicsError(LogLevel::Error, err.append(log.data()));
 	}
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "OSD Shader Program Created");
 	_set_location();
 }
 

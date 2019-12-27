@@ -24,6 +24,7 @@ public:
 	GLuint      GetShader() const;
 	std::string GetSource() const;
 	GLuint      GetType() const;
+	std::string GetTypeString() const;
 	bool        Empty() const;
 
 	//static std::unordered_map<std::string, glslshader> shader_list;

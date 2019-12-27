@@ -1,5 +1,7 @@
 #include "material.h"
 
+#include "log.h"
+
 namespace tv {
 Material::Material(const nlohmann::json& j) : _texture(0) {
 	for (auto& mat : j) {
@@ -15,15 +17,20 @@ Material::Material(const nlohmann::json& j) : _texture(0) {
 	glCreateTextures(GL_TEXTURE_BUFFER, 1, &_texture);
 	glTextureBuffer(_texture, GL_R32F, buffer);
 	glDeleteBuffers(1, &buffer);
+
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Material Created");
 }
 Material::Material(Material&& mat) noexcept
 	: _names(std::move(mat._names))
 	, _material_data(std::move(mat._material_data))
-	, _texture(std::move(mat._texture)) {}
+	, _texture(mat._texture) {
+	Logger::Log<LogLevel::Debug>(InfoType::Graphics, "Material Moved");
+}
 Material::~Material() {
 	if (_texture != 0U) {
 		glDeleteTextures(1, &_texture);
 	}
+	Logger::Log<LogLevel::Trace>(InfoType::Graphics, "Material Destructed");
 }
 Material& Material::operator=(Material&& mat) noexcept {
 	if (this != &mat) {
@@ -32,7 +39,7 @@ Material& Material::operator=(Material&& mat) noexcept {
 		if (_texture != 0U) {
 			glDeleteTextures(1, &_texture);
 		}
-		_texture = std::move(mat._texture);
+		_texture = mat._texture;
 	}
 
 	return *this;

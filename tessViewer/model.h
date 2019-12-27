@@ -21,7 +21,7 @@
 namespace tv {
 class Model : public boost::noncopyable {
 public:
-	Model();
+	Model() = delete;
 	Model(const tv::Model& m);
 	Model(const nlohmann::json& obj, std::shared_ptr<tv::Material> mat);
 	~Model();
