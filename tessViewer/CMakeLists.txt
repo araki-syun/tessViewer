@@ -32,6 +32,8 @@ set(OpenSubdiv_GPU_LIB "${OpenSubdiv_LIBRARY_DIRS}/osdGPU.lib")
 
 add_executable(${PROJECT_NAME})
 
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/version.h.in ${CMAKE_CURRENT_SOURCE_DIR}/version.h)
+
 # setting_schema.json.gen.h 生成
 add_custom_command(
 	OUTPUT doc/schemas/setting_schema.json.gen.h
@@ -88,6 +90,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE
 )
 target_precompile_headers(${PROJECT_NAME} PRIVATE "pch.h")
 target_sources(${PROJECT_NAME} PRIVATE
+	version.h
+	doc/schemas/setting_schema.json.gen.h
 	main.cpp
 	app.cpp
 	camera.cpp
@@ -96,7 +100,6 @@ target_sources(${PROJECT_NAME} PRIVATE
 	glShaderVariable.cpp
 	glslProgram.cpp
 	glslStringDraw.cpp
-	doc/schemas/setting_schema.json.gen.h
 	log.cpp
 	main.cpp
 	material.cpp
