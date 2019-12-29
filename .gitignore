@@ -396,3 +396,4 @@ compile_commands.json
 .vscode/*
 tessViewer/doc/schemas/setting_schema.json.gen.h
 .clangd/*
+CMakeSettings.json
