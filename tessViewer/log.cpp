@@ -59,7 +59,7 @@ void Logger::_log(LogLevel lv, InfoType type, std::string_view str) {
 	auto    now = std::time(nullptr);
 	std::tm tm{};
 	localtime_s(&tm, &now);
-	_output << fmt::format("[{0:13s}] [{2:7s}] {1:%F %T} {3:s}", ToString(type), tm,
+	_output << fmt::format("[ {0:^13s} ] [ {2:^7s} ] {1:%F %T} {3:s}", ToString(type), tm,
 						   ToString(lv), std::string(str))
 			<< std::endl;
 }
